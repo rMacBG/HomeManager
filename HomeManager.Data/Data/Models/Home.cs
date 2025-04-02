@@ -1,6 +1,7 @@
 ﻿using HomeManager.Data.Data.Models.Enums;
 using HomeManager.Data.Data.Models.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace HomeManager.Data.Data.Models
 {
@@ -28,6 +29,10 @@ namespace HomeManager.Data.Data.Models
         public DealType HomeDealType { get; set; } 
         [Required]
         [Range(0.01, 100000000, ConvertValueInInvariantCulture = true)]
-        public decimal HomePrice { get; set; } 
+        public decimal HomePrice { get; set; }
+        [Required]
+        [ForeignKey(nameof(Landlord))]
+        public int LandlordId { get; set; }
+        public Landlord Landlord { get; set; }
     }
 }

@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace HomeManager.Data.Data.Models.Interfaces
 {
-    public interface IHome
+    public interface IHome : IGuidId
     {
-        public Guid Id { get; }
+        
         public string HomeName { get; set; }
         public DateTime AddedAt { get; set; }
         public DateTime LastModifiedAt { get; set; }
@@ -18,5 +18,7 @@ namespace HomeManager.Data.Data.Models.Interfaces
         public string HomeDescription { get; set; }
         public DealType HomeDealType { get; set; }
         public decimal HomePrice { get; set; }
+        public int LandlordId { get; set; }
+        public Landlord Landlord { get; set; }
     }
 }
