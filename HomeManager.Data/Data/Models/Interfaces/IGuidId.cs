@@ -8,6 +8,6 @@ namespace HomeManager.Data.Data.Models.Interfaces
 {
     public interface IGuidId
     {
-        Guid Id { get; }
+        Guid Id { get; set; }
     }
 }

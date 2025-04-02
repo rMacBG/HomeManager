@@ -18,7 +18,7 @@ namespace HomeManager.Data.Data.Models.Interfaces
         public string HomeDescription { get; set; }
         public DealType HomeDealType { get; set; }
         public decimal HomePrice { get; set; }
-        public int LandlordId { get; set; }
+        public Guid LandlordId { get; set; }
         public Landlord Landlord { get; set; }
     }
 }

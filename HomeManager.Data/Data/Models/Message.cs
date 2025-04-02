@@ -24,11 +24,9 @@ namespace HomeManager.Data.Data.Models
         [Range(0, 4)]
         public MessageStatus Status { get; set; }
         [Required]
-        [ForeignKey(nameof(Conversation))]
         public int ConversationId { get; set; }
         public Conversation Conversation { get; set; }
         [Required]
-        [ForeignKey(nameof(Sender))]
         public int SenderId { get; set; }
         public User Sender { get; set; }
 

@@ -11,10 +11,11 @@ namespace HomeManager.Data.Data.Models
 {
     public class User : IUser
     {
-        public User(Guid id, string username, string fullName, string phoneNumber, Role role)
+        public User(Guid id, string username, string passwordHash,string fullName, string phoneNumber, Role role)
         {
             this.Id = id;
             this.Username = username;
+            this.PasswordHash = passwordHash;
             this.FullName = fullName;
             this.PhoneNumber = phoneNumber;
             this.Role = role;
@@ -27,6 +28,9 @@ namespace HomeManager.Data.Data.Models
         [Required]
         [MaxLength(75)]
         public string FullName { get; set; } = null!;
+        [Required]
+        [MaxLength(20)]
+        public string PasswordHash { get; set; }
         [Required]
         [MaxLength(13)]
         public string PhoneNumber { get; set; } = null!;

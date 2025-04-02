@@ -6,14 +6,14 @@ namespace HomeManager.Data.Data.Models
 {
     public class UserConversation : IUserConversation
     {
+      
         [Required]
-        [ForeignKey(nameof(User))]
-        public int UserId { get; set; }
+        public Guid UserId { get; set; }
         public User User { get; set; }
         [Required]
-        [ForeignKey(nameof(Conversation))]
-        public int ConversationId { get; set; }
+        public Guid ConversationId { get; set; }
         
         public Conversation Conversation { get; set; }
+        
     }
 }

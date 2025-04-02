@@ -8,7 +8,7 @@ namespace HomeManager.Data.Data.Models
     public class Home : IHome
     {
         [Key]
-        public Guid Id { get; }
+        public Guid Id { get; set; }
 
         [Required]
         [MaxLength(100)]
@@ -32,7 +32,7 @@ namespace HomeManager.Data.Data.Models
         public decimal HomePrice { get; set; }
         [Required]
         [ForeignKey(nameof(Landlord))]
-        public int LandlordId { get; set; }
+        public Guid LandlordId { get; set; }
         public Landlord Landlord { get; set; }
     }
 }

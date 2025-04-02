@@ -1,5 +1,6 @@
 ﻿using HomeManager.Data.Data.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace HomeManager.Data.Data.Context
 {
-    public class HomeManagerDbContext : IdentityDbContext
+    public class HomeManagerDbContext : DbContext
     {
         public HomeManagerDbContext()
         {
@@ -24,16 +25,20 @@ namespace HomeManager.Data.Data.Context
 
         }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-
-        }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Conversation> Conversations { get; set; }
+        public DbSet<Home> Homes { get; set; }
+        public DbSet<Landlord> Landlords { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<UserConversation> UsersConversations{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            
             modelBuilder
                 .Entity<UserConversation>(e =>
                 e.HasKey(uc => new { uc.UserId, uc.ConversationId }));
+            
 
         }
     }
