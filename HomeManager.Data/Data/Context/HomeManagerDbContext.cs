@@ -1,0 +1,31 @@
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HomeManager.Data.Data.Context
+{
+    public class HomeManagerDbContext : IdentityDbContext
+    {
+        public HomeManagerDbContext()
+        {
+            
+        }
+
+        public HomeManagerDbContext(DbContextOptions options)
+            : base(options) 
+        {
+            
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            
+        }
+
+    }
+}
