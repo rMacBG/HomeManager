@@ -11,15 +11,7 @@ namespace HomeManager.Data.Data.Models
 {
     public class User : IUser
     {
-        public User(Guid id, string username, string passwordHash,string fullName, string phoneNumber, Role role)
-        {
-            this.Id = id;
-            this.Username = username;
-            this.PasswordHash = passwordHash;
-            this.FullName = fullName;
-            this.PhoneNumber = phoneNumber;
-            this.Role = role;
-        }
+        
         [Key]
         public Guid Id { get ; set; }
         [Required]
