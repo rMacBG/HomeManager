@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace HomeManager.Data.Data.Models.Interfaces
 {
-    public interface IUser
+    public interface IGuidId
     {
-        public Guid Id { get; }
-        public string Username { get; set; }
-        public string FullName { get; set; }
+        Guid Id { get; }
     }
 }

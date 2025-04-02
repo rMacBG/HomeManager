@@ -14,7 +14,7 @@ namespace HomeManager.Data.Data.Models
            
         }
 
-        public ICollection<Home> Homes { get; set; }
+        public ICollection<Home> Homes { get; set; } = new List<Home>();
 
     }
 }
