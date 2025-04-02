@@ -12,7 +12,7 @@ namespace HomeManager.Data.Data.Models
         public User User { get; set; }
         [Required]
         [ForeignKey(nameof(Conversation))]
-        public int ConversaionId { get; set; }
+        public int ConversationId { get; set; }
         
         public Conversation Conversation { get; set; }
     }

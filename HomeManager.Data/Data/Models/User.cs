@@ -1,4 +1,5 @@
-﻿using HomeManager.Data.Data.Models.Interfaces;
+﻿using HomeManager.Data.Data.Models.Enums;
+using HomeManager.Data.Data.Models.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,12 +11,13 @@ namespace HomeManager.Data.Data.Models
 {
     public class User : IUser
     {
-        public User(Guid id, string username, string fullName, string phoneNumber)
+        public User(Guid id, string username, string fullName, string phoneNumber, Role role)
         {
             this.Id = id;
             this.Username = username;
             this.FullName = fullName;
             this.PhoneNumber = phoneNumber;
+            this.Role = role;
         }
         [Key]
         public Guid Id { get ; set; }
@@ -28,5 +30,6 @@ namespace HomeManager.Data.Data.Models
         [Required]
         [MaxLength(13)]
         public string PhoneNumber { get; set; } = null!;
+        public Role Role { get; set; }
     }
 }

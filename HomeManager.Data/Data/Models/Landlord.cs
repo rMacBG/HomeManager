@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HomeManager.Data.Data.Models.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -9,8 +10,8 @@ namespace HomeManager.Data.Data.Models
 {
     public class Landlord : User
     {
-        public Landlord(Guid id, string username, string fullName, string phoneNumber)
-            : base(id, username, fullName, phoneNumber)
+        public Landlord(Guid id, string username, string fullName, string phoneNumber, Role role)
+            : base(id, username, fullName, phoneNumber, role)
         {
            
         }

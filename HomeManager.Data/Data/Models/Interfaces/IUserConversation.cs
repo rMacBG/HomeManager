@@ -10,7 +10,7 @@ namespace HomeManager.Data.Data.Models.Interfaces
     {
         public int UserId { get; set; }
         public User User { get; set; }
-        public int ConversaionId { get; set; }
+        public int ConversationId { get; set; }
         public Conversation Conversation { get; set; }
     }
 }
