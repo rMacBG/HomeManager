@@ -9,6 +9,11 @@ namespace HomeManager.Services.Services.Interfaces
 {
     public interface IHomeService
     {
-        
+        Task<ICollection<HomeDto>> GetAllAsync();
+        Task<HomeDto> GetByIdAsync(Guid id);
+
+        Task<Guid> CreateAsync(CreateHomeDto dto);
+        Task UpdateAsync(Guid id, CreateHomeDto dto);
+        Task DeleteAsync(Guid id);
     }
 }
