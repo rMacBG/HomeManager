@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\HomeManager.Data\HomeManager.Data.csproj" />
+    <ProjectReference Include="..\HomeManager.Services\HomeManager.Services.csproj" />
   </ItemGroup>
 
 </Project>
