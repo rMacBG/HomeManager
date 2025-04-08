@@ -11,8 +11,6 @@ builder.Services.AddDbContext<HomeManagerDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<HomeManagerDbContext>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
