@@ -1,5 +1,9 @@
 using HomeManager.Data;
 using HomeManager.Data.Data.Context;
+using HomeManager.Services.Repositories;
+using HomeManager.Services.Repositories.Interfaces;
+using HomeManager.Services.Services;
+using HomeManager.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,7 +14,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<HomeManagerDbContext>(options =>
     options.UseSqlServer(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
-
+builder.Services.AddScoped<IHomeService, HomeService>();
+builder.Services.AddScoped<IHomeRepository, HomeRepository>();
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
