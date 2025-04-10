@@ -1,11 +1,13 @@
 ﻿using HomeManager.Data.Data.Dtos;
 using HomeManager.Services.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Composition.Convention;
 
 namespace HomeManager.Controllers
 {
+    [Authorize(Roles = "Landlord")]
     public class HomeManagerController : Controller
     {
         private readonly IHomeService _homeService;

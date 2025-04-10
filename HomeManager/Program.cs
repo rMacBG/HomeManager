@@ -16,6 +16,7 @@ builder.Services.AddDbContext<HomeManagerDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<IHomeRepository, HomeRepository>();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
