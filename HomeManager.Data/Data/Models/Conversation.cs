@@ -11,7 +11,7 @@ namespace HomeManager.Data.Data.Models
         [MaxLength(20)]
         public string Title { get; set; }
         [Required]
-        public DateTime StartedAt { get; set; }
+        public DateTime StartedAt { get; set; } = DateTime.UtcNow;
         public ICollection<Message> Messages { get; set; }
         public ICollection<UserConversation> UsersConversations { get; set; }
 

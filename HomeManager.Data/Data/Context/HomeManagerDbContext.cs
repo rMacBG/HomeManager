@@ -38,8 +38,16 @@ namespace HomeManager.Data.Data.Context
             modelBuilder
                 .Entity<UserConversation>(e =>
                 e.HasKey(uc => new { uc.UserId, uc.ConversationId }));
-            
 
+            modelBuilder.Entity<UserConversation>()
+    .HasOne(uc => uc.User)
+    .WithMany(u => u.UsersConversations)
+    .HasForeignKey(uc => uc.UserId);
+
+            modelBuilder.Entity<UserConversation>()
+                .HasOne(uc => uc.Conversation)
+                .WithMany(c => c.UsersConversations)
+                .HasForeignKey(uc => uc.ConversationId);
         }
     }
 }

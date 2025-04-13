@@ -27,5 +27,7 @@ namespace HomeManager.Data.Data.Models
         [MaxLength(13)]
         public string PhoneNumber { get; set; } = null!;
         public Role Role { get; set; }
+
+        public ICollection<UserConversation> UsersConversations { get; set; }
     }
 }
