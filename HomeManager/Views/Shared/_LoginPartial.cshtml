@@ -1,7 +1,14 @@
-﻿
+﻿@using HomeManager.Services.Services.Interfaces
+@inject IUserService UserService
+
 <ul class="navbar-nav">
 
-
+    @{
+        var user = await UserService.GetCurrentUserAsync();
+        var isLoggedIn = UserService.IsAuthenticated();
+    }
+    @if (isLoggedIn)
+{
     <li class="nav-item">
         <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
     </li>
@@ -10,6 +17,9 @@
             <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
         </form>
     </li>
+}else
+{
+
 
     <li class="nav-item">
         <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
@@ -17,5 +27,5 @@
     <li class="nav-item">
         <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
     </li>
-
+}
 </ul>
