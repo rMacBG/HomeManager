@@ -30,7 +30,7 @@ namespace HomeManager.Services.Repositories
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 
-        public async Task<IEnumerable<Conversation>> GetByUserId(Guid userId)
+        public async Task<IEnumerable<Conversation>> GetByUserIdAsync(Guid userId)
         {
             return await _context.Conversations
                 .Where(x => x.UsersConversations.Any(uc => uc.UserId == userId))

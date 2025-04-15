@@ -13,6 +13,6 @@ namespace HomeManager.Services.Repositories.Interfaces
 
         Task<Conversation?> GetByIdAsync(Guid id);
 
-        Task<IEnumerable<Conversation>> GetByUserId(Guid userId);
+        Task<IEnumerable<Conversation>> GetByUserIdAsync(Guid userId);
     }
 }
