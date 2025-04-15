@@ -24,10 +24,10 @@ namespace HomeManager.Data.Data.Models
         [Range(0, 4)]
         public MessageStatus Status { get; set; }
         [Required]
-        public int ConversationId { get; set; }
+        public Guid ConversationId { get; set; }
         public Conversation Conversation { get; set; }
         [Required]
-        public int SenderId { get; set; }
+        public Guid SenderId { get; set; }
         public User Sender { get; set; }
 
         

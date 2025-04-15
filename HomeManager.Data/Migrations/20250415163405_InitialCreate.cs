@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace HomeManager.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -76,23 +76,21 @@ namespace HomeManager.Data.Migrations
                     Content = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     SentAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
-                    ConversationId = table.Column<int>(type: "int", nullable: false),
-                    ConversationId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SenderId = table.Column<int>(type: "int", nullable: false),
-                    SenderId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    ConversationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SenderId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Messages", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Messages_Conversations_ConversationId1",
-                        column: x => x.ConversationId1,
+                        name: "FK_Messages_Conversations_ConversationId",
+                        column: x => x.ConversationId,
                         principalTable: "Conversations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Messages_Users_SenderId1",
-                        column: x => x.SenderId1,
+                        name: "FK_Messages_Users_SenderId",
+                        column: x => x.SenderId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -128,14 +126,14 @@ namespace HomeManager.Data.Migrations
                 column: "LandlordId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_ConversationId1",
+                name: "IX_Messages_ConversationId",
                 table: "Messages",
-                column: "ConversationId1");
+                column: "ConversationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Messages_SenderId1",
+                name: "IX_Messages_SenderId",
                 table: "Messages",
-                column: "SenderId1");
+                column: "SenderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UsersConversations_ConversationId",

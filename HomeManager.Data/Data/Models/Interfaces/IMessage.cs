@@ -14,9 +14,9 @@ namespace HomeManager.Data.Data.Models.Interfaces
         public string Content { get; set; }
         public DateTime SentAt { get; set; }
         public MessageStatus Status { get; set; }
-        public int ConversationId { get; set; }
+        public Guid ConversationId { get; set; }
         public Conversation Conversation { get; set; }
-        public int SenderId { get; set; }
+        public Guid SenderId { get; set; }
         public User Sender { get; set; }
     }
 }

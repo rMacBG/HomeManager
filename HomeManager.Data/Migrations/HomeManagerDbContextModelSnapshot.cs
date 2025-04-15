@@ -99,16 +99,10 @@ namespace HomeManager.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int>("ConversationId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("ConversationId1")
+                    b.Property<Guid>("ConversationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("SenderId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("SenderId1")
+                    b.Property<Guid>("SenderId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("SentAt")
@@ -119,9 +113,9 @@ namespace HomeManager.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ConversationId1");
+                    b.HasIndex("ConversationId");
 
-                    b.HasIndex("SenderId1");
+                    b.HasIndex("SenderId");
 
                     b.ToTable("Messages");
                 });
@@ -210,13 +204,13 @@ namespace HomeManager.Data.Migrations
                 {
                     b.HasOne("HomeManager.Data.Data.Models.Conversation", "Conversation")
                         .WithMany("Messages")
-                        .HasForeignKey("ConversationId1")
+                        .HasForeignKey("ConversationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("HomeManager.Data.Data.Models.User", "Sender")
                         .WithMany()
-                        .HasForeignKey("SenderId1")
+                        .HasForeignKey("SenderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
