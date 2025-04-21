@@ -4,6 +4,7 @@ using HomeManager.Services.Repositories;
 using HomeManager.Services.Repositories.Interfaces;
 using HomeManager.Services.Services;
 using HomeManager.Services.Services.Interfaces;
+using HomeManager.Services.Services.SignalR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -39,6 +40,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 builder.Services.AddMvc();
+builder.Services.AddSignalR();
 builder.Services.AddRazorPages();
 builder.Services.AddAuthorization();
 builder.Services.AddControllersWithViews();
@@ -59,7 +61,7 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
+app.MapHub<ChatHub>("/chatHub");
 app.UseRouting();
 
 //app.UseAuthorization();
