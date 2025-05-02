@@ -1,4 +1,5 @@
 ﻿using HomeManager.Data.Data.Dtos;
+using HomeManager.Data.Data.Dtos.Results;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace HomeManager.Services.Services.Interfaces
 {
     public interface IAuthService
     {
-        Task<string> LoginAsync(string username, string password);
-        Task RegisterAsync(RegisterUserDto dto);
+        Task<AuthResult> LoginAsync(string username, string password);
+        Task<AuthResult> RegisterAsync(RegisterUserDto dto);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using HomeManager.Data.Data.Dtos;
+using HomeManager.Data.Data.Dtos.Results;
 using HomeManager.Data.Data.Models;
 using HomeManager.Services.Repositories.Interfaces;
 using HomeManager.Services.Services.Interfaces;
@@ -24,22 +25,33 @@ namespace HomeManager.Services.Services
             _userRepository = userRepository;
             _configuration = configuration;
         }
-        public async Task<string> LoginAsync(string username, string password)
+        public async Task<AuthResult> LoginAsync(string username, string password)
         {
             var user = await _userRepository.GetUsernameAsync(username);
-            if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash)) 
+            if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
             {
-                throw new UnauthorizedAccessException("Invalid Credentials");
+                return new AuthResult
+                {
+                    Success = false,
+                    Errors = new List<string> { "Username or password are incorrect!" }
+                };
             }
-            return GenerateJwtToken(user);
+            return new AuthResult {
+                Success = true,
+                Token = GenerateJwtToken(user)
+            };
         }
 
-        public async Task RegisterAsync(RegisterUserDto dto)
+        public async Task<AuthResult> RegisterAsync(RegisterUserDto dto)
         {
             var exists = await _userRepository.ExistsByUsernameAsync(dto.Username);
             if(exists)
             {
-                throw new InvalidOperationException("Username already exists!");
+                return new AuthResult
+                {
+                    Success = false,
+                    Errors = new List<string> { "Username already exists!" }
+                };
             }
 
             var user = new User
@@ -53,6 +65,12 @@ namespace HomeManager.Services.Services
             };
 
             await _userRepository.AddAsync(user);
+
+            return new AuthResult
+            {
+                Success = true,
+                Token = GenerateJwtToken(user)
+            };
         }
 
         private string GenerateJwtToken(User user)
