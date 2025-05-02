@@ -21,10 +21,10 @@ namespace HomeManager.Data.Data.Models
         [MaxLength(75)]
         public string FullName { get; set; } = null!;
         [Required]
-        [MaxLength(20)]
+        [MaxLength(200)]
         public string PasswordHash { get; set; }
         [Required]
-        [MaxLength(13)]
+        [MaxLength(25)]
         public string PhoneNumber { get; set; } = null!;
         public Role Role { get; set; }
 

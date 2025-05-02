@@ -9,6 +9,8 @@ namespace HomeManager.Data.Data.Models.Enums
     public enum Role
     {
         Admin = 1,
+        Moderator,
+        Landlord,
         Seller,
         User,
     }

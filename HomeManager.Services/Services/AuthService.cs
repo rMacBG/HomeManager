@@ -1,6 +1,7 @@
 ﻿using HomeManager.Data.Data.Dtos;
 using HomeManager.Data.Data.Dtos.Results;
 using HomeManager.Data.Data.Models;
+using HomeManager.Data.Data.Models.Enums;
 using HomeManager.Services.Repositories.Interfaces;
 using HomeManager.Services.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
@@ -61,7 +62,7 @@ namespace HomeManager.Services.Services
                 FullName = dto.FullName,
                 PhoneNumber = dto.PhoneNumber,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
-                Role = dto.Role,
+                Role = dto.Role = Role.User
             };
 
             await _userRepository.AddAsync(user);
