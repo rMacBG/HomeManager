@@ -39,6 +39,9 @@ namespace HomeManager.Services.Services
             }
             return new AuthResult {
                 Success = true,
+                UserId = user.Id,
+                Username = user.Username,
+                Role = user.Role.ToString(),
                 Token = GenerateJwtToken(user)
             };
         }

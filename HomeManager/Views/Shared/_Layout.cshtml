@@ -1,4 +1,15 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Http
+@using System.Security.Claims
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var isAuthenticated = User.Identity.IsAuthenticated;
+    var username = User.Identity.Name;
+    var role = User.FindFirst(ClaimTypes.Role)?.Value;
+}
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -26,12 +37,26 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
                     </ul>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-controller="Auth" asp-action="Register">Register</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Login</a>
-                    </li>
+                    <ul class="navbar-nav">
+                    @if (isAuthenticated)
+                    {
+                        <li class="nav-item">
+                            <span class="nav-link text-dark">Hello, @username (@role)</span>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Auth" asp-action="Logout">Logout</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Auth" asp-action="Login">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-controller="Auth" asp-action="Register">Register</a>
+                        </li>
+                    }
+                    </ul>
                 </div>
             </div>
         </nav>

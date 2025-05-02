@@ -1,7 +1,11 @@
 ﻿using HomeManager.Data.Data.Dtos;
+using HomeManager.Data.Data.Models;
 using HomeManager.Services.Services.Interfaces;
 using Humanizer;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace HomeManager.Controllers
 {
@@ -16,17 +20,17 @@ namespace HomeManager.Controllers
         }
 
         [HttpGet("register")]
-        public IActionResult Register () => View();
+        public IActionResult Register() => View();
 
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterUserDto dto)
         {
-            if(!ModelState.IsValid) 
+            if (!ModelState.IsValid)
                 return View(dto);
 
             var result = await _authService.RegisterAsync(dto);
 
-            if(!result.Success)
+            if (!result.Success)
             {
                 foreach (var error in result.Errors!)
                 {
@@ -51,27 +55,36 @@ namespace HomeManager.Controllers
             {
                 foreach (var error in result.Errors!)
                 {
-                    ModelState.AddModelError(string.Empty, "Invalid attempt.");
+                    ModelState.AddModelError(string.Empty, "Incorrect username or password.");
                     return View();
                 }
             }
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.NameIdentifier, result.UserId.ToString()!),
+        new Claim(ClaimTypes.Name, result.Username!),
+        new Claim(ClaimTypes.Role, result.Role!)
+    };
 
+            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var principal = new ClaimsPrincipal(identity);
+
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
             Response.Cookies.Append("jwt", result.Token!, new CookieOptions
             {
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
                 Expires = DateTimeOffset.UtcNow.AddDays(2)
-
             });
 
             return RedirectToAction("Index", "Home");
         }
 
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            Response.Cookies.Delete("jwt");
-            return RedirectToAction("Login");
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction("Index", "Home");
         }
     }
 }
