@@ -19,6 +19,12 @@ namespace HomeManager.Services.Repositories
             _context = context;
         }
 
+        public async Task<ICollection<User>> GetAllAsync()
+        {
+            return await _context.Users.ToListAsync();
+        }
+
+
         public async Task<User?> GetUsernameAsync(string username)
         {
             return await _context

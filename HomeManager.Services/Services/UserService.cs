@@ -1,7 +1,9 @@
-﻿using HomeManager.Data.Data.Models;
+﻿using HomeManager.Data.Data.Dtos;
+using HomeManager.Data.Data.Models;
 using HomeManager.Services.Repositories.Interfaces;
 using HomeManager.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,6 +49,20 @@ namespace HomeManager.Services.Services
         public bool IsAuthenticated()
         {
             return _httpContextAccessor.HttpContext?.User.Identity?.IsAuthenticated ?? false;
+        }
+
+        public async Task<ICollection<UserDto>> GetAllAsync()
+        {
+            var users = await _userRepository.GetAllAsync();
+
+            return users.Select(u => new UserDto
+            {
+                Id = u.Id,
+                Username = u.Username,
+                FullName = u.FullName,
+                PhoneNumber = u.PhoneNumber,
+                Role = u.Role.ToString()
+            }).ToList();
         }
     }
 }

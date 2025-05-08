@@ -1,6 +1,8 @@
 ﻿using HomeManager.Data.Data.Dtos;
 using HomeManager.Services.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace HomeManager.Controllers
 {
@@ -27,6 +29,23 @@ namespace HomeManager.Controllers
             if (home == null) 
                 return NotFound();
             return View(home);
+        }
+
+        [Authorize(Roles = "Landlord,Admin")]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Landlord,Admin")]
+        public async Task<IActionResult> Create(CreateHomeDto dto)
+        {
+            if (!ModelState.IsValid) return View(dto);
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            await _homeService.CreateAsync(dto);
+            return RedirectToAction("Index");
         }
     }
 }

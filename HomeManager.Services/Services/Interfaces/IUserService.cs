@@ -1,4 +1,5 @@
-﻿using HomeManager.Data.Data.Models;
+﻿using HomeManager.Data.Data.Dtos;
+using HomeManager.Data.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace HomeManager.Services.Services.Interfaces
 {
     public interface IUserService
     {
+        Task<ICollection<UserDto>> GetAllAsync();
         Task<User?> GetCurrentUserAsync();
         Guid? GetCurrentIdAsync();
         bool IsAuthenticated();
