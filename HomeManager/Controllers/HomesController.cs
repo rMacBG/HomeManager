@@ -14,7 +14,7 @@ namespace HomeManager.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var homes = _homeService.GetAllAsync();
+            var homes = await _homeService.GetAllAsync();
             if (homes == null)
                 return View(new List<HomeDto>());
             return View(homes);
