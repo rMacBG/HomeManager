@@ -1,8 +1,25 @@
-﻿@{
+﻿
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@model ICollection<HomeManager.Data.Data.Dtos.HomeDto>
+
+<h2>Available Homes</h2>
+@if (Model != null && Model.Any())
+{
+    foreach (var home in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>@home.HomeName</h5>
+                <p>@home.HomeDescription</p>
+                <a href="@Url.Action("Details", "Home", new { id = home.Id })">View Details</a>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <p>No homes available.</p>
+}

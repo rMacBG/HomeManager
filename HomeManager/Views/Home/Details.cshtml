@@ -1,0 +1,47 @@
+﻿@model HomeManager.Data.Data.Dtos.HomeDto
+
+<h2>@Model.HomeName</h2>
+<p>@Model.HomeDescription</p>
+<p>Location: @Model.HomeLocation</p>
+
+<!-- Embed Google Maps -->
+<iframe
+    width="600"
+    height="450"
+    style="border:0"
+    loading="lazy"
+    allowfullscreen
+    referrerpolicy="no-referrer-when-downgrade"
+    src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=@Model.HomeLocation">
+</iframe>
+
+<!-- Chat section here -->
+<div id="chatSection">
+    <ul id="messagesList"></ul>
+    <input type="text" id="messageInput" />
+    <button onclick="sendMessage()">Send</button>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/chat", {
+                accessTokenFactory: () => localStorage.getItem("jwt") // adapt if needed
+            })
+            .build();
+
+        connection.on("ReceiveMessage", (user, message) => {
+            const li = document.createElement("li");
+            li.textContent = `${user}: ${message}`;
+            document.getElementById("messagesList").appendChild(li);
+        });
+
+        connection.start().catch(err => console.error(err.toString()));
+
+        function sendMessage() {
+            const msg = document.getElementById("messageInput").value;
+            connection.invoke("SendMessage", "You", msg, "@Model.Id");
+        }
+    </script>
+}
