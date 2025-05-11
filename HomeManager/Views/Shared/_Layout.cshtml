@@ -35,15 +35,35 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+
                         </li>
+                        @if (isAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Homes" asp-action="Index">Homes</a>
+                            </li>
+                        }
                     </ul>
                     <ul class="navbar-nav">
                     @if (isAuthenticated)
                     {
+                            
                         <li class="nav-item">
                             <span class="nav-link text-dark">Hello, @username (@role)</span>
                         </li>
-                        <li class="nav-item">
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">Admin Panel</a>
+                                </li>
+                            }
+                            else if (User.IsInRole("Landlord"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Landlord" asp-action="Index">My Properties</a>
+                                </li>
+                            }
+                            <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Auth" asp-action="Logout">Logout</a>
                         </li>
                     }
@@ -55,10 +75,7 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-controller="Auth" asp-action="Register">Register</a>
                         </li>
-                    }
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="Homes" asp-action="Index">Homes</a>
-                        </li>
+                    }                
                     </ul>
                 </div>
             </div>

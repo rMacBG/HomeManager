@@ -1,5 +1,6 @@
 ﻿using HomeManager.Data.Data.Dtos;
 using HomeManager.Data.Data.Models;
+using HomeManager.Data.Data.Models.Enums;
 using HomeManager.Services.Repositories.Interfaces;
 using HomeManager.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -63,6 +64,26 @@ namespace HomeManager.Services.Services
                 PhoneNumber = u.PhoneNumber,
                 Role = u.Role.ToString()
             }).ToList();
+        }
+
+        public async Task UpdateUserRoleAsync(Guid userId, Role newRole)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+
+            if (user == null) throw new InvalidOperationException("User not Found!");
+
+            user.Role = newRole;
+            await _userRepository.UpdateAsync(user);
+        }
+
+        public async Task DeleteUserAsync(Guid id)
+        {
+            await _userRepository.DeleteAsync(id);
+
+            var user = await _userRepository.GetByIdAsync(id);
+            if (user == null || user.Role == Role.Admin)
+                throw new InvalidOperationException("Cannot delete admin users.");
+
         }
     }
 }

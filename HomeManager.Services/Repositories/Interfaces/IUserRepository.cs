@@ -15,5 +15,8 @@ namespace HomeManager.Services.Repositories.Interfaces
         Task<bool> ExistsByUsernameAsync(string username);
         Task AddAsync(User user);
 
+        Task UpdateAsync(User user);
+
+        Task DeleteAsync(Guid id);
     }
 }

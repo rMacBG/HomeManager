@@ -12,19 +12,27 @@ namespace HomeManager.Controllers
 
         public AdminController(IUserService userService)
         {
-                _userService = userService;
+            _userService = userService;
         }
-        public async Task<IActionResult> Uesrs()
+        public async Task<IActionResult> Index()
         {
             var users = await _userService.GetAllAsync();
             return View(users);
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> ChangeRole(Guid userId, Role newRole)
-        //{
-        //    await _userService.ChangeUserRoleAsync(userId, newRole);
-        //    return RedirectToAction("Users");
-        //}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateRole(Guid userId, Role newRole)
+        {
+            await _userService.UpdateUserRoleAsync(userId, newRole);
+            return RedirectToAction("Index");
+        }
+
+        public async Task<IActionResult> DeleteRole(Guid id)
+        {
+            await _userService.DeleteUserAsync(id);
+            return RedirectToAction("Index");
+
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using HomeManager.Data.Data.Models;
+using HomeManager.Data.Data.Models.Enums;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using Microsoft.EntityFrameworkCore;
@@ -34,7 +35,19 @@ namespace HomeManager.Data.Data.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            
+
+            var adminId = Guid.Parse("11111111-1111-1111-1111-111111111111");
+            var adminUser = new User
+            {
+                Id = adminId,
+                Username = "admin",
+                FullName = "Admin User",
+                PhoneNumber = "0000000000",
+                PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin123!"),
+                Role = Role.Admin
+            };
+            modelBuilder.Entity<User>().HasData(adminUser);
+
             modelBuilder
                 .Entity<UserConversation>(e =>
                 e.HasKey(uc => new { uc.UserId, uc.ConversationId }));

@@ -1,5 +1,6 @@
 ﻿using HomeManager.Data.Data.Dtos;
 using HomeManager.Data.Data.Models;
+using HomeManager.Data.Data.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +16,9 @@ namespace HomeManager.Services.Services.Interfaces
         Guid? GetCurrentIdAsync();
         bool IsAuthenticated();
         string? GetCurrentUsername();
+
+        Task UpdateUserRoleAsync(Guid userId, Role newRole);
+
+        Task DeleteUserAsync(Guid id);
     }
 }
