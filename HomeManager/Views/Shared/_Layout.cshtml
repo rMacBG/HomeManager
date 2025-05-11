@@ -47,18 +47,21 @@
                     <ul class="navbar-nav">
                     @if (isAuthenticated)
                     {
-                            
+                          @if(User.IsInRole("User")){  
                         <li class="nav-item">
-                            <span class="nav-link text-dark">Hello, @username (@role)</span>
+                                    <span class="nav-link text-dark">Hello, @username (<span style="color:forestgreen">@role</span>)</span>
                         </li>
-                            @if (User.IsInRole("Admin"))
+                          }
+                            else if (User.IsInRole("Admin"))
                             {
+                                <span class="nav-link text-dark">Hello, @username (<span style="color:red">@role</span>)</span>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">Admin Panel</a>
                                 </li>
                             }
                             else if (User.IsInRole("Landlord"))
                             {
+                                <span class="nav-link text-dark">Hello, @username (<span style="color:dodgerblue">@role</span>)</span>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-controller="Landlord" asp-action="Index">My Properties</a>
                                 </li>
