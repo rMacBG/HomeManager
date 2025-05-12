@@ -1,5 +1,6 @@
 ﻿using HomeManager.Data.Data.Dtos;
 using HomeManager.Data.Data.Models;
+using HomeManager.Data.Data.Models.Interfaces;
 using HomeManager.Services.Repositories.Interfaces;
 using HomeManager.Services.Services.Interfaces;
 using System;
@@ -52,6 +53,22 @@ namespace HomeManager.Services.Services
             return homeById;
         }
 
+        public async Task<IEnumerable<HomeDto>> GetByOwnerIdsync(Guid ownerId)
+        {
+            var homes = await _repository.GetByOwnerIdAsync(ownerId);
+
+            return homes.Select(home => new HomeDto
+            {
+                HomeName = home.HomeName,
+                HomeLocation = home.HomeLocation,
+                HomeType = home.HomeType,
+                HomeDescription = home.HomeDescription,
+                HomeDealType = home.HomeDealType,
+                HomePrice = home.HomePrice,
+                LandlordId = home.LandlordId,
+            }) ?? new List<HomeDto>();
+        }
+
         public async Task<Guid> CreateAsync(CreateHomeDto dto)
         {
             var home = new Home
@@ -96,5 +113,7 @@ namespace HomeManager.Services.Services
 
             await _repository.DeleteAsync(home);
         }
+
+        
     }
 }

@@ -10,6 +10,8 @@ namespace HomeManager.Services.Services.Interfaces
     public interface IHomeService
     {
         Task<ICollection<HomeDto>> GetAllAsync();
+
+        Task<IEnumerable<HomeDto>> GetByOwnerIdsync(Guid ownerId);
         Task<HomeDto> GetByIdAsync(Guid id);
 
         Task<Guid> CreateAsync(CreateHomeDto dto);

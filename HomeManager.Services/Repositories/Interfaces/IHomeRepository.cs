@@ -9,14 +9,15 @@ namespace HomeManager.Services.Repositories.Interfaces
 {
     public interface IHomeRepository
     {
-        Task<ICollection<Home>> GetAllAsync();
+        public Task<ICollection<Home>> GetAllAsync();
 
-        Task<Home> GetByIdAsync(Guid Id);
+        public Task<Home> GetByIdAsync(Guid Id);
+        public Task<ICollection<Home>> GetByOwnerIdAsync(Guid ownerId);
 
-        Task AddAsync(Home home);
-        Task UpdateAsync(Home home);
+        public Task AddAsync(Home home);
+        public Task UpdateAsync(Home home);
 
-        Task DeleteAsync(Home Home);
+        public Task DeleteAsync(Home Home);
 
     }
 }

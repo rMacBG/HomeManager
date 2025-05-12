@@ -47,6 +47,11 @@ namespace HomeManager.Services.Repositories
             _context.Homes.Remove(Home);
             await _context.SaveChangesAsync();
         }
- 
+
+        public async Task<ICollection<Home>> GetByOwnerIdAsync(Guid ownerId)
+        {
+            return await _context.Homes.Where(h => h.Id == ownerId)
+                .ToListAsync();
+        }
     }
 }
