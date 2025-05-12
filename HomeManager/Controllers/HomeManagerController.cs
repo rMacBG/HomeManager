@@ -4,23 +4,34 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Composition.Convention;
+using System.Security.Claims;
 
 namespace HomeManager.Controllers
 {
-    [Authorize(Roles = "Landlord")]
+    [Authorize(Roles = "Landlord,Seller")]
     public class HomeManagerController : Controller
     {
         private readonly IHomeService _homeService;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public HomeManagerController(IHomeService homeService)
+        public HomeManagerController(IHomeService homeService, IHttpContextAccessor httpContextAccessor)
         {
             _homeService = homeService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<IActionResult> Index()
         {
              var homes = await _homeService.GetAllAsync();
             return View(homes);
+        }
+
+        public async Task<IActionResult> MyProperties()
+        {
+            var userId = Guid.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var myHomes = await _homeService.GetByIdAsync(userId);
+
+            return View(myHomes);
         }
 
         public async Task<IActionResult> Details(Guid id)

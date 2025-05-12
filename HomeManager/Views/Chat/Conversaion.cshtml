@@ -1,0 +1,54 @@
+﻿@model HomeManager.Data.Data.Dtos.ConversationDto
+@{
+    ViewData["Title"] = "Chat";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Conversation</h2>
+
+<div id="chatBox" style="height:300px; overflow-y:scroll; border:1px solid #ccc; padding:10px;">
+</div>
+
+<form id="sendMessageForm">
+    <input type="hidden" id="conversationId" value="@Model.Id" />
+    <input type="hidden" id="senderId" value="@User.FindFirst("nameidentifier")?.Value" />
+    <input type="text" id="messageInput" placeholder="Type your message..." class="form-control" />
+    <button type="submit" class="btn btn-primary mt-2">Send</button>
+</form>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/chathub")
+            .build();
+
+        connection.on("ReceiveMessage", function (message) {
+            const chatBox = document.getElementById("chatBox");
+            const msgElement = document.createElement("div");
+            msgElement.textContent = `${message.SentAt} - ${message.Content}`;
+            chatBox.appendChild(msgElement);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        });
+
+        document.getElementById("sendMessageForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const messageDto = {
+                conversationId: document.getElementById("conversationId").value,
+                content: document.getElementById("messageInput").value,
+                senderId: document.getElementById("senderId").value
+            };
+
+            connection.invoke("SendMessage", messageDto).catch(function (err) {
+                return console.error(err.toString());
+            });
+
+            document.getElementById("messageInput").value = "";
+        });
+
+        connection.start().catch(function (err) {
+            return console.error(err.toString());
+        });
+    </script>
+}

@@ -1,0 +1,15 @@
+﻿@using HomeManager.Data.Data.Models.Enums
+@model HomeManager.Data.Data.Dtos.CreateHomeDto
+<form asp-action="Create" method="post">
+    <input asp-for="HomeName" class="form-control" placeholder="Title" />
+    <textarea asp-for="HomeDescription" class="form-control" placeholder="Description"></textarea>
+    <input asp-for="HomeLocation" class="form-control" placeholder="Address" />
+    <input asp-for="HomePrice" class="form-control" placeholder="Price" />
+    <div class="form-group">
+        <label asp-for="HomeDealType" class="control-label"></label>
+        <select asp-for="HomeDealType" class="form-control" asp-items="Html.GetEnumSelectList<DealType>()"></select>
+    </div>
+    </select>
+    <input asp-for="HomeLocation" class="form-control" placeholder="Google Maps Link or Coordinates" />
+    <button type="submit" class="btn btn-primary">Create Listing</button>
+</form>

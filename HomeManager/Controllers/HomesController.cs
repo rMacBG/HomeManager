@@ -9,10 +9,12 @@ namespace HomeManager.Controllers
     public class HomesController : Controller
     {
         private readonly IHomeService _homeService;
+        private readonly IUserService _userService;
 
-        public HomesController(IHomeService homeService)
+        public HomesController(IHomeService homeService, IUserService userService)
         {
             _homeService = homeService;
+            _userService = userService;
         }
         public async Task<IActionResult> Index()
         {
