@@ -21,7 +21,7 @@ namespace HomeManager.Data.Data.Models
         [MaxLength(100)]
         public string HomeLocation { get; set; } = null!;
         [Required]
-        public string HomeType { get; set; } = null!;
+        public HomeType HomeType { get; set; } 
         [Required]
         [MaxLength(1000)]
         public string HomeDescription { get; set; } = null!;

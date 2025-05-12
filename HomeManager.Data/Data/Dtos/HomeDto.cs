@@ -13,7 +13,7 @@ namespace HomeManager.Data.Data.Dtos
         public Guid Id { get; set; }
         public string HomeName { get; set; }
         public string HomeLocation { get; set; }
-        public string HomeType { get; set; }
+        public HomeType HomeType { get; set; }
         public string HomeDescription { get; set; }
         public DealType HomeDealType { get; set; }
         public decimal HomePrice { get; set; }

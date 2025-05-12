@@ -4,6 +4,9 @@
 @using System.Security.Claims
 @inject IHttpContextAccessor HttpContextAccessor
 
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
 @{
     var isAuthenticated = User.Identity.IsAuthenticated;
     var username = User.Identity.Name;
@@ -57,6 +60,12 @@
                                 <span class="nav-link text-dark">Hello, @username (<span style="color:red">@role</span>)</span>
                                 <li class="nav-item">
                                     <a class="nav-link text-dark" asp-controller="Admin" asp-action="Index">Admin Panel</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Homes" asp-action="MyProperties">My Properties</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link text-dark" asp-controller="Homes" asp-action="Index">All Properties</a>
                                 </li>
                             }
                             else if (User.IsInRole("Landlord"))

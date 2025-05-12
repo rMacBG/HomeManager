@@ -17,12 +17,11 @@ namespace HomeManager.Data.Data.Dtos
         [MinLength(3)]
         public string HomeLocation { get; set; }
         [Required]
-        [MinLength(3)]
-        public string HomeType { get; set; }
+        public HomeType HomeType { get; set; }
         [Required]
         [MinLength(3)]
         public string HomeDescription { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Please select a deal type.")]
         public DealType HomeDealType { get; set; }
         [Required]
         public decimal HomePrice { get; set; }

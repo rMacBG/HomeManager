@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace HomeManager.Data.Data.Models.Enums
 {
-    public enum DealType
+    public enum HomeType
     {
-        Rent = 0,
-        Sale,
-        
+        House,
+        Apartment,
 
     }
 }

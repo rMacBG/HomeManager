@@ -6,10 +6,21 @@
     <input asp-for="HomeLocation" class="form-control" placeholder="Address" />
     <input asp-for="HomePrice" class="form-control" placeholder="Price" />
     <div class="form-group">
-        <label asp-for="HomeDealType" class="control-label"></label>
-        <select asp-for="HomeDealType" class="form-control" asp-items="Html.GetEnumSelectList<DealType>()"></select>
+        <label asp-for="HomeType" class="control-label"></label>
+        <select asp-for="HomeType" class="form-control" asp-items="Html.GetEnumSelectList<HomeType>()">
+            <option value="">-- Select Home Type --</option>
+        </select>
+
+        <span asp-validation-for="HomeType" class="text-danger"></span>
     </div>
-    </select>
+    <div class="form-group">
+        <label asp-for="HomeDealType" class="control-label"></label>
+        <select asp-for="HomeDealType" class="form-control" asp-items="Html.GetEnumSelectList<DealType>()">
+            <option value="">-- Select Deal Type --</option>
+        </select>
+        
+        <span asp-validation-for="HomeDealType" class="text-danger"></span>
+    </div>
     <input asp-for="HomeLocation" class="form-control" placeholder="Google Maps Link or Coordinates" />
     <button type="submit" class="btn btn-primary">Create Listing</button>
 </form>

@@ -54,8 +54,11 @@ namespace HomeManager.Controllers
         [Authorize(Roles = "Landlord,Seller,Admin")]
         public async Task<IActionResult> Create(CreateHomeDto dto)
         {
-            if (!ModelState.IsValid) return View(dto);
+            if (!ModelState.IsValid)
+                return View(dto);
 
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            dto.LandlordId = userId;
             await _homeService.CreateAsync(dto);
             return RedirectToAction(nameof(Index)); 
         }
