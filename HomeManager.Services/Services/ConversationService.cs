@@ -46,5 +46,34 @@ namespace HomeManager.Services.Services
             await _conversationRepository.AddAsync(conversation);
             return conversation.Id;
         }
+
+        public async Task<Guid> GetOrCreateConversationAsync(Guid userId1, Guid userId2)
+        {
+            var allConversations = await _conversationRepository.GetByUserIdAsync(userId1);
+
+            
+            var existingConversation = allConversations
+                .FirstOrDefault(conv =>
+                    conv.UsersConversations.Any(uc => uc.UserId == userId2) &&
+                    conv.UsersConversations.Count == 2);
+
+            if (existingConversation != null)
+                return existingConversation.Id;
+
+            
+            var newConversation = new Conversation
+            {
+                Id = Guid.NewGuid(),
+                StartedAt = DateTime.UtcNow,
+                UsersConversations = new List<UserConversation>
+        {
+            new UserConversation { UserId = userId1 },
+            new UserConversation { UserId = userId2 }
+        }
+            };
+
+            await _conversationRepository.AddAsync(newConversation);
+            return newConversation.Id;
+        }
     }
 }

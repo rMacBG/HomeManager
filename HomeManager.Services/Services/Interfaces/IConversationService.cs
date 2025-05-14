@@ -12,6 +12,8 @@ namespace HomeManager.Services.Services.Interfaces
         Task<Guid> StartConversationAsync(Guid[] participantIds);
         Task<IEnumerable<ConversationDto>> GetUserConversationsForUserIdAsync(Guid UserId);
 
+        Task<Guid> GetOrCreateConversationAsync(Guid userId1, Guid userId2);
+
     }
 
 }
