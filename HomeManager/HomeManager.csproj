@@ -22,4 +22,12 @@
     <ProjectReference Include="..\HomeManager.Services\HomeManager.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\Homes\Details.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Homes\Details.cshtml" />
+  </ItemGroup>
+
 </Project>

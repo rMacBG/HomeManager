@@ -50,7 +50,7 @@ namespace HomeManager.Services.Repositories
 
         public async Task<ICollection<Home>> GetByOwnerIdAsync(Guid ownerId)
         {
-            return await _context.Homes.Where(h => h.Id == ownerId)
+            return await _context.Homes.Where(h => h.LandlordId == ownerId)
                 .ToListAsync();
         }
     }

@@ -1,0 +1,120 @@
+﻿@model HomeManager.Data.Data.Dtos.HomeDto
+
+<h2>@Model.HomeName</h2>
+<p>@Model.HomeDescription</p>
+<p>Location: @Model.HomeLocation</p>
+<style>
+    .chat-popup {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        right: 20px;
+        width: 300px;
+        background: white;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 10px rgba(0,0,0,.3);
+        z-index: 1000;
+        border-radius: 10px;
+    }
+
+    .chat-header {
+        padding: 10px;
+        background: #007bff;
+        color: white;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .chat-body {
+        height: 200px;
+        padding: 10px;
+        background: #f9f9f9;
+    }
+
+    .chat-footer {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ddd;
+        gap: 5px;
+    }
+
+        .chat-footer input {
+            flex: 1;
+            padding: 5px;
+        }
+
+        .chat-footer button {
+            padding: 5px 10px;
+        }
+
+    .close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+    }
+</style>
+<!-- Embed Google Maps -->
+<iframe
+    width="600"
+    height="450"
+    style="border:0"
+    loading="lazy"
+    allowfullscreen
+    referrerpolicy="no-referrer-when-downgrade"
+    src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=@Model.HomeLocation">
+</iframe>
+
+<!-- Chat section here -->
+<div id="chatSection">
+    <button id="openChatBtn" class="btn btn-primary mt-3">Ask the Dealer</button>
+    <div id="chatBox" class="chat-popup">
+        <div class="chat-header">
+            <span>Chat with Dealer</span>
+            <button id="closeChatBtn" class="close-btn">&times;</button>
+        </div>
+        <div class="chat-body" id="messagesList" style="overflow-y:auto;"></div>
+        <div class="chat-footer">
+            <input type="text" id="messageInput" placeholder="Type a message..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+    <script>
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/chat", {
+                accessTokenFactory: () => localStorage.getItem("jwt") // adapt if needed
+            })
+            .build();
+        document.getElementById("openChatBtn").addEventListener("click", () => {
+            document.getElementById("chatBox").style.display = "block";
+        });
+
+        document.getElementById("closeChatBtn").addEventListener("click", () => {
+            document.getElementById("chatBox").style.display = "none";
+        });
+
+        function sendMessage() {
+            const msg = document.getElementById("messageInput").value;
+            if (!msg) return;
+
+            connection.invoke("SendMessage", "You", msg, "@Model.Id").catch(err => console.error(err));
+            document.getElementById("messageInput").value = "";
+        }
+
+        // Optional: auto-scroll on new message
+        connection.on("ReceiveMessage", (user, message) => {
+            const li = document.createElement("div");
+            li.textContent = `${user}: ${message}`;
+            document.getElementById("messagesList").appendChild(li);
+            document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
+        });
+    </script>
+}

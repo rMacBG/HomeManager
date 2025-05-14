@@ -41,6 +41,10 @@ namespace HomeManager.Controllers
         public async Task<IActionResult> Details(Guid id)
         {
             var home = await _homeService.GetByIdAsync(id);
+            if (home == null)
+            {
+                return NotFound();
+            }
             return View(home);
         }
         

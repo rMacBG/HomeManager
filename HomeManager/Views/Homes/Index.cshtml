@@ -9,7 +9,8 @@
             <div class="card-body">
                 <h5>@home.HomeName</h5>
                 <p>@home.HomeDescription</p>
-                <a href="@Url.Action("Details", "Home", new { id = home.Id })">View Details</a>
+                <!--<a href="@Url.Action("Details", "Home", new { id = home.Id })">View Details</a>-->
+                <a asp-action="Details" asp-route-id="@home.Id" class="btn btn-info">View Details</a>
             </div>
         </div>
     }
