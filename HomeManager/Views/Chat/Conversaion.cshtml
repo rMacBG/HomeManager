@@ -20,15 +20,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
     <script>
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/chathub")
+            .withUrl("/hubs/chat", {
+                accessTokenFactory: () => localStorage.getItem("jwt")
+            })
             .build();
 
         connection.on("ReceiveMessage", function (message) {
+            console.log("Received message:", message);
             const chatBox = document.getElementById("chatBox");
-
             const msgElement = document.createElement("div");
-            msgElement.innerHTML = `<strong>${message.senderId}</strong>: ${message.content} <small>${message.sentAt}</small>`;
-
+            msgElement.textContent = `${message.SentAt} - ${message.Content}`;
             chatBox.appendChild(msgElement);
             chatBox.scrollTop = chatBox.scrollHeight;
         });
@@ -38,15 +39,16 @@
 
             const messageDto = {
                 conversationId: document.getElementById("conversationId").value,
-                content: document.getElementById("content").value,
+                content: document.getElementById("messageInput").value,
                 senderId: document.getElementById("senderId").value
             };
 
-            connection.invoke("SendMessage", messageDto).catch(function (err) {
-                return console.error(err.toString());
-            });
+            connection.invoke("SendMessage", messageDto).then(() => console.log("Message sent"))
+                .catch(function (err) {
+                    console.error("SendMessage error:", err.toString());
+                });
 
-            document.getElementById("content").value = "";
+            document.getElementById("messageInput").value = "";
         });
 
         connection.start().catch(function (err) {
