@@ -1,4 +1,5 @@
 ﻿using HomeManager.Data.Data.Dtos;
+using HomeManager.Data.Data.Models;
 using HomeManager.Services.Repositories.Interfaces;
 using HomeManager.Services.Services.Interfaces;
 using System;
@@ -34,14 +35,20 @@ namespace HomeManager.Services.Services
 
         public async Task<Guid> SendMessageAsync(CreateMessageDto dto)
         {
-            var message = new CreateMessageDto
+            var message = new Message
             {
+                Id = Guid.NewGuid(),
                 ConversationId = dto.ConversationId,
                 Content = dto.Content,
                 SenderId = dto.SenderId,
+                SentAt = dto.SentAt,
+                Status = dto.Status,
                
             };
-            return message.SenderId;
+
+            await _messageRepository.AddAsync(message);
+            
+            return message.Id;
             
         }
     }

@@ -25,8 +25,10 @@
 
         connection.on("ReceiveMessage", function (message) {
             const chatBox = document.getElementById("chatBox");
+
             const msgElement = document.createElement("div");
-            msgElement.textContent = `${message.SentAt} - ${message.Content}`;
+            msgElement.innerHTML = `<strong>${message.senderId}</strong>: ${message.content} <small>${message.sentAt}</small>`;
+
             chatBox.appendChild(msgElement);
             chatBox.scrollTop = chatBox.scrollHeight;
         });
@@ -36,7 +38,7 @@
 
             const messageDto = {
                 conversationId: document.getElementById("conversationId").value,
-                content: document.getElementById("messageInput").value,
+                content: document.getElementById("content").value,
                 senderId: document.getElementById("senderId").value
             };
 
@@ -44,7 +46,7 @@
                 return console.error(err.toString());
             });
 
-            document.getElementById("messageInput").value = "";
+            document.getElementById("content").value = "";
         });
 
         connection.start().catch(function (err) {
