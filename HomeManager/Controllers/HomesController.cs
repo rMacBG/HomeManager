@@ -70,21 +70,14 @@ namespace HomeManager.Controllers
             await _homeService.CreateAsync(dto);
             return RedirectToAction(nameof(Index)); 
         }
-
+        [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
             var home = await _homeService.GetByIdAsync(id);
-            var dto = new CreateHomeDto
-            {
-                HomeName = home.HomeName,
-                HomeLocation = home.HomeLocation,
-                HomeType = home.HomeType,
-                HomeDescription = home.HomeDescription,
-                HomeDealType = home.HomeDealType,
-                HomePrice = home.HomePrice,
-                LandlordId = home.LandlordId
-            };
-            return View(dto);
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            //await _homeService.EditAsync(home);
+
+            return View(home);
         }
 
         [HttpPost]

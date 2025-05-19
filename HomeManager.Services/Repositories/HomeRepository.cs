@@ -26,7 +26,8 @@ namespace HomeManager.Services.Repositories
 
         public async Task<Home?> GetByIdAsync(Guid Id)
         {
-            return await _context.Homes.FindAsync(Id);
+            //return await _context.Homes.FindAsync(Id);
+            return await _context.Homes.FirstOrDefaultAsync(x => x.Id == Id);
         }
 
 

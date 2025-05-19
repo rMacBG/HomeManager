@@ -13,7 +13,7 @@ namespace HomeManager.Services.Services.Interfaces
 
         Task<IEnumerable<HomeDto>> GetByOwnerIdsync(Guid ownerId);
         Task<HomeDto> GetByIdAsync(Guid id);
-
+        Task<HomeDto> EditAsync(HomeDto dto);
         Task<Guid> CreateAsync(CreateHomeDto dto);
         Task UpdateAsync(Guid id, CreateHomeDto dto);
         Task DeleteAsync(Guid id);

@@ -42,6 +42,7 @@ namespace HomeManager.Services.Services
 
             var homeById = new HomeDto
             {
+                Id = home.Id,
                 HomeName = home.HomeName,
                 HomeLocation = home.HomeLocation,
                 HomeType = home.HomeType,
@@ -50,6 +51,7 @@ namespace HomeManager.Services.Services
                 HomePrice = home.HomePrice,
                 LandlordId= home.LandlordId,
             };
+
             return homeById;
         }
 
@@ -59,6 +61,7 @@ namespace HomeManager.Services.Services
 
             return homes.Select(home => new HomeDto
             {
+                Id = home.Id, //this line trolled me this whole time reeeeeeeeeeee
                 HomeName = home.HomeName,
                 HomeLocation = home.HomeLocation,
                 HomeType = home.HomeType,
@@ -69,6 +72,23 @@ namespace HomeManager.Services.Services
             }) ?? new List<HomeDto>();
         }
 
+        public async Task<HomeDto> EditAsync(HomeDto dto)
+        {
+
+            var home = new HomeDto
+            {
+                Id = dto.Id,
+                HomeName = dto.HomeName,
+                HomeLocation = dto.HomeLocation,
+                HomeType = dto.HomeType,
+                HomeDescription = dto.HomeDescription,
+                HomeDealType = dto.HomeDealType,
+                HomePrice = dto.HomePrice,
+                LandlordId = dto.LandlordId
+            };
+            
+            return home;
+        }
         public async Task<Guid> CreateAsync(CreateHomeDto dto)
         {
             var home = new Home
