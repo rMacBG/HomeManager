@@ -77,7 +77,7 @@ builder.Services.AddMvc();
 builder.Services.AddSignalR();
 builder.Services.AddRazorPages();
 builder.Services.AddAuthorization();
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews().AddRazorRuntimeCompilation();
 
 var app = builder.Build();
 

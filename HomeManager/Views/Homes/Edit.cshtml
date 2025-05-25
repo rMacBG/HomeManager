@@ -1,5 +1,27 @@
-﻿@*
-    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
-*@
-@{
-}
+﻿@using HomeManager.Data.Data.Models.Enums
+@model HomeManager.Data.Data.Dtos.HomeDto
+
+<form asp-action="Edit" method="post">
+    <input asp-for="HomeName" class="form-control" placeholder="Title" />
+    <textarea asp-for="HomeDescription" class="form-control" placeholder="Description"></textarea>
+    <input asp-for="HomeLocation" class="form-control" placeholder="Address" />
+    <input asp-for="HomePrice" class="form-control" placeholder="Price" />
+    <div class="form-group">
+        <label asp-for="HomeType" class="control-label"></label>
+        <select asp-for="HomeType" class="form-control" asp-items="Html.GetEnumSelectList<HomeType>()">
+            <option value="">-- Select Home Type --</option>
+        </select>
+
+        <span asp-validation-for="HomeType" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="HomeDealType" class="control-label"></label>
+        <select asp-for="HomeDealType" class="form-control" asp-items="Html.GetEnumSelectList<DealType>()">
+            <option value="">-- Select Deal Type --</option>
+        </select>
+
+        <span asp-validation-for="HomeDealType" class="text-danger"></span>
+    </div>
+    <input asp-for="HomeLocation" class="form-control" placeholder="Google Maps Link or Coordinates" />
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>

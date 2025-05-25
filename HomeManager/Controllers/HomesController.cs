@@ -1,6 +1,7 @@
 ﻿using HomeManager.Data.Data.Dtos;
 using HomeManager.Services.Services;
 using HomeManager.Services.Services.Interfaces;
+using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -73,6 +74,9 @@ namespace HomeManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
+            if (!ModelState.IsValid)
+                return View(id);
+
             var home = await _homeService.GetByIdAsync(id);
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             //await _homeService.EditAsync(home);
