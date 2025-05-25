@@ -90,7 +90,7 @@ namespace HomeManager.Controllers
         public async Task<IActionResult> Edit(Guid id, CreateHomeDto dto)
         {
             if (!ModelState.IsValid) return View(dto);
-
+            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             await _homeService.UpdateAsync(id, dto);
             return RedirectToAction(nameof(Index));
         }

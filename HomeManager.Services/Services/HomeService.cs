@@ -14,10 +14,12 @@ namespace HomeManager.Services.Services
     public class HomeService : IHomeService
     {
         private readonly IHomeRepository _repository;
+        private readonly IUserRepository _userRepository;
 
-        public HomeService(IHomeRepository repository)
+        public HomeService(IHomeRepository repository, IUserRepository userRepository)
         {
             _repository = repository;
+            _userRepository = userRepository;
         }
         public async Task<ICollection<HomeDto>> GetAllAsync()
         {
@@ -113,7 +115,9 @@ namespace HomeManager.Services.Services
         {
             var home = await _repository.GetByIdAsync(id)
                 ?? throw new Exception("Home not Found!");
-
+            
+           // var landlord = await _userRepository.GetByIdAsync(home.LandlordId);
+            
             home.HomeName = dto.HomeName;
             home.HomeLocation = dto.HomeLocation;
             home.HomeType = dto.HomeType;
@@ -123,6 +127,7 @@ namespace HomeManager.Services.Services
             home.LandlordId = dto.LandlordId;
             home.LastModifiedAt = DateTime.UtcNow;
 
+            
             await _repository.UpdateAsync(home);
         }
 

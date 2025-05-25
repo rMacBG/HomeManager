@@ -25,6 +25,7 @@ namespace HomeManager.Data.Data.Dtos
         public DealType HomeDealType { get; set; }
         [Required]
         public decimal HomePrice { get; set; }
+        [Required]
         public Guid LandlordId { get; set; }
     }
 }
