@@ -3,28 +3,33 @@
     ViewData["Title"] = "Chat";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
-
-<h2>Conversation</h2>
-
-<div id="chatBox" style="height:300px; overflow-y:scroll; border:1px solid #ccc; padding:10px;">
-</div>
-
-<form id="sendMessageForm">
-    <input type="hidden" id="conversationId" value="@Model.Id" />
-    <input type="hidden" id="senderId" value="@User.FindFirst("nameidentifier")?.Value" />
-    <input type="text" id="messageInput" placeholder="Type your message..." class="form-control" />
-    <button type="submit" class="btn btn-primary mt-2">Send</button>
-</form>
-
 @section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+
     <script>
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/hubs/chat", {
-                accessTokenFactory: () => localStorage.getItem("jwt")
-            })
+        let connectionStarted = false;
+        let connection;
+
+        async function startConnection() {
+            try {
+                await connection.start();
+                connectionStarted = true;
+                console.log("SignalR connected");
+            } catch (err) {
+                console.error("Connection failed, retrying in 5s", err.ToString());
+                setTimeout(startConnection, 5000);
+            }
+        }
+        connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/chat")
+            .configureLogging(signalR.LogLevel.Information)
             .build();
 
+
+        // connection.start().then(() => {
+        //     console.log("Connected!");
+        // }).catch(function (err) {
+        //     return console.error(err.toString());
+        // });
         connection.on("ReceiveMessage", function (message) {
             console.log("Received message:", message);
             const chatBox = document.getElementById("chatBox");
@@ -51,8 +56,19 @@
             document.getElementById("messageInput").value = "";
         });
 
-        connection.start().catch(function (err) {
-            return console.error(err.toString());
-        });
+
     </script>
 }
+<h2>Conversation</h2>
+
+<div id="chatBox" style="height:300px; overflow-y:scroll; border:1px solid #ccc; padding:10px;">
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+<form id="sendMessageForm">
+    <input type="hidden" id="conversationId" value="@Model.Id" />
+    <input type="hidden" id="senderId" value="@User.FindFirst("nameidentifier")?.Value" />
+    <input type="text" id="messageInput" placeholder="Type your message..." class="form-control" />
+    <button type="submit" class="btn btn-primary mt-2">Send</button>
+</form>
+
+

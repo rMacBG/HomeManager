@@ -65,6 +65,13 @@ builder.Services.AddAuthentication(options =>
         }
     };
 });
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.MinimumSameSitePolicy = SameSiteMode.None;
+});
+
+
+
 
 builder.Services.AddMvc();
 builder.Services.AddSignalR();
@@ -90,6 +97,14 @@ app.UseStaticFiles();
 
 
 app.UseRouting();
+app.UseCookiePolicy();
+app.UseCors(policy =>
+{
+    policy.WithOrigins("https://localhost:7206")
+          .AllowAnyHeader()
+          .AllowAnyMethod()
+          .AllowCredentials();
+});
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapHub<ChatHub>("/hubs/chat");
