@@ -1,8 +1,7 @@
-﻿@model HomeManager.Data.Data.ViewModels.HomeDetailsViewModel
-
-<h2>@Model.Home.HomeName</h2>
-<p>@Model.Home.HomeDescription</p>
-<p>Location: @Model.Home.HomeLocation</p>
+﻿@model HomeManager.Data.Data.Dtos.HomeDto
+<h2>@Model.HomeName</h2>
+<p>@Model.HomeDescription</p>
+<p>Location: @Model.HomeLocation</p>
 <style>
     .chat-popup {
         display: none;
@@ -66,7 +65,7 @@
     loading="lazy"
     allowfullscreen
     referrerpolicy="no-referrer-when-downgrade"
-    src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=@Model.Home.HomeLocation">
+    src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=@Model.HomeLocation">
 </iframe>
 
 <button id="openChatBtn" class="btn btn-primary mt-3">Ask the Dealer</button>
@@ -85,14 +84,25 @@
     </div>
 </div>
 
-@await Html.PartialAsync("Conversation", Model.Conversation)
-@* @section Scripts {
+@section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
     <script>
-        const connection = new signalR.HubConnectionBuilder()
-            .withUrl("/hubs/chat", {
-                accessTokenFactory: () => localStorage.getItem("jwt") // adapt if needed
-            })
+        let connectionStarted = false;
+        let connection;
+
+        async function startConnection() {
+            try {
+                await connection.start();
+                connectionStarted = true;
+                console.log("SignalR connected");
+            } catch (err) {
+                console.error("Connection failed, retrying in 5s", err.ToString());
+                setTimeout(startConnection, 5000);
+            }
+        }
+        connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/chat")
+            .configureLogging(signalR.LogLevel.Information)
             .build();
         document.getElementById("openChatBtn").addEventListener("click", () => {
             document.getElementById("chatBox").style.display = "block";
@@ -106,7 +116,7 @@
             const msg = document.getElementById("messageInput").value;
             if (!msg) return;
 
-            connection.invoke("SendMessage", "You", msg, "@Model.Home.Id").catch(err => console.error(err));
+            connection.invoke("SendMessage", "You", msg, "@Model.Id").catch(err => console.error(err));
             document.getElementById("messageInput").value = "";
         }
 
@@ -117,5 +127,7 @@
             document.getElementById("messagesList").appendChild(li);
             document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
         });
+
+        startConnection();
     </script>
-} *@
+}

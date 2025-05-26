@@ -1,5 +1,6 @@
 using HomeManager.Data;
 using HomeManager.Data.Data.Context;
+using HomeManager.Services.AutoMapper;
 using HomeManager.Services.Repositories;
 using HomeManager.Services.Repositories.Interfaces;
 using HomeManager.Services.Services;
@@ -17,7 +18,7 @@ var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<HomeManagerDbContext>(options =>
     options.UseSqlServer(connectionString));
-//builder.Services.AddAutoMapper(typeof(MappingProfile));
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddScoped<IHomeRepository, HomeRepository>();
 builder.Services.AddScoped<IConversationRepository, ConversationRepository>();

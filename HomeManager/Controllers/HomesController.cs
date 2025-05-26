@@ -1,5 +1,6 @@
 ﻿using HomeManager.Data.Data.Dtos;
 using HomeManager.Data.Data.Models;
+using HomeManager.Data.Data.ViewModels;
 using HomeManager.Services.Services;
 using HomeManager.Services.Services.Interfaces;
 using Humanizer;
@@ -51,6 +52,8 @@ namespace HomeManager.Controllers
             {
                 return NotFound();
             }
+
+            //var model = await _homeService.GetHomeDetailsAsync(home.Id, userId);
             return View(home);
         }
         
