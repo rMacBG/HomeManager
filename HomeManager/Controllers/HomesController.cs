@@ -1,4 +1,5 @@
 ﻿using HomeManager.Data.Data.Dtos;
+using HomeManager.Data.Data.Models;
 using HomeManager.Services.Services;
 using HomeManager.Services.Services.Interfaces;
 using Humanizer;
@@ -90,7 +91,8 @@ namespace HomeManager.Controllers
         public async Task<IActionResult> Edit(Guid id, CreateHomeDto dto)
         {
             if (!ModelState.IsValid) return View(dto);
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = User.FindFirst("nameidentifier")?.Value;
+            
             await _homeService.UpdateAsync(id, dto);
             return RedirectToAction(nameof(Index));
         }

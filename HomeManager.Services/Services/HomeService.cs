@@ -124,7 +124,7 @@ namespace HomeManager.Services.Services
             home.HomeDescription = dto.HomeDescription;
             home.HomeDealType = dto.HomeDealType;
             home.HomePrice = dto.HomePrice;
-            home.LandlordId = dto.LandlordId;
+            // home.LandlordId = dto.LandlordId;
             home.LastModifiedAt = DateTime.UtcNow;
 
             
