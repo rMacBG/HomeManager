@@ -148,18 +148,18 @@ namespace HomeManager.Services.Services
             await _repository.DeleteAsync(home);
         }
 
-        public async Task<HomeDetailsViewModel> GetHomeDetailsAsync(Guid homeId, Guid userId)
-        {
-            var home = await _repository.GetByIdAsync(homeId);
-            if (home == null) throw new Exception("Home not found!");
+        //public async Task<HomeDetailsViewModel> GetHomeDetailsAsync(Guid homeId, Guid userId)
+        //{
+        //    var home = await _repository.GetByIdAsync(homeId);
+        //    if (home == null) throw new Exception("Home not found!");
 
-            var conversation = await _conversationService.GetOrCreateConversationAsync(userId, home.LandlordId);
+        //    var conversation = await _conversationService.GetOrCreateConversationAsync(userId, home.LandlordId);
 
-            return new HomeDetailsViewModel
-            {
-                Home = _mapper.Map<HomeDto>(home),
-                Conversation = _mapper.Map<ConversationDto>(conversation)
-            };
-        }
+        //    return new HomeDetailsViewModel
+        //    {
+        //        Home = _mapper.Map<HomeDto>(home),
+        //        Conversation = _mapper.Map<ConversationDto>(conversation)
+        //    };
+        //}
     }
 }

@@ -14,7 +14,7 @@ namespace HomeManager.Services.Services.Interfaces
 
         Task<IEnumerable<HomeDto>> GetByOwnerIdsync(Guid ownerId);
 
-        Task<HomeDetailsViewModel> GetHomeDetailsAsync(Guid homeId, Guid userId);
+        //Task<HomeDetailsViewModel> GetHomeDetailsAsync(Guid homeId, Guid userId);
         Task<HomeDto> GetByIdAsync(Guid id);
         Task<HomeDto> EditAsync(HomeDto dto);
         Task<Guid> CreateAsync(CreateHomeDto dto);
