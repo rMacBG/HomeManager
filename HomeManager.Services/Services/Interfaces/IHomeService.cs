@@ -1,4 +1,5 @@
 ﻿using HomeManager.Data.Data.Dtos;
+using HomeManager.Data.Data.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,8 @@ namespace HomeManager.Services.Services.Interfaces
         Task<ICollection<HomeDto>> GetAllAsync();
 
         Task<IEnumerable<HomeDto>> GetByOwnerIdsync(Guid ownerId);
+
+        Task<HomeDetailsViewModel> GetHomeDetailsAsync(Guid homeId, Guid userId);
         Task<HomeDto> GetByIdAsync(Guid id);
         Task<HomeDto> EditAsync(HomeDto dto);
         Task<Guid> CreateAsync(CreateHomeDto dto);

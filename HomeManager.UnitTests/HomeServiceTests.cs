@@ -21,7 +21,7 @@ namespace HomeManager.UnitTests
             public void Setup()
             {
                 _repoMock = new Mock<IHomeRepository>();
-                _service = new HomeService(_repoMock.Object);
+               // _service = new HomeService(_repoMock.Object);
             }
 
             [Test]

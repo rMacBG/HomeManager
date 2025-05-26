@@ -1,8 +1,8 @@
-﻿@model HomeManager.Data.Data.Dtos.HomeDto
+﻿@model HomeManager.Data.Data.ViewModels.HomeDetailsViewModel
 
-<h2>@Model.HomeName</h2>
-<p>@Model.HomeDescription</p>
-<p>Location: @Model.HomeLocation</p>
+<h2>@Model.Home.HomeName</h2>
+<p>@Model.Home.HomeDescription</p>
+<p>Location: @Model.Home.HomeLocation</p>
 <style>
     .chat-popup {
         display: none;
@@ -66,7 +66,7 @@
     loading="lazy"
     allowfullscreen
     referrerpolicy="no-referrer-when-downgrade"
-    src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=@Model.HomeLocation">
+    src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=@Model.Home.HomeLocation">
 </iframe>
 
 <button id="openChatBtn" class="btn btn-primary mt-3">Ask the Dealer</button>
@@ -85,7 +85,8 @@
     </div>
 </div>
 
-@section Scripts {
+@await Html.PartialAsync("Conversation", Model.Conversation)
+@* @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
     <script>
         const connection = new signalR.HubConnectionBuilder()
@@ -105,7 +106,7 @@
             const msg = document.getElementById("messageInput").value;
             if (!msg) return;
 
-            connection.invoke("SendMessage", "You", msg, "@Model.Id").catch(err => console.error(err));
+            connection.invoke("SendMessage", "You", msg, "@Model.Home.Id").catch(err => console.error(err));
             document.getElementById("messageInput").value = "";
         }
 
@@ -117,4 +118,4 @@
             document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
         });
     </script>
-}
+} *@

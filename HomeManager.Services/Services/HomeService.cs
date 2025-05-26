@@ -1,8 +1,11 @@
-﻿using HomeManager.Data.Data.Dtos;
+﻿using AutoMapper;
+using HomeManager.Data.Data.Dtos;
 using HomeManager.Data.Data.Models;
 using HomeManager.Data.Data.Models.Interfaces;
+using HomeManager.Data.Data.ViewModels;
 using HomeManager.Services.Repositories.Interfaces;
 using HomeManager.Services.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,12 +18,18 @@ namespace HomeManager.Services.Services
     {
         private readonly IHomeRepository _repository;
         private readonly IUserRepository _userRepository;
+        private readonly IConversationService _conversationService;
+        private readonly IMapper _mapper;
+        private IHomeRepository @object;
 
-        public HomeService(IHomeRepository repository, IUserRepository userRepository)
+        public HomeService(IHomeRepository repository, IUserRepository userRepository, IConversationService conversationService, IMapper mapper)
         {
             _repository = repository;
             _userRepository = userRepository;
+            _conversationService = conversationService;
+            _mapper = mapper;
         }
+
         public async Task<ICollection<HomeDto>> GetAllAsync()
         {
             var homes = await _repository.GetAllAsync();
@@ -139,6 +148,18 @@ namespace HomeManager.Services.Services
             await _repository.DeleteAsync(home);
         }
 
-        
+        //public async Task<HomeDetailsViewModel> GetHomeDetailsAsync(Guid homeId, Guid userId)
+        //{
+        //    var home = await _repository.GetByIdAsync(homeId);
+        //    if (home == null) throw new Exception("Home not found!");
+
+        //    var conversation = await _conversationService.GetOrCreateConversationAsync(userId, home.LandlordId);
+
+        //    return new HomeDetailsViewModel
+        //    {
+        //        Home = _mapper.Map<HomeDto>(home),
+        //        Conversation = _mapper.Map<ConversationDto>(conversation)
+        //    };
+        //}
     }
 }
