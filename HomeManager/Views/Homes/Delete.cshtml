@@ -1,0 +1,74 @@
+﻿@model HomeManager.Data.Data.Dtos.HomeDto
+<h2>@Model.HomeName</h2>
+<p>@Model.HomeDescription</p>
+<p>Location: @Model.HomeLocation</p>
+<style>
+    .chat-popup {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        right: 20px;
+        width: 300px;
+        background: white;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 10px rgba(0,0,0,.3);
+        z-index: 1000;
+        border-radius: 10px;
+    }
+
+    .chat-header {
+        padding: 10px;
+        background: #007bff;
+        color: white;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .chat-body {
+        height: 200px;
+        padding: 10px;
+        background: #f9f9f9;
+    }
+
+    .chat-footer {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ddd;
+        gap: 5px;
+    }
+
+        .chat-footer input {
+            flex: 1;
+            padding: 5px;
+        }
+
+        .chat-footer button {
+            padding: 5px 10px;
+        }
+
+    .close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+    }
+</style>
+<!-- Embed Google Maps -->
+<iframe width="600"
+        height="450"
+        style="border:0"
+        loading="lazy"
+        allowfullscreen
+        referrerpolicy="no-referrer-when-downgrade"
+        src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=@Model.HomeLocation">
+</iframe>
+
+<h2>Are you sure you want to delete this Property?</h2>
+
+<form action="Delete" method="post">
+    <button type="submit" class="btn btn-primary">Delete Property</button>
+    </form>
