@@ -78,6 +78,8 @@
         </div>
         <div class="chat-body" id="messagesList" style="overflow-y:auto;"></div>
         <div class="chat-footer">
+            <input type="hidden" id="senderId" value="@User.FindFirst("nameidentifier")?.Value" />
+            <input type="hidden" id="conversationId" />
             <input type="text" id="messageInput" placeholder="Type a message..." />
             <button onclick="sendMessage()">Send</button>
         </div>
@@ -100,6 +102,11 @@
                 setTimeout(startConnection, 5000);
             }
         }
+        async function fetchConversationId(homeId) {
+            const res = await fetch(`/api/conversations/for-home/${homeId}`);
+            const data = await res.json();
+            document.getElementById("conversationId").value = data.conversationId;
+        }
         connection = new signalR.HubConnectionBuilder()
             .withUrl("/hubs/chat")
             .configureLogging(signalR.LogLevel.Information)
@@ -114,20 +121,38 @@
 
         function sendMessage() {
             const msg = document.getElementById("messageInput").value;
-            if (!msg) return;
+            const conversationId = "@Model.Id";
+            const senderId = document.getElementById("senderId")?.value;
 
-            connection.invoke("SendMessage", "You", msg, "@Model.Id").catch(err => console.error(err));
+            if (!msg || !senderId || !conversationId) {
+                console.error("Missing fields for message sending.");
+                return;
+            }
+
+            const messageDto = {
+                conversationId: conversationId,
+                senderId: senderId,
+                content: msg,
+                sentAt: new Date().toISOString(), 
+                status: 0 
+            };
+
+            connection.invoke("SendMessage", messageDto)
+                .then(() => console.log("Message sent"))
+                .catch(err => console.error("SignalR SendMessage failed:", err));
+
             document.getElementById("messageInput").value = "";
         }
 
-        // Optional: auto-scroll on new message
+        
         connection.on("ReceiveMessage", (user, message) => {
             const li = document.createElement("div");
             li.textContent = `${user}: ${message}`;
             document.getElementById("messagesList").appendChild(li);
             document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
         });
-
+        
+        fetchConversationId("@Model.Id");
         startConnection();
     </script>
 }

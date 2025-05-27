@@ -24,15 +24,25 @@ namespace HomeManager.Services.Services.SignalR
 
         public async Task SendMessage(CreateMessageDto dto)
         {
-            var messageId = await _messageService.SendMessageAsync(dto);
-
-            await Clients.Group(dto.ConversationId.ToString()).SendAsync("ReceiveMessage", new
+            try
             {
-                MessageId = messageId,
-                dto.SenderId,
-                dto.Content,
-                SentAt = DateTime.UtcNow.ToString("g")
-            });
+
+
+                var messageId = await _messageService.SendMessageAsync(dto);
+
+                await Clients.Group(dto.ConversationId.ToString()).SendAsync("ReceiveMessage", new
+                {
+                    MessageId = messageId,
+                    dto.SenderId,
+                    dto.Content,
+                    SentAt = DateTime.UtcNow.ToString("dd/MM/yyyy")
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"SendMessage failed {ex.Message}");
+                throw;
+            }
         }
 
         public override async Task OnConnectedAsync()
