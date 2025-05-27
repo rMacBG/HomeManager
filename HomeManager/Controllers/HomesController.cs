@@ -112,7 +112,7 @@ namespace HomeManager.Controllers
             await _homeService.UpdateAsync(id, dto);
             return RedirectToAction(nameof(Index));
         }
-
+        [HttpGet]
         public async Task<IActionResult> Delete(Guid id)
         {
             var home = await _homeService.GetByIdAsync(id);
