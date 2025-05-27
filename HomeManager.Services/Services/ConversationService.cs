@@ -46,12 +46,29 @@ namespace HomeManager.Services.Services
             await _conversationRepository.AddAsync(conversation);
             return conversation.Id;
         }
+        //public async Task<Guid> GetOrCreateConversationAsync(Guid homeId, Guid userId)
+        //{
+        //    var conversation = await _conversationRepository.FindByHomeAndUserAsync(homeId, userId);
+        //    if (conversation != null) return conversation.Id;
 
+        //    var newConv = new Conversation
+        //    {
+        //        Id = Guid.NewGuid(),
+        //        HomeId = homeId,
+        //        CreatedAt = DateTime.UtcNow,
+        //        Participants = new List<UserConversation> {
+        //    new UserConversation { UserId = userId }
+        //}
+        //    };
+
+        //    await _conversationRepository.AddAsync(newConv);
+        //    return newConv.Id;
+        //}
         public async Task<Guid> GetOrCreateConversationAsync(Guid userId1, Guid userId2)
         {
             var allConversations = await _conversationRepository.GetByUserIdAsync(userId1);
 
-            
+
             var existingConversation = allConversations
                 .FirstOrDefault(conv =>
                     conv.UsersConversations.Any(uc => uc.UserId == userId2) &&
@@ -60,7 +77,7 @@ namespace HomeManager.Services.Services
             if (existingConversation != null)
                 return existingConversation.Id;
 
-            
+
             var newConversation = new Conversation
             {
                 Id = Guid.NewGuid(),
