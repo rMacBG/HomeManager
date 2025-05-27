@@ -89,29 +89,36 @@
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
     <script>
-        let connectionStarted = false;
-        let connection;
+        let connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/chat")
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
 
         async function startConnection() {
             try {
                 await connection.start();
-                connectionStarted = true;
                 console.log("SignalR connected");
             } catch (err) {
-                console.error("Connection failed, retrying in 5s", err.ToString());
+                console.error("Connection failed, retrying in 5s", err);
                 setTimeout(startConnection, 5000);
             }
         }
-        async function fetchConversationId(homeId) {
-            const res = await fetch(`/api/conversations/for-home/${homeId}`);
-            const data = await res.json();
-            document.getElementById("conversationId").value = data.conversationId;
+
+        // Call this when opening chat
+        async function prepareChat(homeId) {
+            try {
+                const res = await fetch(`/api/conversations/for-home/${homeId}`);
+                const data = await res.json();
+                document.getElementById("conversationId").value = data.conversationId;
+                document.getElementById("chatBox").style.display = "block";
+            } catch (err) {
+                console.error("Failed to fetch conversationId:", err);
+            }
         }
-        connection = new signalR.HubConnectionBuilder()
-            .withUrl("/hubs/chat")
-            .configureLogging(signalR.LogLevel.Information)
-            .build();
+
+        
         document.getElementById("openChatBtn").addEventListener("click", () => {
+            prepareChat("@Model.Id");
             document.getElementById("chatBox").style.display = "block";
         });
 
@@ -121,8 +128,8 @@
 
         function sendMessage() {
             const msg = document.getElementById("messageInput").value;
-            const conversationId = "@Model.Id";
             const senderId = document.getElementById("senderId")?.value;
+            const conversationId = document.getElementById("conversationId")?.value;
 
             if (!msg || !senderId || !conversationId) {
                 console.error("Missing fields for message sending.");
@@ -133,8 +140,8 @@
                 conversationId: conversationId,
                 senderId: senderId,
                 content: msg,
-                sentAt: new Date().toISOString(), 
-                status: 0 
+                sentAt: new Date().toISOString(),
+                status: 0
             };
 
             connection.invoke("SendMessage", messageDto)
@@ -144,15 +151,14 @@
             document.getElementById("messageInput").value = "";
         }
 
-        
         connection.on("ReceiveMessage", (user, message) => {
             const li = document.createElement("div");
             li.textContent = `${user}: ${message}`;
-            document.getElementById("messagesList").appendChild(li);
-            document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
+            const list = document.getElementById("messagesList");
+            list.appendChild(li);
+            list.scrollTop = list.scrollHeight;
         });
-        
-        fetchConversationId("@Model.Id");
+
         startConnection();
     </script>
 }

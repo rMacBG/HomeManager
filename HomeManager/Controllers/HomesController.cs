@@ -18,12 +18,14 @@ namespace HomeManager.Controllers
         private readonly IHomeService _homeService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserService _userService;
+        private readonly IConversationService _conversationService;
 
-        public HomesController(IHomeService homeService, IHttpContextAccessor httpContextAccessor, IUserService userService)
+        public HomesController(IHomeService homeService, IHttpContextAccessor httpContextAccessor, IUserService userService, IConversationService conversationService)
         {
             _homeService = homeService;
             _httpContextAccessor = httpContextAccessor;
             _userService = userService;
+            _conversationService = conversationService;
             
         }
 
@@ -56,7 +58,18 @@ namespace HomeManager.Controllers
             //var model = await _homeService.GetHomeDetailsAsync(home.Id, userId);
             return View(home);
         }
-        
+
+        [HttpGet("api/conversations/for-home/{homeId}")]
+        public async Task<IActionResult> GetOrCreateConversation(Guid homeId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            var conversationId = await _conversationService.GetOrCreateConversationAsync(homeId, Guid.Parse(userId));
+
+            return Ok(new { conversationId });
+        }
+
         public IActionResult Create()
         {
             return View();  
