@@ -117,7 +117,8 @@
         }
 
         
-        document.getElementById("openChatBtn").addEventListener("click", () => {
+        document.getElementById("openChatBtn").addEventListener("click", async () => {
+            
             prepareChat("@Model.Id");
             document.getElementById("chatBox").style.display = "block";
         });

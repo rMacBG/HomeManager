@@ -65,7 +65,7 @@ namespace HomeManager.Controllers
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
             
-            var conversationId = await _conversationService.GetOrCreateConversationAsync(homeId, Guid.Parse(userId));
+            var conversationId = await _conversationService.GetOrCreateConversationForHomeAsync(homeId, Guid.Parse(userId));
 
             return Ok(new { conversationId });
         }
