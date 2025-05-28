@@ -8,7 +8,7 @@ namespace HomeManager.Data.Data.Models
         [Key]
         public Guid Id { get; set; }
         [Required]
-        [MaxLength(20)]
+        [MaxLength(60)]
         public string Title { get; set; }
         [Required]
         public DateTime StartedAt { get; set; } = DateTime.UtcNow;

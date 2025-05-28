@@ -12,7 +12,7 @@ using System.Security.Claims;
 
 namespace HomeManager.Controllers
 {
-    [Authorize(Roles = "Landlord,Seller")]
+    [Authorize(Roles = "Landlord,Seller, User")]
     public class HomesController : Controller
     {
         private readonly IHomeService _homeService;
@@ -64,7 +64,7 @@ namespace HomeManager.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
-
+            
             var conversationId = await _conversationService.GetOrCreateConversationAsync(homeId, Guid.Parse(userId));
 
             return Ok(new { conversationId });
