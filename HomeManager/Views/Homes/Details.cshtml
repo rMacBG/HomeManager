@@ -1,4 +1,5 @@
-﻿@model HomeManager.Data.Data.Dtos.HomeDto
+﻿@using System.Security.Claims
+@model HomeManager.Data.Data.Dtos.HomeDto
 <h2>@Model.HomeName</h2>
 <p>@Model.HomeDescription</p>
 <p>Location: @Model.HomeLocation</p>
@@ -67,21 +68,32 @@
     referrerpolicy="no-referrer-when-downgrade"
     src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=@Model.HomeLocation">
 </iframe>
-
+<p>User ID Test: @User.FindFirst(ClaimTypes.NameIdentifier)?.Value</p>
+<p>Is Authenticated: @User.Identity.IsAuthenticated</p>
 <button id="openChatBtn" class="btn btn-primary mt-3">Ask the Dealer</button>
 <div id="chatSection">
     
     <div id="chatBox" class="chat-popup">
         <div class="chat-header">
             <span>Chat with Dealer</span>
+            <p>Debug UserId: @User.FindFirst(ClaimTypes.NameIdentifier)?.Value</p>
             <button id="closeChatBtn" class="close-btn">&times;</button>
         </div>
         <div class="chat-body" id="messagesList" style="overflow-y:auto;"></div>
         <div class="chat-footer">
-            <input type="hidden" id="senderId" value="@User.FindFirst("nameidentifier")?.Value" />
-            <input type="hidden" id="conversationId" />
+            <br />
+            
             <input type="text" id="messageInput" placeholder="Type a message..." />
+            <input type="hidden" id="senderId" value='@User.FindFirst(ClaimTypes.NameIdentifier)?.Value' />
+            <input type="hidden" id="conversationId" />
+
             <button onclick="sendMessage()">Send</button>
+            @* <form id="sendMessageForm">
+        <input type="hidden" id="conversationId" value="@Model.Id" />
+        <input type="hidden" id="senderId" value='@User.FindFirst(ClaimTypes.NameIdentifier)?.Value' />
+        <input type="text" id="messageInput" placeholder="Type your message..." class="form-control" />
+        <button type="submit" class="btn btn-primary mt-2">Send</button>
+            </form> *@
         </div>
     </div>
 </div>
@@ -94,6 +106,11 @@
             .configureLogging(signalR.LogLevel.Information)
             .build();
 
+        const senderIdInput = document.getElementById("senderId");
+        const loggedInUserId = "@(User.Identity.IsAuthenticated ? @User.FindFirst(ClaimTypes.NameIdentifier)?.Value : "")";
+        console.log("Set senderIdInput.value to:", senderIdInput.value);
+
+
         async function startConnection() {
             try {
                 await connection.start();
@@ -104,12 +121,19 @@
             }
         }
 
-        // Call this when opening chat
         async function prepareChat(homeId) {
             try {
                 const res = await fetch(`/api/conversations/for-home/${homeId}`);
                 const data = await res.json();
+
                 document.getElementById("conversationId").value = data.conversationId;
+
+                
+
+                if (!senderIdInput.value) {
+                    senderIdInput.value = "@User.FindFirst("nameidentifier")?.Value";
+                }
+                
                 document.getElementById("chatBox").style.display = "block";
             } catch (err) {
                 console.error("Failed to fetch conversationId:", err);
@@ -118,9 +142,7 @@
 
         
         document.getElementById("openChatBtn").addEventListener("click", async () => {
-            
-            prepareChat("@Model.Id");
-            document.getElementById("chatBox").style.display = "block";
+            await prepareChat("@Model.Id");
         });
 
         document.getElementById("closeChatBtn").addEventListener("click", () => {
@@ -131,7 +153,9 @@
             const msg = document.getElementById("messageInput").value;
             const senderId = document.getElementById("senderId")?.value;
             const conversationId = document.getElementById("conversationId")?.value;
-
+            console.log("DEBUG - Message:", msg);
+            console.log("DEBUG - SenderId:", senderId);
+            console.log("DEBUG - ConversationId:", conversationId);
             if (!msg || !senderId || !conversationId) {
                 console.error("Missing fields for message sending.");
                 return;
@@ -158,7 +182,26 @@
             const list = document.getElementById("messagesList");
             list.appendChild(li);
             list.scrollTop = list.scrollHeight;
+
+
         });
+
+        //  document.getElementById("sendMessageForm").addEventListener("submit", function (e) {
+        //     e.preventDefault();
+
+        //     const messageDto = {
+        //         conversationId: document.getElementById("conversationId").value,
+        //         content: document.getElementById("messageInput").value,
+        //         senderId: document.getElementById("senderId").value
+        //     };
+
+        //     connection.invoke("SendMessage", messageDto).then(() => console.log("Message sent"))
+        //         .catch(function (err) {
+        //             console.error("SendMessage error:", err.toString());
+        //         });
+
+        //     document.getElementById("messageInput").value = "";
+        // });
 
         startConnection();
     </script>

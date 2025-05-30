@@ -66,7 +66,7 @@ namespace HomeManager.Services.Services
             {
                 
                 var allConversations = await _conversationRepository.GetByUserIdAsync(userId1);
-
+                //var userName = await _conversationRepository.GetByUserIdAsync
 
                 var existingConversation = allConversations
                     .FirstOrDefault(conv =>

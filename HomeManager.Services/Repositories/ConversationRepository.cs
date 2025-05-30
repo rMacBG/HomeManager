@@ -37,5 +37,6 @@ namespace HomeManager.Services.Repositories
                 .Include(x => x.UsersConversations)
                 .ToListAsync();
         }
+
     }
 }
