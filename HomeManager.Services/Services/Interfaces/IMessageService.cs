@@ -9,7 +9,9 @@ namespace HomeManager.Services.Services.Interfaces
 {
     public interface IMessageService
     {
-        Task<Guid> SendMessageAsync(CreateMessageDto dto);
+        Task<MessageDto> SendMessageAsync(CreateMessageDto dto);
         Task<IEnumerable<MessageDto>> GetMessagesAsync(Guid conversationId);
+
+        //Task<IEnumerable<MessageDto>> GetMessagesByConversationAsync(Guid conversationId);
     }
 }

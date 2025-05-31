@@ -2,6 +2,7 @@
 using HomeManager.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,7 +28,6 @@ namespace HomeManager.Services.Services.SignalR
             try
             {
 
-
                 var messageId = await _messageService.SendMessageAsync(dto);
 
                 await Clients.Group(dto.ConversationId.ToString()).SendAsync("ReceiveMessage", new
@@ -37,6 +37,8 @@ namespace HomeManager.Services.Services.SignalR
                     dto.Content,
                     SentAt = DateTime.UtcNow.ToString("dd/MM/yyyy")
                 });
+
+                await Clients.All.SendAsync("ReceiveMessage", messageId.SenderId.ToString(), messageId);
             }
             catch (Exception ex)
             {

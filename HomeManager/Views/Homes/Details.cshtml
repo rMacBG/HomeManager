@@ -140,7 +140,15 @@
             }
         }
 
-        
+        function getMessageStatusText(status) {
+            switch (status) {
+                case 0: return "Sent";
+                case 1: return "Delivered";
+                case 2: return "Read";
+                default: return "Unknown";
+            }
+        }
+
         document.getElementById("openChatBtn").addEventListener("click", async () => {
             await prepareChat("@Model.Id");
         });
@@ -161,6 +169,8 @@
                 return;
             }
 
+            const tempId = "msg_" + Date.now();
+
             const messageDto = {
                 conversationId: conversationId,
                 senderId: senderId,
@@ -169,22 +179,53 @@
                 status: 0
             };
 
+            
+            messageDto.tempId = tempId;
+
+
+            const li = document.createElement("div");
+            li.id = tempId;
+            li.innerHTML = `<strong>You:</strong> ${msg} <span class="status-text" style="font-size:0.8em; color: gray;">[Sending...]</span>`;
+            document.getElementById("messagesList").appendChild(li);
+            document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
+
+
             connection.invoke("SendMessage", messageDto)
                 .then(() => console.log("Message sent"))
                 .catch(err => console.error("SignalR SendMessage failed:", err));
 
             document.getElementById("messageInput").value = "";
-        }
 
-        connection.on("ReceiveMessage", (user, message) => {
-            const li = document.createElement("div");
-            li.textContent = `${user}: ${message}`;
-            const list = document.getElementById("messagesList");
-            list.appendChild(li);
-            list.scrollTop = list.scrollHeight;
+            connection.on("ReceiveMessage", (user, message) => {
+                const currentUserId = document.getElementById("senderId").value;
+                const isSelf = currentUserId === userId;
 
+                if (isSelf) {
+                    const existingMsg = [...document.getElementById("messagesList").children]
+                        .reverse()
+                        .find(el => el.textContent.includes(message.content));
 
-        });
+                    if (existingMsg) {
+                        const statusEl = existingMsg.querySelector(".status-text");
+                        if (statusEl) {
+                            statusEl.textContent = `[${getMessageStatusText(message.status)}]`;
+                        }
+                        return;
+                    }
+                }
+                const li = document.createElement("div");
+                li.innerHTML = `<strong>${isSelf ? "You" : "Dealer"}:</strong> ${message.content} <span class="status-text" style="font-size: 0.8em; color: gray;">[${getMessageStatusText(message.status)}]</span>`;
+                const list = document.getElementById("messagesList");
+                list.appendChild(li);
+                list.scrollTop = list.scrollHeight;
+            });
+            };
+        
+
+       
+       
+
+        
 
         //  document.getElementById("sendMessageForm").addEventListener("submit", function (e) {
         //     e.preventDefault();
@@ -202,6 +243,8 @@
 
         //     document.getElementById("messageInput").value = "";
         // });
+
+
 
         startConnection();
     </script>

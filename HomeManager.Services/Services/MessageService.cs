@@ -33,7 +33,7 @@ namespace HomeManager.Services.Services
 
         }
 
-        public async Task<Guid> SendMessageAsync(CreateMessageDto dto)
+        public async Task<MessageDto> SendMessageAsync(CreateMessageDto dto)
         {
             var message = new Message
             {
@@ -47,9 +47,19 @@ namespace HomeManager.Services.Services
             };
 
             await _messageRepository.AddAsync(message);
-            
-            return message.Id;
-            
+
+
+
+            return new MessageDto {
+                Id = message.Id,
+                ConversationId = message.ConversationId,
+                Content = message.Content,
+                SenderId = message.SenderId,
+                SentAt = message.SentAt,
+                MessageStatus = message.Status
+            };
+
+
         }
     }
 }
