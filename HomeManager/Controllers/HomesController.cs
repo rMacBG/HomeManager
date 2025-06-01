@@ -46,10 +46,14 @@ namespace HomeManager.Controllers
         public async Task<IActionResult> Details(Guid id)
         {
             var home = await _homeService.GetByIdAsync(id);
+           // var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
 
-            //var conversationId = await _conversationService.GetOrCreateConversationAsync(userId, home.LandlordId);
+            var conversationId = await _conversationService.GetOrCreateConversationForHomeAsync(id, Guid.Parse(userId));
+
+           // var messages = await _messageService.GetMessagesAsync(conversationId);
             if (home == null)
             {
                 return NotFound();

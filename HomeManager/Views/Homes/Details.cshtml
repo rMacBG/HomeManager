@@ -1,5 +1,5 @@
 ﻿@using System.Security.Claims
-@model HomeManager.Data.Data.Dtos.HomeDto
+@model HomeManager.Data.Data.ViewModels.HomeDetailsViewModel
 <h2>@Model.HomeName</h2>
 <p>@Model.HomeDescription</p>
 <p>Location: @Model.HomeLocation</p>
@@ -70,6 +70,7 @@
 </iframe>
 <p>User ID Test: @User.FindFirst(ClaimTypes.NameIdentifier)?.Value</p>
 <p>Is Authenticated: @User.Identity.IsAuthenticated</p>
+<p>Debug ConversationId: @Model.ConversationId </p>
 <button id="openChatBtn" class="btn btn-primary mt-3">Ask the Dealer</button>
 <div id="chatSection">
     
@@ -77,6 +78,7 @@
         <div class="chat-header">
             <span>Chat with Dealer</span>
             <p>Debug UserId: @User.FindFirst(ClaimTypes.NameIdentifier)?.Value</p>
+            <p>Debug ConversationId: @Model.ConversationId </p>
             <button id="closeChatBtn" class="close-btn">&times;</button>
         </div>
         <div class="chat-body" id="messagesList" style="overflow-y:auto;"></div>
@@ -86,6 +88,7 @@
             <input type="text" id="messageInput" placeholder="Type a message..." />
             <input type="hidden" id="senderId" value='@User.FindFirst(ClaimTypes.NameIdentifier)?.Value' />
             <input type="hidden" id="conversationId" />
+            <input type="hidden" name="conversationId" value="@Model.ConversationId" />
 
             <button onclick="sendMessage()">Send</button>
             @* <form id="sendMessageForm">
@@ -125,7 +128,14 @@
             try {
                 const res = await fetch(`/api/conversations/for-home/${homeId}`);
                 const data = await res.json();
+                const messagesRes = await fetch(`/Conversation/GetMessages?conversationId=${conversationId}`);
 
+                messages.forEach(msg => {
+                    const div = document.createElement("div");
+                    const isOwn = msg.senderId === senderIdInput.value;
+                    div.textContent = `${isOwn ? "You" : "Dealer"}: ${msg.content} (${msg.status})`;
+                    list.appendChild(div);
+                });
                 document.getElementById("conversationId").value = data.conversationId;
 
                 

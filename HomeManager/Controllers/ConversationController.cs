@@ -8,13 +8,13 @@ namespace HomeManager.Controllers
 {
     public class ConversationController : Controller
     {
+        
         private readonly IMessageService _messageService;
 
-        public ConversationController(IMessageService messageService)
+        public ConversationController( IMessageService messageService)
         {
-            messageService = _messageService;
+                 _messageService = messageService;
         }
-
         [HttpGet]
         [Authorize]
         public async Task<JsonResult> GetMessages(Guid conversationId)

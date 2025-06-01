@@ -12,5 +12,7 @@ namespace HomeManager.Data.Data.ViewModels
         public HomeDto Home { get; set; }
 
         public ConversationDto Conversation { get; set; }
+
+        public IEnumerable<MessageDto> Messages { get; set; }
     }
 }
