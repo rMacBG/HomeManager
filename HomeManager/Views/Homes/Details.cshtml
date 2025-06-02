@@ -1,8 +1,8 @@
 ﻿@using System.Security.Claims
 @model HomeManager.Data.Data.ViewModels.HomeDetailsViewModel
-<h2>@Model.HomeName</h2>
-<p>@Model.HomeDescription</p>
-<p>Location: @Model.HomeLocation</p>
+<h2>@Model.Home.HomeName</h2>
+<p>@Model.Home.HomeDescription</p>
+<p>Location: @Model.Home.HomeLocation</p>
 <style>
     .chat-popup {
         display: none;
@@ -66,11 +66,19 @@
     loading="lazy"
     allowfullscreen
     referrerpolicy="no-referrer-when-downgrade"
-    src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=@Model.HomeLocation">
+    src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=@Model.Home.HomeLocation">
 </iframe>
 <p>User ID Test: @User.FindFirst(ClaimTypes.NameIdentifier)?.Value</p>
 <p>Is Authenticated: @User.Identity.IsAuthenticated</p>
-<p>Debug ConversationId: @Model.ConversationId </p>
+<p>
+    Debug ConversationId: @if (Model.Conversation != null)
+    {
+    <p>Debug ConversationId: @Model.Conversation.Id</p>
+    }
+    else
+    {
+    <p>No conversation found.</p>
+    } </p>
 <button id="openChatBtn" class="btn btn-primary mt-3">Ask the Dealer</button>
 <div id="chatSection">
     
@@ -78,7 +86,7 @@
         <div class="chat-header">
             <span>Chat with Dealer</span>
             <p>Debug UserId: @User.FindFirst(ClaimTypes.NameIdentifier)?.Value</p>
-            <p>Debug ConversationId: @Model.ConversationId </p>
+
             <button id="closeChatBtn" class="close-btn">&times;</button>
         </div>
         <div class="chat-body" id="messagesList" style="overflow-y:auto;"></div>
@@ -88,15 +96,9 @@
             <input type="text" id="messageInput" placeholder="Type a message..." />
             <input type="hidden" id="senderId" value='@User.FindFirst(ClaimTypes.NameIdentifier)?.Value' />
             <input type="hidden" id="conversationId" />
-            <input type="hidden" name="conversationId" value="@Model.ConversationId" />
+            <input type="hidden" name="conversationId" value="@Model.Conversation.Id" />
 
             <button onclick="sendMessage()">Send</button>
-            @* <form id="sendMessageForm">
-        <input type="hidden" id="conversationId" value="@Model.Id" />
-        <input type="hidden" id="senderId" value='@User.FindFirst(ClaimTypes.NameIdentifier)?.Value' />
-        <input type="text" id="messageInput" placeholder="Type your message..." class="form-control" />
-        <button type="submit" class="btn btn-primary mt-2">Send</button>
-            </form> *@
         </div>
     </div>
 </div>
@@ -126,9 +128,30 @@
 
         async function prepareChat(homeId) {
             try {
-                const res = await fetch(`/api/conversations/for-home/${homeId}`);
-                const data = await res.json();
+                const res = await fetch(`/api/conversations/for-home/${homeId}`, {
+                    credentials: 'include'
+                });
+                
                 const messagesRes = await fetch(`/Conversation/GetMessages?conversationId=${conversationId}`);
+                if (!res.ok) {
+                    const text = await res.text();
+                    console.error("Failed to get conversationId:", text);
+                    return;
+                }
+
+                const data = await res.json();
+                const conversationId = data.conversationId;
+
+                document.getElementById("conversationId").value = conversationId;
+
+                
+
+                if (!messagesRes.ok) {
+                    const errorText = await messagesRes.text();
+                    console.error("Failed to get messages:", errorText);
+                    return;
+                }
+                const messages = await messagesRes.json();
 
                 messages.forEach(msg => {
                     const div = document.createElement("div");
@@ -160,7 +183,7 @@
         }
 
         document.getElementById("openChatBtn").addEventListener("click", async () => {
-            await prepareChat("@Model.Id");
+            await prepareChat("@Model.Conversation.Id");
         });
 
         document.getElementById("closeChatBtn").addEventListener("click", () => {

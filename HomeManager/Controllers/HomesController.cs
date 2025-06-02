@@ -19,13 +19,15 @@ namespace HomeManager.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IUserService _userService;
         private readonly IConversationService _conversationService;
+        private readonly IMessageService _messageService;
 
-        public HomesController(IHomeService homeService, IHttpContextAccessor httpContextAccessor, IUserService userService, IConversationService conversationService)
+        public HomesController(IHomeService homeService, IHttpContextAccessor httpContextAccessor, IUserService userService, IConversationService conversationService, IMessageService messageService)
         {
             _homeService = homeService;
             _httpContextAccessor = httpContextAccessor;
             _userService = userService;
             _conversationService = conversationService;
+            _messageService = messageService;
             
         }
 
@@ -45,33 +47,57 @@ namespace HomeManager.Controllers
 
         public async Task<IActionResult> Details(Guid id)
         {
-            var home = await _homeService.GetByIdAsync(id);
-           // var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null) return Unauthorized();
+            // var home = await _homeService.GetByIdAsync(id);
+            //var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+            ConversationDto conversation = null;
+             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+             if (userId == null) return Unauthorized();
 
             var conversationId = await _conversationService.GetOrCreateConversationForHomeAsync(id, Guid.Parse(userId));
-
-           // var messages = await _messageService.GetMessagesAsync(conversationId);
-            if (home == null)
+            conversation = new ConversationDto
             {
-                return NotFound();
-            }
+                Id = conversationId,
 
-            //var model = await _homeService.GetHomeDetailsAsync(home.Id, userId);
-            return View(home);
+            };
+            var messages = await _messageService.GetMessagesAsync(conversationId);
+            // if (home == null)
+            // {
+            //     return NotFound();
+            // }
+
+            // //var model = await _homeService.GetHomeDetailsAsync(home.Id, userId);
+            // return View(home);
+            var home = await _homeService.GetByIdAsync(id);
+
+            var viewModel = new HomeDetailsViewModel
+            {
+                Home = home,
+                Messages = messages,
+                Conversation = conversation
+               
+            };
+
+            return View(viewModel);
         }
 
         [HttpGet("api/conversations/for-home/{homeId}")]
         public async Task<IActionResult> GetOrCreateConversation(Guid homeId)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null) return Unauthorized();
-            
-            var conversationId = await _conversationService.GetOrCreateConversationForHomeAsync(homeId, Guid.Parse(userId));
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userId == null) return Unauthorized();
 
-            return Ok(new { conversationId });
+                var conversationId = await _conversationService.GetOrCreateConversationForHomeAsync(homeId, Guid.Parse(userId));
+
+                return Ok(new { conversationId });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { error = ex.Message });
+
+            }
+            
         }
 
         public IActionResult Create()
