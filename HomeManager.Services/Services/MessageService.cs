@@ -42,7 +42,7 @@ namespace HomeManager.Services.Services
                 Content = dto.Content,
                 SenderId = dto.SenderId,
                 SentAt = dto.SentAt,
-                Status = dto.Status,
+                Status = (Data.Data.Models.Enums.MessageStatus)(int)dto.Status,
                
             };
 

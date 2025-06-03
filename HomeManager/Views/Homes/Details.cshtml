@@ -104,13 +104,6 @@
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
     <script>
-        const currentUserId = "@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value";
-
-        let connection = new signalR.HubConnectionBuilder()
-            .withUrl("/hubs/chat")
-            .configureLogging(signalR.LogLevel.Information)
-            .build();
-
         async function startConnection() {
             try {
                 await connection.start();
@@ -120,8 +113,16 @@
                 setTimeout(startConnection, 5000);
             }
         }
+        let connection = new signalR.HubConnectionBuilder()
+            .withUrl("/hubs/chat")
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
 
-        startConnection();
+        const currentUserId = "@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value";
+        const senderIdInput = document.getElementById("senderId");
+        if (senderIdInput) {
+            senderIdInput.value = currentUserId;
+        }
 
         async function prepareChat(homeId) {
             try {
@@ -148,7 +149,8 @@
 
                 const messages = await messagesRes.json();
                 const list = document.getElementById("messagesList");
-                list.innerHTML = ''; // Clear existing messages
+                list.innerHTML = ''; // Clear previous messages
+                console.log("Current user ID for comparison:", currentUserId);
 
                 messages.forEach(msg => {
                     const div = document.createElement("div");
@@ -158,18 +160,21 @@
                 });
 
                 document.getElementById("chatBox").style.display = "block";
-
             } catch (err) {
                 console.error("Failed to fetch conversationId:", err);
             }
         }
 
         function getMessageStatusText(status) {
-            switch (status) {
-                case 0: return "Sent";
-                case 1: return "Delivered";
-                case 2: return "Read";
-                default: return "Unknown";
+            const num = parseInt(status)
+            switch (num) {
+
+                case 0: return "Pending";
+                case 1: return "Sent";
+                case 2: return "Delivered";
+                case 3: return "Seen";
+                case 4: return "Failed";
+                default: return `Unknown (${status})`;
             }
         }
 
@@ -203,7 +208,9 @@
 
             const li = document.createElement("div");
             li.id = tempId;
-            li.innerHTML = `<strong>You:</strong> ${msg} <span class="status-text" style="font-size:0.8em; color: gray;">[Sending...]</span>`;
+            li.dataset.content = msg;
+            li.dataset.temp = "true";
+            li.innerHTML = `<strong>You:</strong> ${msg} <span class="status-text status-text-${tempId}" style="font-size:0.8em; color: gray;">[Sending...]</span>`;
             document.getElementById("messagesList").appendChild(li);
             document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
 
@@ -214,30 +221,36 @@
             document.getElementById("messageInput").value = "";
         }
 
-        // 🧠 Place this outside to avoid multiple registrations
-        connection.on("ReceiveMessage", (user, message) => {
+        connection.on("ReceiveMessage", (message) => {
+            console.log("Received message from SignalR:", message);
             const isSelf = message.senderId === currentUserId;
 
-            // Try to update status of existing message if self
             if (isSelf) {
                 const existingMsg = [...document.getElementById("messagesList").children]
                     .reverse()
-                    .find(el => el.textContent.includes(message.content));
+                    .find(el => el.dataset.content === message.content && el.dataset.temp === "true");
 
                 if (existingMsg) {
                     const statusEl = existingMsg.querySelector(".status-text");
                     if (statusEl) {
                         statusEl.textContent = `[${getMessageStatusText(message.status)}]`;
                     }
+                    existingMsg.dataset.temp = "false"; // no longer temporary
                     return;
                 }
             }
 
             const li = document.createElement("div");
-            li.innerHTML = `<strong>${isSelf ? "You" : "Dealer"}:</strong> ${message.content} <span class="status-text" style="font-size: 0.8em; color: gray;">[${getMessageStatusText(message.status)}]</span>`;
-            const list = document.getElementById("messagesList");
-            list.appendChild(li);
-            list.scrollTop = list.scrollHeight;
+            li.innerHTML = `
+                <strong>${isSelf ? "You" : "Dealer"}:</strong> ${message.content}
+                <span class="status-text" style="font-size: 0.8em; color: gray;">[${getMessageStatusText(message.status)}]</span>
+            `;
+            document.getElementById("messagesList").appendChild(li);
+            document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
         });
+
+        startConnection();
+
+       
     </script>
 }

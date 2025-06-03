@@ -1,4 +1,5 @@
 ﻿using HomeManager.Data.Data.Dtos;
+using HomeManager.Data.Data.Models.Enums;
 using HomeManager.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -27,18 +28,19 @@ namespace HomeManager.Services.Services.SignalR
         {
             try
             {
-
                 var messageId = await _messageService.SendMessageAsync(dto);
 
-                await Clients.Group(dto.ConversationId.ToString()).SendAsync("ReceiveMessage", new
+                var payload = new
                 {
-                    MessageId = messageId,
-                    dto.SenderId,
-                    dto.Content,
-                    SentAt = DateTime.UtcNow.ToString("dd/MM/yyyy")
-                });
+                    messageId = messageId,
+                    senderId = dto.SenderId,
+                    content = dto.Content,
+                    sentAt = DateTime.UtcNow.ToString("dd/MM/yyyy"),
+                    status = (int)dto.Status
+                };
 
-                await Clients.All.SendAsync("ReceiveMessage", messageId.SenderId.ToString(), messageId);
+                await Clients.Group(dto.ConversationId.ToString())
+                             .SendAsync("ReceiveMessage", payload);
             }
             catch (Exception ex)
             {
