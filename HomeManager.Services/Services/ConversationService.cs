@@ -53,10 +53,39 @@ namespace HomeManager.Services.Services
         public async Task<Guid> GetOrCreateConversationForHomeAsync(Guid homeId, Guid userId)
         {
             var home = await _homeRepository.GetByIdAsync(homeId);
+
+            Console.WriteLine($"Home ID: {homeId}");
+            Console.WriteLine($"Logged-in User ID: {userId}");
+            Console.WriteLine($"Home Landlord ID: {home.LandlordId}");
+
             if (home == null || home.LandlordId == userId)
                 throw new InvalidOperationException("Invalid home or cannot start a conversation with yourself.");
 
             return await GetOrCreateConversationAsync(userId, home.LandlordId);
+            //var home = await _homeRepository.GetByIdAsync(homeId);
+
+            //if (home == null)
+            //    throw new InvalidOperationException("Invalid home.");
+
+            //Guid otherUserId;
+
+            //if (home.LandlordId == userId)
+            //{
+            //    // Landlord is initiating the chat
+            //    if (home.Landlord == null)
+            //        throw new InvalidOperationException("No tenant to chat with.");
+            //    otherUserId = home.LandlordId;
+            //}
+            //else
+            //{
+            //    // Tenant or viewer is initiating the chat
+            //    otherUserId = home.LandlordId;
+            //}
+
+            //if (userId == otherUserId)
+            //    throw new InvalidOperationException("Cannot start a conversation with yourself.");
+
+            //return await GetOrCreateConversationAsync(userId, otherUserId);
         }
         public async Task<Guid> GetOrCreateConversationAsync(Guid userId1, Guid userId2)
         {

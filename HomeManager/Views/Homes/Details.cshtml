@@ -70,10 +70,9 @@
 </iframe>
 <p>User ID Test: @User.FindFirst(ClaimTypes.NameIdentifier)?.Value</p>
 <p>Is Authenticated: @User.Identity.IsAuthenticated</p>
-<p>
-    Debug ConversationId: @if (Model.Conversation != null)
+<p>Debug ConversationId: @if (Model.Conversation != null)
     {
-    <p>Debug ConversationId: @Model.Conversation.Id</p>
+    <p> @Model.Conversation.Id</p>
     }
     else
     {
@@ -95,8 +94,7 @@
             
             <input type="text" id="messageInput" placeholder="Type a message..." />
             <input type="hidden" id="senderId" value='@User.FindFirst(ClaimTypes.NameIdentifier)?.Value' />
-            <input type="hidden" id="conversationId" />
-            <input type="hidden" name="conversationId" value="@Model.Conversation.Id" />
+            <input type="hidden" id="conversationId" value="@Model.Conversation.Id" />
 
             <button onclick="sendMessage()">Send</button>
         </div>
@@ -106,15 +104,12 @@
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
     <script>
+        const currentUserId = "@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value";
+
         let connection = new signalR.HubConnectionBuilder()
             .withUrl("/hubs/chat")
             .configureLogging(signalR.LogLevel.Information)
             .build();
-
-        const senderIdInput = document.getElementById("senderId");
-        const loggedInUserId = "@(User.Identity.IsAuthenticated ? @User.FindFirst(ClaimTypes.NameIdentifier)?.Value : "")";
-        console.log("Set senderIdInput.value to:", senderIdInput.value);
-
 
         async function startConnection() {
             try {
@@ -126,13 +121,14 @@
             }
         }
 
+        startConnection();
+
         async function prepareChat(homeId) {
             try {
                 const res = await fetch(`/api/conversations/for-home/${homeId}`, {
                     credentials: 'include'
                 });
-                
-                const messagesRes = await fetch(`/Conversation/GetMessages?conversationId=${conversationId}`);
+
                 if (!res.ok) {
                     const text = await res.text();
                     console.error("Failed to get conversationId:", text);
@@ -141,33 +137,28 @@
 
                 const data = await res.json();
                 const conversationId = data.conversationId;
-
                 document.getElementById("conversationId").value = conversationId;
 
-                
-
+                const messagesRes = await fetch(`/Conversation/GetMessages?conversationId=${conversationId}`);
                 if (!messagesRes.ok) {
                     const errorText = await messagesRes.text();
                     console.error("Failed to get messages:", errorText);
                     return;
                 }
+
                 const messages = await messagesRes.json();
+                const list = document.getElementById("messagesList");
+                list.innerHTML = ''; // Clear existing messages
 
                 messages.forEach(msg => {
                     const div = document.createElement("div");
-                    const isOwn = msg.senderId === senderIdInput.value;
-                    div.textContent = `${isOwn ? "You" : "Dealer"}: ${msg.content} (${msg.status})`;
+                    const isOwn = msg.senderId === currentUserId;
+                    div.textContent = `${isOwn ? "You" : "Dealer"}: ${msg.content} (${getMessageStatusText(msg.status)})`;
                     list.appendChild(div);
                 });
-                document.getElementById("conversationId").value = data.conversationId;
 
-                
-
-                if (!senderIdInput.value) {
-                    senderIdInput.value = "@User.FindFirst("nameidentifier")?.Value";
-                }
-                
                 document.getElementById("chatBox").style.display = "block";
+
             } catch (err) {
                 console.error("Failed to fetch conversationId:", err);
             }
@@ -183,7 +174,7 @@
         }
 
         document.getElementById("openChatBtn").addEventListener("click", async () => {
-            await prepareChat("@Model.Conversation.Id");
+            await prepareChat("@Model.Home.Id");
         });
 
         document.getElementById("closeChatBtn").addEventListener("click", () => {
@@ -192,12 +183,9 @@
 
         function sendMessage() {
             const msg = document.getElementById("messageInput").value;
-            const senderId = document.getElementById("senderId")?.value;
             const conversationId = document.getElementById("conversationId")?.value;
-            console.log("DEBUG - Message:", msg);
-            console.log("DEBUG - SenderId:", senderId);
-            console.log("DEBUG - ConversationId:", conversationId);
-            if (!msg || !senderId || !conversationId) {
+
+            if (!msg || !conversationId || !currentUserId) {
                 console.error("Missing fields for message sending.");
                 return;
             }
@@ -206,15 +194,12 @@
 
             const messageDto = {
                 conversationId: conversationId,
-                senderId: senderId,
+                senderId: currentUserId,
                 content: msg,
                 sentAt: new Date().toISOString(),
-                status: 0
+                status: 0,
+                tempId: tempId
             };
-
-            
-            messageDto.tempId = tempId;
-
 
             const li = document.createElement("div");
             li.id = tempId;
@@ -222,63 +207,37 @@
             document.getElementById("messagesList").appendChild(li);
             document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
 
-
             connection.invoke("SendMessage", messageDto)
                 .then(() => console.log("Message sent"))
                 .catch(err => console.error("SignalR SendMessage failed:", err));
 
             document.getElementById("messageInput").value = "";
+        }
 
-            connection.on("ReceiveMessage", (user, message) => {
-                const currentUserId = document.getElementById("senderId").value;
-                const isSelf = currentUserId === userId;
+        // 🧠 Place this outside to avoid multiple registrations
+        connection.on("ReceiveMessage", (user, message) => {
+            const isSelf = message.senderId === currentUserId;
 
-                if (isSelf) {
-                    const existingMsg = [...document.getElementById("messagesList").children]
-                        .reverse()
-                        .find(el => el.textContent.includes(message.content));
+            // Try to update status of existing message if self
+            if (isSelf) {
+                const existingMsg = [...document.getElementById("messagesList").children]
+                    .reverse()
+                    .find(el => el.textContent.includes(message.content));
 
-                    if (existingMsg) {
-                        const statusEl = existingMsg.querySelector(".status-text");
-                        if (statusEl) {
-                            statusEl.textContent = `[${getMessageStatusText(message.status)}]`;
-                        }
-                        return;
+                if (existingMsg) {
+                    const statusEl = existingMsg.querySelector(".status-text");
+                    if (statusEl) {
+                        statusEl.textContent = `[${getMessageStatusText(message.status)}]`;
                     }
+                    return;
                 }
-                const li = document.createElement("div");
-                li.innerHTML = `<strong>${isSelf ? "You" : "Dealer"}:</strong> ${message.content} <span class="status-text" style="font-size: 0.8em; color: gray;">[${getMessageStatusText(message.status)}]</span>`;
-                const list = document.getElementById("messagesList");
-                list.appendChild(li);
-                list.scrollTop = list.scrollHeight;
-            });
-            };
-        
+            }
 
-       
-       
-
-        
-
-        //  document.getElementById("sendMessageForm").addEventListener("submit", function (e) {
-        //     e.preventDefault();
-
-        //     const messageDto = {
-        //         conversationId: document.getElementById("conversationId").value,
-        //         content: document.getElementById("messageInput").value,
-        //         senderId: document.getElementById("senderId").value
-        //     };
-
-        //     connection.invoke("SendMessage", messageDto).then(() => console.log("Message sent"))
-        //         .catch(function (err) {
-        //             console.error("SendMessage error:", err.toString());
-        //         });
-
-        //     document.getElementById("messageInput").value = "";
-        // });
-
-
-
-        startConnection();
+            const li = document.createElement("div");
+            li.innerHTML = `<strong>${isSelf ? "You" : "Dealer"}:</strong> ${message.content} <span class="status-text" style="font-size: 0.8em; color: gray;">[${getMessageStatusText(message.status)}]</span>`;
+            const list = document.getElementById("messagesList");
+            list.appendChild(li);
+            list.scrollTop = list.scrollHeight;
+        });
     </script>
 }
