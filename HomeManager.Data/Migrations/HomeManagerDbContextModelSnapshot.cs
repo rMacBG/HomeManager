@@ -38,7 +38,7 @@ namespace HomeManager.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Conversations");
+                    b.ToTable("Conversations", (string)null);
                 });
 
             modelBuilder.Entity("HomeManager.Data.Data.Models.Home", b =>
@@ -84,7 +84,7 @@ namespace HomeManager.Data.Migrations
 
                     b.HasIndex("LandlordId");
 
-                    b.ToTable("Homes");
+                    b.ToTable("Homes", (string)null);
                 });
 
             modelBuilder.Entity("HomeManager.Data.Data.Models.Message", b =>
@@ -116,7 +116,7 @@ namespace HomeManager.Data.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("HomeManager.Data.Data.Models.User", b =>
@@ -155,7 +155,7 @@ namespace HomeManager.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
 
                     b.HasDiscriminator().HasValue("User");
 
@@ -185,7 +185,7 @@ namespace HomeManager.Data.Migrations
 
                     b.HasIndex("ConversationId");
 
-                    b.ToTable("UsersConversations");
+                    b.ToTable("UsersConversations", (string)null);
                 });
 
             modelBuilder.Entity("HomeManager.Data.Data.Models.Landlord", b =>

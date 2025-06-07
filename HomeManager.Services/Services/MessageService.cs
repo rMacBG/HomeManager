@@ -27,7 +27,7 @@ namespace HomeManager.Services.Services
                 Id = x.Id,
                 Content = x.Content,
                 SenderId = x.SenderId,
-                MessageStatus = x.Status,
+                MessageStatus = (Data.Data.Models.Enums.MessageStatus)(int)x.Status,
                 SentAt = x.SentAt,
             });
 
@@ -53,15 +53,13 @@ namespace HomeManager.Services.Services
 
             await _messageRepository.AddAsync(message);
 
-
-
             return new MessageDto {
                 Id = message.Id,
                 ConversationId = message.ConversationId,
                 Content = message.Content,
                 SenderId = message.SenderId,
                 SentAt = message.SentAt,
-                MessageStatus = message.Status
+                MessageStatus = (Data.Data.Models.Enums.MessageStatus)(int)message.Status
             };
 
 

@@ -30,6 +30,7 @@ namespace HomeManager.Data.Data.Models
         public Guid SenderId { get; set; }
         public User Sender { get; set; }
 
-        
+
+
     }
 }

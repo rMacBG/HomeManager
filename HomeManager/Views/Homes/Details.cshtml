@@ -165,14 +165,16 @@
             const list = document.getElementById("messagesList");
             list.innerHTML = "";
 
+            
+
+            document.getElementById("chatBox").style.display = "block";
+
             messages.forEach(msg => {
                 const div = document.createElement("div");
                 const isSelf = msg.senderId === currentUserId;
-                div.textContent = `${isSelf ? "You" : "Dealer"}: ${msg.content} (${getMessageStatusText(msg.status)})`;
+                div.textContent = `${isSelf ? "You" : "Dealer"}: ${msg.content} (${getMessageStatusText(status)})`;
                 list.appendChild(div);
             });
-
-            document.getElementById("chatBox").style.display = "block";
         }
 
         function getMessageStatusText(status) {
@@ -187,6 +189,7 @@
                 default: return `Unknown (${status})`;
             }
         }
+        
 
         document.getElementById("openChatBtn").addEventListener("click", async () => {
             await prepareChat("@Model.Home.Id");
