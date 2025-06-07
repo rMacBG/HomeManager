@@ -14,7 +14,7 @@ namespace HomeManager.Services.Repositories.Interfaces
         Task<User?> GetByIdAsync(Guid id);
         Task<bool> ExistsByUsernameAsync(string username);
         Task AddAsync(User user);
-
+        Task<IEnumerable<User>> SearchUsersAsync(string query);
         Task UpdateAsync(User user);
 
         Task DeleteAsync(Guid id);

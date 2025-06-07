@@ -85,5 +85,16 @@ namespace HomeManager.Services.Services
                 throw new InvalidOperationException("Cannot delete admin users.");
 
         }
+
+        public async Task<IEnumerable<UserDto>> SearchUsersAsync(string query)
+        {
+            var users = await _userRepository.SearchUsersAsync(query);
+
+            return users.Select(u => new UserDto
+            {
+                Username = u.Username,
+                Id = u.Id,
+            });
+        }
     }
 }

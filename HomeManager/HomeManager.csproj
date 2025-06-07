@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Content Remove="Views\Homes\Edit.cshtml" />
+    <Content Remove="wwwroot\js\SearchEngine.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +35,7 @@
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Views\Homes\Details.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Homes\Edit.cshtml" />
+    <_ContentIncludedByDefault Remove="wwwroot\js\SearchEngine.js" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,6 +44,7 @@
 
   <ItemGroup>
     <None Include="Views\Homes\Edit.cshtml" />
+    <None Include="wwwroot\js\SearchEngine.js" />
   </ItemGroup>
 
 </Project>

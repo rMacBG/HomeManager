@@ -16,7 +16,7 @@ namespace HomeManager.Services.Services
 {
     public class HomeService : IHomeService
     {
-        private readonly IHomeRepository _repository;
+        private readonly IHomeRepository _homeRepository;
         private readonly IUserRepository _userRepository;
         private readonly IConversationService _conversationService;
         private readonly IMapper _mapper;
@@ -24,7 +24,7 @@ namespace HomeManager.Services.Services
 
         public HomeService(IHomeRepository repository, IUserRepository userRepository, IConversationService conversationService, IMapper mapper)
         {
-            _repository = repository;
+            _homeRepository = repository;
             _userRepository = userRepository;
             _conversationService = conversationService;
             _mapper = mapper;
@@ -32,7 +32,7 @@ namespace HomeManager.Services.Services
 
         public async Task<ICollection<HomeDto>> GetAllAsync()
         {
-            var homes = await _repository.GetAllAsync();
+            var homes = await _homeRepository.GetAllAsync();
             return homes.Select(x => new HomeDto
             {
                 Id = x.Id,
@@ -48,7 +48,7 @@ namespace HomeManager.Services.Services
 
         public async Task<HomeDto> GetByIdAsync(Guid id)
         {
-            var home = await _repository.GetByIdAsync(id)
+            var home = await _homeRepository.GetByIdAsync(id)
                 ?? throw new Exception("Home not found!");
 
             var homeById = new HomeDto
@@ -68,7 +68,7 @@ namespace HomeManager.Services.Services
 
         public async Task<IEnumerable<HomeDto>> GetByOwnerIdsync(Guid ownerId)
         {
-            var homes = await _repository.GetByOwnerIdAsync(ownerId);
+            var homes = await _homeRepository.GetByOwnerIdAsync(ownerId);
 
             return homes.Select(home => new HomeDto
             {
@@ -116,13 +116,13 @@ namespace HomeManager.Services.Services
                 LastModifiedAt = DateTime.UtcNow,
 
             };
-            await _repository.AddAsync(home);
+            await _homeRepository.AddAsync(home);
             return home.Id;
         }
 
         public async Task UpdateAsync(Guid id, CreateHomeDto dto)
         {
-            var home = await _repository.GetByIdAsync(id)
+            var home = await _homeRepository.GetByIdAsync(id)
                 ?? throw new Exception("Home not Found!");
             
            // var landlord = await _userRepository.GetByIdAsync(home.LandlordId);
@@ -137,15 +137,25 @@ namespace HomeManager.Services.Services
             home.LastModifiedAt = DateTime.UtcNow;
 
             
-            await _repository.UpdateAsync(home);
+            await _homeRepository.UpdateAsync(home);
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            var home = await _repository.GetByIdAsync(id)
+            var home = await _homeRepository.GetByIdAsync(id)
                 ?? throw new Exception("Home not Found!");
 
-            await _repository.DeleteAsync(home);
+            await _homeRepository.DeleteAsync(home);
+        }
+
+        public async Task<IEnumerable<HomeDto>> SearchHomesAsync(string query)
+        {
+            var homes = await _homeRepository.SearchAsync(query);
+            return homes.Select(h => new HomeDto
+            {
+                HomeName = h.HomeName,
+                Id = h.Id,
+            });
         }
 
         //public async Task<HomeDetailsViewModel> GetHomeDetailsAsync(Guid homeId, Guid userId)

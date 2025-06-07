@@ -30,7 +30,7 @@ namespace HomeManager.Controllers
             _messageService = messageService;
             
         }
-
+        
         public async Task<IActionResult> Index()
         {
              var homes = await _homeService.GetAllAsync();
@@ -47,58 +47,20 @@ namespace HomeManager.Controllers
 
         public async Task<IActionResult> Details(Guid id)
         {
-            // var home = await _homeService.GetByIdAsync(id);
-            //var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            ConversationDto conversation = null;
-             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-             if (userId == null) return Unauthorized();
-
-            var conversationId = await _conversationService.GetOrCreateConversationForHomeAsync(id, Guid.Parse(userId));
-            conversation = new ConversationDto
-            {
-                Id = conversationId,
-
-            };
-            var messages = await _messageService.GetMessagesAsync(conversationId);
-            // if (home == null)
-            // {
-            //     return NotFound();
-            // }
-
-            // //var model = await _homeService.GetHomeDetailsAsync(home.Id, userId);
-            // return View(home);
             var home = await _homeService.GetByIdAsync(id);
 
-            var viewModel = new HomeDetailsViewModel
-            {
-                Home = home,
-                Messages = messages,
-                Conversation = conversation
-               
-            };
+    if (home == null)
+        return NotFound();
 
-            return View(viewModel);
+    var viewModel = new HomeDetailsViewModel
+    {
+        Home = home,      
+    };
+
+    return View(viewModel);
         }
 
-        [HttpGet("api/conversations/for-home/{homeId}")]
-        public async Task<IActionResult> GetOrCreateConversation(Guid homeId)
-        {
-            try
-            {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (userId == null) return Unauthorized();
-
-                var conversationId = await _conversationService.GetOrCreateConversationForHomeAsync(homeId, Guid.Parse(userId));
-
-                return Ok(new { conversationId });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = ex.Message });
-
-            }
-            
-        }
+        
 
         public IActionResult Create()
         {

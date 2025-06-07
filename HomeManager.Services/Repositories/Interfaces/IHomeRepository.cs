@@ -19,5 +19,7 @@ namespace HomeManager.Services.Repositories.Interfaces
 
         public Task DeleteAsync(Home Home);
 
+        Task<IEnumerable<Home>> SearchAsync(string qry);
+
     }
 }

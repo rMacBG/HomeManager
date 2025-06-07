@@ -66,5 +66,12 @@ namespace HomeManager.Services.Repositories
             }
             await _context.SaveChangesAsync();
         }
+
+        public async Task<IEnumerable<User>> SearchUsersAsync(string query)
+        {
+            return await _context.Users
+                .Where(u => u.Username.Contains(query) || u.FullName.Contains(query))
+                .ToListAsync();
+        }
     }
 }

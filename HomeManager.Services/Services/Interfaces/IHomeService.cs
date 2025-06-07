@@ -20,5 +20,7 @@ namespace HomeManager.Services.Services.Interfaces
         Task<Guid> CreateAsync(CreateHomeDto dto);
         Task UpdateAsync(Guid id, CreateHomeDto dto);
         Task DeleteAsync(Guid id);
+
+        Task<IEnumerable<HomeDto>> SearchHomesAsync(string query);
     }
 }

@@ -54,5 +54,12 @@ namespace HomeManager.Services.Repositories
             return await _context.Homes.Where(h => h.LandlordId == ownerId)
                 .ToListAsync();
         }
+
+        public async Task<IEnumerable<Home>> SearchAsync(string qry)
+        {
+            return await _context.Homes
+                .Where(h => h.HomeName.Contains(qry) || h.HomeDescription.Contains(qry))
+                .ToListAsync();
+        }
     }
 }

@@ -88,13 +88,15 @@
 
             <button id="closeChatBtn" class="close-btn">&times;</button>
         </div>
+
         <div class="chat-body" id="messagesList" style="overflow-y:auto;"></div>
         <div class="chat-footer">
             <br />
             
             <input type="text" id="messageInput" placeholder="Type a message..." />
             <input type="hidden" id="senderId" value='@User.FindFirst(ClaimTypes.NameIdentifier)?.Value' />
-            <input type="hidden" id="conversationId" value="@Model.Conversation.Id" />
+            <input type="hidden" id="conversationId" />
+            
 
             <button onclick="sendMessage()">Send</button>
         </div>
@@ -125,44 +127,52 @@
         }
 
         async function prepareChat(homeId) {
-            try {
-                const res = await fetch(`/api/conversations/for-home/${homeId}`, {
-                    credentials: 'include'
-                });
+            const res = await fetch(`/api/conversations/for-home/${homeId}`, {
+                credentials: 'include'
+            });
 
-                if (!res.ok) {
-                    const text = await res.text();
-                    console.error("Failed to get conversationId:", text);
-                    return;
-                }
-
-                const data = await res.json();
-                const conversationId = data.conversationId;
-                document.getElementById("conversationId").value = conversationId;
-
-                const messagesRes = await fetch(`/Conversation/GetMessages?conversationId=${conversationId}`);
-                if (!messagesRes.ok) {
-                    const errorText = await messagesRes.text();
-                    console.error("Failed to get messages:", errorText);
-                    return;
-                }
-
-                const messages = await messagesRes.json();
-                const list = document.getElementById("messagesList");
-                list.innerHTML = ''; // Clear previous messages
-                console.log("Current user ID for comparison:", currentUserId);
-
-                messages.forEach(msg => {
-                    const div = document.createElement("div");
-                    const isOwn = msg.senderId === currentUserId;
-                    div.textContent = `${isOwn ? "You" : "Dealer"}: ${msg.content} (${getMessageStatusText(msg.status)})`;
-                    list.appendChild(div);
-                });
-
-                document.getElementById("chatBox").style.display = "block";
-            } catch (err) {
-                console.error("Failed to fetch conversationId:", err);
+            if (!res.ok) {
+                const errorText = await res.text();
+                alert("Error: " + errorText);
+                return;
             }
+
+            const data = await res.json();
+            const conversationId = data.conversationId;
+            const messagesRes = await fetch(`/Conversation/GetMessages?conversationId=${conversationId}`);
+
+            if (!messagesRes.ok) {
+                const errorText = await messagesRes.text();
+                console.error("Failed to get messages:", errorText);
+                return;
+            }
+
+            let messages;
+            try {
+                messages = await messagesRes.json();
+            } catch (err) {
+                console.error("Failed to parse JSON:", err);
+                return;
+            }
+
+            if (!Array.isArray(messages)) {
+                console.error("Expected array of messages but got:", messages);
+                return;
+            }
+
+            document.getElementById("conversationId").value = conversationId;
+
+            const list = document.getElementById("messagesList");
+            list.innerHTML = "";
+
+            messages.forEach(msg => {
+                const div = document.createElement("div");
+                const isSelf = msg.senderId === currentUserId;
+                div.textContent = `${isSelf ? "You" : "Dealer"}: ${msg.content} (${getMessageStatusText(msg.status)})`;
+                list.appendChild(div);
+            });
+
+            document.getElementById("chatBox").style.display = "block";
         }
 
         function getMessageStatusText(status) {
