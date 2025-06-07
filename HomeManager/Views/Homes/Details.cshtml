@@ -176,9 +176,9 @@
         }
 
         function getMessageStatusText(status) {
-            const num = parseInt(status)
-            switch (num) {
+            const num = parseInt(status);
 
+            switch (num) {
                 case 0: return "Pending";
                 case 1: return "Sent";
                 case 2: return "Delivered";
@@ -233,6 +233,7 @@
 
         connection.on("ReceiveMessage", (message) => {
             console.log("Received message from SignalR:", message);
+            console.log("Received message status:", message.status);
             const isSelf = message.senderId === currentUserId;
 
             if (isSelf) {

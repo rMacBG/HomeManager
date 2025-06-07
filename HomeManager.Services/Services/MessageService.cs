@@ -33,6 +33,11 @@ namespace HomeManager.Services.Services
 
         }
 
+        public async Task MarkMessagesAsSeenAsync(Guid conversationId, Guid userId)
+        {
+          //  var messages = await _messageRepository.GetUnseenMessages;
+        }
+
         public async Task<MessageDto> SendMessageAsync(CreateMessageDto dto)
         {
             var message = new Message

@@ -13,6 +13,8 @@ namespace HomeManager.Data.Data.Dtos
 
         public Guid ConversationId { get; set; }
         public Guid SenderId { get; set; }
+
+        //public Guid ReceiverId { get; set; }
         public string Content { get; set; }
         public DateTime SentAt { get; set; }
         public MessageStatus MessageStatus{ get; set; }

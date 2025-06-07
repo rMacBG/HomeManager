@@ -49,6 +49,17 @@ namespace HomeManager.Services.Services.SignalR
             }
         }
 
+        public async Task MarkAsSeen(Guid conversationId, Guid userId)
+        {
+            await _messageService.MarkMessagesAsSeenAsync(conversationId, userId);
+
+            await Clients.Group(conversationId.ToString()).SendAsync("MessagesSeen", new
+            {
+                conversationId = conversationId,
+                seenBy = userId
+            });
+        }
+
         public override async Task OnConnectedAsync()
         {
             var userIdClaim = Context.User?.FindFirst("nameidentifier")?.Value;
