@@ -39,7 +39,10 @@ namespace HomeManager.Services.Services
         {
             //  var messages = await _messageRepository.GetUnseenMessages;
         }
-
+        public async Task<Message?> GetMessageByIdAsync(Guid messageId)
+        {
+            return await _messageRepository.GetByIdAsync(messageId);
+        }
 
         public async Task<MessageDto> SendMessageAsync(CreateMessageDto dto)
         {
@@ -69,6 +72,8 @@ namespace HomeManager.Services.Services
 
             await _messageRepository.AddAsync(message);
 
+            message.Status = MessageStatus.Sent;
+            await _messageRepository.UpdateAsync(message);
             return new MessageDto
             {
                 Id = message.Id,

@@ -66,13 +66,10 @@ namespace HomeManager.Services.Services
 
         public async Task<Guid> GetOrCreateConversationAsync(Guid userId1, Guid userId2)
         {
-
             try
-                
             {
-                
                 var allConversations = await _conversationRepository.GetByUserIdAsync(userId1);
-                //var userName = await _conversationRepository.GetByUserIdAsync
+
 
                 var existingConversation = allConversations
                     .FirstOrDefault(conv =>

@@ -11,7 +11,6 @@ namespace HomeManager.Services.Repositories.Interfaces
     {
         Task AddAsync(Message message);
         Task<IEnumerable<Message>> GetByConversationIdAsync(Guid conversationId);
-
         Task<IEnumerable<Message>> GetUnseenMessagesAsync(Guid conversationId, Guid receiverId);
         Task<Conversation> GetConversationWithUsersAsync(Guid conversationId);
         Task<Message> GetByIdAsync(Guid id);

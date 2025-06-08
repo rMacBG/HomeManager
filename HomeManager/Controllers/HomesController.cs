@@ -60,8 +60,6 @@ namespace HomeManager.Controllers
     return View(viewModel);
         }
 
-        
-
         public IActionResult Create()
         {
             return View();  

@@ -33,13 +33,21 @@ namespace HomeManager.Services.Services.SignalR
             {
                 var messageId = await _messageService.SendMessageAsync(dto);
 
+                var message = await _messageService.GetMessageByIdAsync(messageId.Id);
+
+                if (message == null)
+                {
+                    Console.WriteLine("Message not found after sending.");
+                    return;
+                }
+
                 var payload = new
                 {
-                    messageId = messageId,
-                    senderId = dto.SenderId,
-                    content = dto.Content,
-                    sentAt = DateTime.UtcNow.ToString("dd/MM/yyyy"),
-                    status = (int)dto.Status
+                    messageId = message.Id,
+                    senderId = message.SenderId,
+                    content = message.Content,
+                    sentAt = message.SentAt.ToString("dd/MM/yyyy"),
+                    status = (int)message.Status
                 };
 
                 await Clients.Group(dto.ConversationId.ToString())

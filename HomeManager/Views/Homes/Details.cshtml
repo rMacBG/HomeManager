@@ -172,13 +172,13 @@
             messages.forEach(msg => {
                 const div = document.createElement("div");
                 const isSelf = msg.senderId === currentUserId;
-                div.textContent = `${isSelf ? "You" : "Dealer"}: ${msg.content} (${getMessageStatusText(status)})`;
+                div.textContent = `${isSelf ? "You" : "Dealer"}: ${msg.content} (${getMessageStatusText(msg.status)})`;
                 list.appendChild(div);
             });
         }
 
-        function getMessageStatusText(status) {
-            const num = parseInt(status);
+        function getMessageStatusText(messageStatus) {
+            const num = parseInt(messageStatus ?? 0);
 
             switch (num) {
                 case 0: return "Pending";
@@ -186,7 +186,7 @@
                 case 2: return "Delivered";
                 case 3: return "Seen";
                 case 4: return "Failed";
-                default: return `Unknown (${status})`;
+                default: return `Unknown (${messageStatus})`;
             }
         }
         
@@ -223,7 +223,7 @@
             li.id = tempId;
             li.dataset.content = msg;
             li.dataset.temp = "true";
-            li.innerHTML = `<strong>You:</strong> ${msg} <span class="status-text status-text-${tempId}" style="font-size:0.8em; color: gray;">[Sending...]</span>`;
+            li.innerHTML = `<strong>You:</strong> ${msg} <span class="status-text status-text-${tempId}" style="font-size:0.8em; color: gray;">(${status})</span>`;
             document.getElementById("messagesList").appendChild(li);
             document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
 
@@ -236,7 +236,7 @@
 
         connection.on("ReceiveMessage", (message) => {
             
-            // const isSelf = message.senderId === currentUserId;
+             const isSelf = message.senderId === currentUserId;
 
             if (message.senderId !== currentUserId) {
                 
@@ -274,7 +274,7 @@
             const li = document.createElement("div");
             li.innerHTML = `
                 <strong>${isSelf ? "You" : "Dealer"}:</strong> ${message.content}
-                <span class="status-text" style="font-size: 0.8em; color: gray;">[${getMessageStatusText(message.status)}]</span>
+                <span class="status-text" style="font-size: 0.8em; color: gray;">[${getMessageStatusText(message.messageStatus)}]</span>
             `;
             document.getElementById("messagesList").appendChild(li);
             document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
