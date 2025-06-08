@@ -61,6 +61,18 @@ namespace HomeManager.Data.Data.Context
                 .HasOne(uc => uc.Conversation)
                 .WithMany(c => c.UsersConversations)
                 .HasForeignKey(uc => uc.ConversationId);
+
+            modelBuilder.Entity<Message>()
+        .HasOne(m => m.Sender)
+        .WithMany()
+        .HasForeignKey(m => m.SenderId)
+        .OnDelete(DeleteBehavior.Restrict); // <== prevent cascade
+
+            modelBuilder.Entity<Message>()
+                .HasOne(m => m.Receiver)
+                .WithMany()
+                .HasForeignKey(m => m.ReceiverId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

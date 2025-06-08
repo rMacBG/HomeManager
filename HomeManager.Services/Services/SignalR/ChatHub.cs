@@ -1,5 +1,6 @@
 ﻿using HomeManager.Data.Data.Dtos;
 using HomeManager.Data.Data.Models.Enums;
+using HomeManager.Services.Repositories.Interfaces;
 using HomeManager.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -17,11 +18,13 @@ namespace HomeManager.Services.Services.SignalR
     {
         private readonly IMessageService _messageService;
         private readonly IConversationService _conversationService;
+        private readonly IMessageRepository _messageRepository;
 
-        public ChatHub(IMessageService messageService, IConversationService conversationService)
+        public ChatHub(IMessageService messageService, IConversationService conversationService, IMessageRepository messageRepository)
         {
             _messageService = messageService;
             _conversationService = conversationService;
+            _messageRepository = messageRepository;
         }
 
         public async Task SendMessage(CreateMessageDto dto)
@@ -48,16 +51,39 @@ namespace HomeManager.Services.Services.SignalR
                 throw;
             }
         }
-
-        public async Task MarkAsSeen(Guid conversationId, Guid userId)
+        public async Task AcknowledgeDelivery(Guid messageId)
         {
-            await _messageService.MarkMessagesAsSeenAsync(conversationId, userId);
+            var message = await _messageRepository.GetByIdAsync(messageId);
+            if (message == null || message.Status >= MessageStatus.Delivered)
+                return;
 
-            await Clients.Group(conversationId.ToString()).SendAsync("MessagesSeen", new
+            message.Status = MessageStatus.Delivered;
+            await _messageRepository.UpdateAsync(message);
+
+            await Clients.User(message.SenderId.ToString())
+                         .SendAsync("UpdateMessageStatus", new
+                         {
+                             messageId = message.Id,
+                             status = message.Status
+                         });
+        }
+        public async Task MarkMessagesAsSeen(Guid conversationId)
+        {
+            var userId = Context.UserIdentifier;
+            var unseen = await _messageRepository.GetUnseenMessagesAsync(conversationId, Guid.Parse(userId));
+
+            foreach (var msg in unseen)
             {
-                conversationId = conversationId,
-                seenBy = userId
-            });
+                msg.Status = MessageStatus.Seen;
+                await _messageRepository.UpdateAsync(msg);
+
+                await Clients.User(msg.SenderId.ToString())
+                             .SendAsync("UpdateMessageStatus", new
+                             {
+                                 messageId = msg.Id,
+                                 status = msg.Status
+                             });
+            }
         }
 
         public override async Task OnConnectedAsync()

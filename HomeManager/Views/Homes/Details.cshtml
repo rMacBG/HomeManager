@@ -235,24 +235,41 @@
         }
 
         connection.on("ReceiveMessage", (message) => {
-            console.log("Received message from SignalR:", message);
-            console.log("Received message status:", message.status);
-            const isSelf = message.senderId === currentUserId;
+            
+            // const isSelf = message.senderId === currentUserId;
 
-            if (isSelf) {
-                const existingMsg = [...document.getElementById("messagesList").children]
-                    .reverse()
-                    .find(el => el.dataset.content === message.content && el.dataset.temp === "true");
-
-                if (existingMsg) {
-                    const statusEl = existingMsg.querySelector(".status-text");
-                    if (statusEl) {
-                        statusEl.textContent = `[${getMessageStatusText(message.status)}]`;
-                    }
-                    existingMsg.dataset.temp = "false"; // no longer temporary
-                    return;
-                }
+            if (message.senderId !== currentUserId) {
+                
+                connection.invoke("AcknowledgeDelivery", message.messageId)
+                    .catch(err => console.error("Ack delivery failed", err));
             }
+
+            function markAllAsSeen(conversationId) {
+                connection.invoke("MarkMessagesAsSeen", conversationId)
+                    .catch(err => console.error("Mark as seen failed", err));
+            }
+
+            connection.on("UpdateMessageStatus", ({ messageId, status }) => {
+                const statusEl = document.querySelector(`.status-text-${messageId}`);
+                if (statusEl) {
+                    statusEl.textContent = `[${getMessageStatusText(status)}]`;
+                }
+            });
+
+            // if (isSelf) {
+            //     const existingMsg = [...document.getElementById("messagesList").children]
+            //         .reverse()
+            //         .find(el => el.dataset.content === message.content && el.dataset.temp === "true");
+
+            //     if (existingMsg) {
+            //         const statusEl = existingMsg.querySelector(".status-text");
+            //         if (statusEl) {
+            //             statusEl.textContent = `[${getMessageStatusText(message.status)}]`;
+            //         }
+            //         existingMsg.dataset.temp = "false"; 
+            //         return;
+            //     }
+            // }
 
             const li = document.createElement("div");
             li.innerHTML = `

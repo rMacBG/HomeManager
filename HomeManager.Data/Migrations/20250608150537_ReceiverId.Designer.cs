@@ -4,6 +4,7 @@ using HomeManager.Data.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeManager.Data.Migrations
 {
     [DbContext(typeof(HomeManagerDbContext))]
-    partial class HomeManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250608150537_ReceiverId")]
+    partial class ReceiverId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,7 +104,7 @@ namespace HomeManager.Data.Migrations
                     b.Property<Guid>("ConversationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ReceiverId")
+                    b.Property<Guid?>("ReceiverId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("SenderId")
@@ -171,7 +174,7 @@ namespace HomeManager.Data.Migrations
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
                             FullName = "Admin User",
-                            PasswordHash = "$2a$11$JDjcZ6HlN3GwqFUgSZJJb.90dXE/zB0TS9/.nHU9CGTJVMdwysNVa",
+                            PasswordHash = "$2a$11$TWYCOaTEmF.QoNsWq9cdPOXF9Ql9dfqc4tL30Yz07EyRKlmMvIeGm",
                             PhoneNumber = "0000000000",
                             Role = 1,
                             Username = "admin"
@@ -226,8 +229,7 @@ namespace HomeManager.Data.Migrations
                     b.HasOne("HomeManager.Data.Data.Models.User", "Receiver")
                         .WithMany()
                         .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("HomeManager.Data.Data.Models.User", "Sender")
                         .WithMany()
