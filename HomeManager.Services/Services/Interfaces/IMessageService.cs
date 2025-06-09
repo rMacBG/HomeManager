@@ -14,6 +14,8 @@ namespace HomeManager.Services.Services.Interfaces
         Task<IEnumerable<MessageDto>> GetMessagesAsync(Guid conversationId);
         Task<Message?> GetMessageByIdAsync(Guid messageId);
         Task MarkMessagesAsSeenAsync(Guid conversationId, Guid userId);
-        
+        Task MarkAsDeliveredAsync(Guid messageId);
+        Task<IEnumerable<Message>> MarkAllAsSeenAsync(Guid conversationId, Guid receiverId);
+
     }
 }

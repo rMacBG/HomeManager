@@ -15,5 +15,6 @@ namespace HomeManager.Services.Repositories.Interfaces
         Task<Conversation> GetConversationWithUsersAsync(Guid conversationId);
         Task<Message> GetByIdAsync(Guid id);
         Task UpdateAsync(Message message);
+
     }
 }

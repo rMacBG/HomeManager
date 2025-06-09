@@ -172,7 +172,11 @@
             messages.forEach(msg => {
                 const div = document.createElement("div");
                 const isSelf = msg.senderId === currentUserId;
-                div.textContent = `${isSelf ? "You" : "Dealer"}: ${msg.content} (${getMessageStatusText(msg.status)})`;
+
+               
+                const status = msg.status ?? msg.messageStatus ?? 0;
+
+                div.innerHTML = `<strong>${isSelf ? "You" : "Dealer"}:</strong> ${msg.content} <span class="status-text" style="font-size:0.8em; color: gray;">[${getMessageStatusText(status)}]</span>`;
                 list.appendChild(div);
             });
         }
@@ -223,7 +227,10 @@
             li.id = tempId;
             li.dataset.content = msg;
             li.dataset.temp = "true";
-            li.innerHTML = `<strong>You:</strong> ${msg} <span class="status-text status-text-${tempId}" style="font-size:0.8em; color: gray;">(${status})</span>`;
+            li.id = tempId;
+            li.dataset.content = msg;
+            li.dataset.temp = "true";
+            li.innerHTML = `<strong>You:</strong> ${msg} <span class="status-text status-text-${tempId}" style="font-size:0.8em; color: gray;">[${getMessageStatusText(0)}]</span>`;
             document.getElementById("messagesList").appendChild(li);
             document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
 
@@ -235,46 +242,28 @@
         }
 
         connection.on("ReceiveMessage", (message) => {
-            
-             const isSelf = message.senderId === currentUserId;
+            const isSelf = message.senderId === currentUserId;
 
-            if (message.senderId !== currentUserId) {
-                
-                connection.invoke("AcknowledgeDelivery", message.messageId)
-                    .catch(err => console.error("Ack delivery failed", err));
-            }
+            if (isSelf && message.tempId) {
+                const tempEl = document.getElementById(message.tempId);
 
-            function markAllAsSeen(conversationId) {
-                connection.invoke("MarkMessagesAsSeen", conversationId)
-                    .catch(err => console.error("Mark as seen failed", err));
-            }
+                if (tempEl) {
+                    const statusEl = tempEl.querySelector("span.status-text");
+                    if (statusEl) {
+                        statusEl.className = `status-text status-text-${message.messageId}`;
+                        statusEl.textContent = `[${getMessageStatusText(message.messageStatus)}]`;
+                    }
 
-            connection.on("UpdateMessageStatus", ({ messageId, status }) => {
-                const statusEl = document.querySelector(`.status-text-${messageId}`);
-                if (statusEl) {
-                    statusEl.textContent = `[${getMessageStatusText(status)}]`;
+                    tempEl.dataset.temp = "false";
+                    tempEl.id = message.messageId;
+                    return;
                 }
-            });
-
-            // if (isSelf) {
-            //     const existingMsg = [...document.getElementById("messagesList").children]
-            //         .reverse()
-            //         .find(el => el.dataset.content === message.content && el.dataset.temp === "true");
-
-            //     if (existingMsg) {
-            //         const statusEl = existingMsg.querySelector(".status-text");
-            //         if (statusEl) {
-            //             statusEl.textContent = `[${getMessageStatusText(message.status)}]`;
-            //         }
-            //         existingMsg.dataset.temp = "false"; 
-            //         return;
-            //     }
-            // }
+            }
 
             const li = document.createElement("div");
             li.innerHTML = `
                 <strong>${isSelf ? "You" : "Dealer"}:</strong> ${message.content}
-                <span class="status-text" style="font-size: 0.8em; color: gray;">[${getMessageStatusText(message.messageStatus)}]</span>
+                <span class="status-text status-text-${message.messageId}" style="font-size: 0.8em; color: gray;">[${getMessageStatusText(message.status)}]</span>
             `;
             document.getElementById("messagesList").appendChild(li);
             document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;

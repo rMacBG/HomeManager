@@ -18,5 +18,7 @@ namespace HomeManager.Data.Data.Dtos
 
         public MessageStatus Status { get; set; }
 
+        public string TempId { get; set; }
+
     }
 }

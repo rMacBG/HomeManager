@@ -86,6 +86,28 @@ namespace HomeManager.Services.Services
             };
         }
 
+        public async Task MarkAsDeliveredAsync(Guid messageId)
+        {
+            var message = await _messageRepository.GetByIdAsync(messageId);
+            if (message == null) return;
+
+            message.Status = MessageStatus.Delivered;
+            await _messageRepository.UpdateAsync(message);
+        }
+
+        public async Task<IEnumerable<Message>> MarkAllAsSeenAsync(Guid conversationId, Guid receiverId)
+        {
+            var messages = await _messageRepository.GetUnseenMessagesAsync(conversationId, receiverId);
+
+            foreach (var msg in messages)
+            {
+                msg.Status = MessageStatus.Seen;
+                await _messageRepository.UpdateAsync(msg);
+            }
+
+            return messages;
+        }
+
     }
 
 }

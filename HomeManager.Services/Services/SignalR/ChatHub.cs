@@ -31,15 +31,7 @@ namespace HomeManager.Services.Services.SignalR
         {
             try
             {
-                var messageId = await _messageService.SendMessageAsync(dto);
-
-                var message = await _messageService.GetMessageByIdAsync(messageId.Id);
-
-                if (message == null)
-                {
-                    Console.WriteLine("Message not found after sending.");
-                    return;
-                }
+                var message = await _messageService.SendMessageAsync(dto);
 
                 var payload = new
                 {
@@ -47,7 +39,8 @@ namespace HomeManager.Services.Services.SignalR
                     senderId = message.SenderId,
                     content = message.Content,
                     sentAt = message.SentAt.ToString("dd/MM/yyyy"),
-                    status = (int)message.Status
+                    status = (int)message.MessageStatus,
+                    tempId = dto.TempId,
                 };
 
                 await Clients.Group(dto.ConversationId.ToString())
@@ -61,19 +54,18 @@ namespace HomeManager.Services.Services.SignalR
         }
         public async Task AcknowledgeDelivery(Guid messageId)
         {
-            var message = await _messageRepository.GetByIdAsync(messageId);
-            if (message == null || message.Status >= MessageStatus.Delivered)
-                return;
+            await _messageService.MarkAsDeliveredAsync(messageId);
 
-            message.Status = MessageStatus.Delivered;
-            await _messageRepository.UpdateAsync(message);
+            var message = await _messageService.GetMessageByIdAsync(messageId);
 
-            await Clients.User(message.SenderId.ToString())
-                         .SendAsync("UpdateMessageStatus", new
-                         {
-                             messageId = message.Id,
-                             status = message.Status
-                         });
+            if (message != null)
+            {
+                await Clients.Group(message.ConversationId.ToString()).SendAsync("UpdateMessageStatus", new
+                {
+                    messageId = message.Id,
+                    status = (int)message.Status
+                });
+            }
         }
         public async Task MarkMessagesAsSeen(Guid conversationId)
         {

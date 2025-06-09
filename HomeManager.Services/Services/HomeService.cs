@@ -124,8 +124,7 @@ namespace HomeManager.Services.Services
         {
             var home = await _homeRepository.GetByIdAsync(id)
                 ?? throw new Exception("Home not Found!");
-            
-           // var landlord = await _userRepository.GetByIdAsync(home.LandlordId);
+           
             
             home.HomeName = dto.HomeName;
             home.HomeLocation = dto.HomeLocation;
@@ -133,7 +132,7 @@ namespace HomeManager.Services.Services
             home.HomeDescription = dto.HomeDescription;
             home.HomeDealType = dto.HomeDealType;
             home.HomePrice = dto.HomePrice;
-            // home.LandlordId = dto.LandlordId;
+            
             home.LastModifiedAt = DateTime.UtcNow;
 
             
@@ -158,18 +157,5 @@ namespace HomeManager.Services.Services
             });
         }
 
-        //public async Task<HomeDetailsViewModel> GetHomeDetailsAsync(Guid homeId, Guid userId)
-        //{
-        //    var home = await _repository.GetByIdAsync(homeId);
-        //    if (home == null) throw new Exception("Home not found!");
-
-        //    var conversation = await _conversationService.GetOrCreateConversationAsync(userId, home.LandlordId);
-
-        //    return new HomeDetailsViewModel
-        //    {
-        //        Home = _mapper.Map<HomeDto>(home),
-        //        Conversation = _mapper.Map<ConversationDto>(conversation)
-        //    };
-        //}
     }
 }
