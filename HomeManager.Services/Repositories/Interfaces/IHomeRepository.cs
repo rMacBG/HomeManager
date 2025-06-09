@@ -14,6 +14,7 @@ namespace HomeManager.Services.Repositories.Interfaces
         public Task<Home> GetByIdAsync(Guid Id);
         public Task<ICollection<Home>> GetByOwnerIdAsync(Guid ownerId);
 
+        Task AddHomeImageAsync(HomeImage image);
         public Task AddAsync(Home home);
         public Task UpdateAsync(Home home);
 

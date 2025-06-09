@@ -28,12 +28,12 @@ namespace HomeManager.Controllers
             _userService = userService;
             _conversationService = conversationService;
             _messageService = messageService;
-            
+
         }
-        
+
         public async Task<IActionResult> Index()
         {
-             var homes = await _homeService.GetAllAsync();
+            var homes = await _homeService.GetAllAsync();
             return View(homes);
         }
 
@@ -49,20 +49,20 @@ namespace HomeManager.Controllers
         {
             var home = await _homeService.GetByIdAsync(id);
 
-    if (home == null)
-        return NotFound();
+            if (home == null)
+                return NotFound();
 
-    var viewModel = new HomeDetailsViewModel
-    {
-        Home = home,      
-    };
+            var viewModel = new HomeDetailsViewModel
+            {
+                Home = home,
+            };
 
-    return View(viewModel);
+            return View(viewModel);
         }
 
         public IActionResult Create()
         {
-            return View();  
+            return View();
         }
 
         [HttpPost]
@@ -76,7 +76,7 @@ namespace HomeManager.Controllers
             var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             dto.LandlordId = userId;
             await _homeService.CreateAsync(dto);
-            return RedirectToAction(nameof(Index)); 
+            return RedirectToAction(nameof(Index));
         }
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
@@ -98,7 +98,7 @@ namespace HomeManager.Controllers
         {
             if (!ModelState.IsValid) return View(dto);
             var userId = User.FindFirst("nameidentifier")?.Value;
-            
+
             await _homeService.UpdateAsync(id, dto);
             return RedirectToAction(nameof(Index));
         }

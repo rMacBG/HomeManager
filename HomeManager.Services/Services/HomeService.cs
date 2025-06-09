@@ -5,6 +5,8 @@ using HomeManager.Data.Data.Models.Interfaces;
 using HomeManager.Data.Data.ViewModels;
 using HomeManager.Services.Repositories.Interfaces;
 using HomeManager.Services.Services.Interfaces;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -20,14 +22,16 @@ namespace HomeManager.Services.Services
         private readonly IUserRepository _userRepository;
         private readonly IConversationService _conversationService;
         private readonly IMapper _mapper;
-        private IHomeRepository @object;
+        private readonly IWebHostEnvironment _env;
 
-        public HomeService(IHomeRepository repository, IUserRepository userRepository, IConversationService conversationService, IMapper mapper)
+        public HomeService(IHomeRepository repository, IUserRepository userRepository, IConversationService conversationService, IMapper mapper, IWebHostEnvironment env)
         {
             _homeRepository = repository;
             _userRepository = userRepository;
             _conversationService = conversationService;
             _mapper = mapper;
+
+            _env = env;
         }
 
         public async Task<ICollection<HomeDto>> GetAllAsync()
@@ -61,7 +65,13 @@ namespace HomeManager.Services.Services
                 HomeDealType= home.HomeDealType,
                 HomePrice = home.HomePrice,
                 LandlordId= home.LandlordId,
-            };
+                
+                Images = home.Images.Select(img => new HomeImageDto
+                {
+                    FilePath = img.FilePath,
+                }).ToList()
+            
+        };
 
             return homeById;
         }
@@ -116,6 +126,31 @@ namespace HomeManager.Services.Services
                 LastModifiedAt = DateTime.UtcNow,
 
             };
+
+            if (dto.UploadedImages != null)
+            {
+                foreach (var image in dto.UploadedImages)
+                {
+                    if (image.Length > 0)
+                    {
+                        var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
+                        Directory.CreateDirectory(uploadsFolder);
+
+                        var uniqueFileName = Guid.NewGuid() + Path.GetExtension(image.FileName);
+                        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await image.CopyToAsync(stream);
+                        }
+
+                        home.Images.Add(new HomeImage
+                        {
+                            FilePath = "/uploads/" + uniqueFileName
+                        });
+                    }
+                }
+            }
             await _homeRepository.AddAsync(home);
             return home.Id;
         }
@@ -155,6 +190,33 @@ namespace HomeManager.Services.Services
                 HomeName = h.HomeName,
                 Id = h.Id,
             });
+        }
+
+        public async Task<string> UploadHomeImageAsync(Guid homeId, IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                throw new ArgumentException("Invalid image file.");
+
+            var uploadsPath = Path.Combine(_env.WebRootPath, "uploads");
+            Directory.CreateDirectory(uploadsPath);
+
+            var fileName = Guid.NewGuid() + Path.GetExtension(file.FileName);
+            var filePath = Path.Combine(uploadsPath, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var homeImage = new HomeImage
+            {
+                HomeId = homeId,
+                FilePath = "/uploads/" + fileName
+            };
+
+            await _homeRepository.AddHomeImageAsync(homeImage);
+
+            return homeImage.FilePath;
         }
 
     }

@@ -4,6 +4,7 @@ using HomeManager.Data.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeManager.Data.Migrations
 {
     [DbContext(typeof(HomeManagerDbContext))]
-    partial class HomeManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250609165719_PicturesForHomes")]
+    partial class PicturesForHomes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -104,7 +107,7 @@ namespace HomeManager.Data.Migrations
 
                     b.HasIndex("HomeId");
 
-                    b.ToTable("HomeImages");
+                    b.ToTable("HomeImage");
                 });
 
             modelBuilder.Entity("HomeManager.Data.Data.Models.Message", b =>
@@ -191,7 +194,7 @@ namespace HomeManager.Data.Migrations
                         {
                             Id = new Guid("11111111-1111-1111-1111-111111111111"),
                             FullName = "Admin User",
-                            PasswordHash = "$2a$11$emWANEmvlyHz3Y5z73K/dut.kcPCzR2pgg6lj79tckd8bm4B4Qn62",
+                            PasswordHash = "$2a$11$EaIG1HvPboP0N9vNAfIAPemOgcdsZUPV2FtFWzPUVa7H.tgayXKti",
                             PhoneNumber = "0000000000",
                             Role = 1,
                             Username = "admin"

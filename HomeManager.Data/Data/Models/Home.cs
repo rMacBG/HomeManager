@@ -30,6 +30,7 @@ namespace HomeManager.Data.Data.Models
         [Required]
         [Range(0.01, 100000000, ConvertValueInInvariantCulture = true)]
         public decimal HomePrice { get; set; }
+        public List<HomeImage> Images { get; set; } = new();
         [Required]
         [ForeignKey(nameof(Landlord))]
         public Guid LandlordId { get; set; }

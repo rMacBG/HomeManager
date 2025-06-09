@@ -46,9 +46,8 @@
                                 <input type="text" id="searchInput" placeholder="Search homes or users..." autocomplete="off" />
                                 <button type="submit">Search</button>
                             </form>
-
-                            <div id="searchResults"></div>
-                        </li>
+                            
+                            <div id="searchResults" style="position:absolute; z-index: 1000; background:#fff; width:250px;"></div>
                         @if (isAuthenticated)
                         {
                             <li class="nav-item">

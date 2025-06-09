@@ -33,6 +33,8 @@ namespace HomeManager.Data.Data.Context
         public DbSet<Message> Messages { get; set; }
         public DbSet<UserConversation> UsersConversations{ get; set; }
 
+        public DbSet<HomeImage> HomeImages { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
 

@@ -4,7 +4,7 @@
     const resultsDiv = document.getElementById("searchResults");
 
     form.addEventListener("submit", async function (e) {
-        e.preventDefault(); // prevent actual form submission
+        e.preventDefault(); // Prevent form submission
 
         const query = input.value.trim();
         if (query.length < 2) {
@@ -14,18 +14,25 @@
 
         try {
             const res = await fetch(`/Search/GetResults?query=${encodeURIComponent(query)}`);
-            if (!res.ok) throw new Error("Failed to fetch");
-
+            if (!res.ok) {
+                throw new Error(`HTTP error: ${res.status}`);
+            }
             const data = await res.json();
             resultsDiv.innerHTML = "";
 
-            data.forEach(item => {
-                const div = document.createElement("div");
-                div.textContent = item.name || item.homeName; // adjust as needed
-                resultsDiv.appendChild(div);
-            });
+            if (data.length === 0) {
+                resultsDiv.textContent = "No results found.";
+            } else {
+                data.forEach(item => {
+                    const div = document.createElement("div");
+                    // Display the result with name and type
+                    div.textContent = `${item.name} (${item.type})`;
+                    resultsDiv.appendChild(div);
+                });
+            }
         } catch (err) {
             console.error("Search failed:", err);
+            resultsDiv.textContent = "An error occurred during search.";
         }
     });
 });

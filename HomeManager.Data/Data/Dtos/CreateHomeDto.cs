@@ -1,4 +1,5 @@
 ﻿using HomeManager.Data.Data.Models.Enums;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -27,5 +28,7 @@ namespace HomeManager.Data.Data.Dtos
         public decimal HomePrice { get; set; }
         [Required]
         public Guid LandlordId { get; set; }
+
+        public List<IFormFile> UploadedImages { get; set; } = new();
     }
 }

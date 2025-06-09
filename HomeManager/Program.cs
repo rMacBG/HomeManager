@@ -30,6 +30,16 @@ builder.Services.AddScoped<IHomeService, HomeService>();
 builder.Services.AddScoped<IConversationService, ConversationService>();
 builder.Services.AddScoped<IMessageService, MessageService>();
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        });
+});
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -102,13 +112,8 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseCookiePolicy();
-app.UseCors(policy =>
-{
-    policy.WithOrigins("https://localhost:7206")
-          .AllowAnyHeader()
-          .AllowAnyMethod()
-          .AllowCredentials();
-});
+app.UseCors("AllowAll");
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapHub<ChatHub>("/hubs/chat");

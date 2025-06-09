@@ -1,6 +1,6 @@
 ﻿@using HomeManager.Data.Data.Models.Enums
 @model HomeManager.Data.Data.Dtos.CreateHomeDto
-<form asp-action="Create" method="post">
+<form asp-action="Create" method="post" enctype="multipart/form-data">
     <input asp-for="HomeName" class="form-control" placeholder="Title" />
     <textarea asp-for="HomeDescription" class="form-control" placeholder="Description"></textarea>
     <input asp-for="HomeLocation" class="form-control" placeholder="Address" />
@@ -22,5 +22,10 @@
         <span asp-validation-for="HomeDealType" class="text-danger"></span>
     </div>
     <input asp-for="HomeLocation" class="form-control" placeholder="Google Maps Link or Coordinates" />
+
+    <div class="form-group">
+        <label for="UploadedImages">Upload Images</label>
+        <input type="file" name="UploadedImages" multiple class="form-control" />
+    </div>
     <button type="submit" class="btn btn-primary">Create Listing</button>
 </form>

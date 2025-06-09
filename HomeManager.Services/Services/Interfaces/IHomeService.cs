@@ -1,5 +1,6 @@
 ﻿using HomeManager.Data.Data.Dtos;
 using HomeManager.Data.Data.ViewModels;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace HomeManager.Services.Services.Interfaces
         Task<Guid> CreateAsync(CreateHomeDto dto);
         Task UpdateAsync(Guid id, CreateHomeDto dto);
         Task DeleteAsync(Guid id);
-
+        Task<string> UploadHomeImageAsync(Guid homeId, IFormFile file);
         Task<IEnumerable<HomeDto>> SearchHomesAsync(string query);
     }
 }

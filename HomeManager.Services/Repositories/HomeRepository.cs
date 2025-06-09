@@ -27,7 +27,8 @@ namespace HomeManager.Services.Repositories
         public async Task<Home?> GetByIdAsync(Guid Id)
         {
             //return await _context.Homes.FindAsync(Id);
-            return await _context.Homes.FirstOrDefaultAsync(x => x.Id == Id);
+            return await _context.Homes.Include(x => x.Images)
+                .FirstOrDefaultAsync(x => x.Id == Id);
         }
 
 
@@ -60,6 +61,12 @@ namespace HomeManager.Services.Repositories
             return await _context.Homes
                 .Where(h => h.HomeName.Contains(qry) || h.HomeDescription.Contains(qry))
                 .ToListAsync();
+        }
+
+        public async Task AddHomeImageAsync(HomeImage image)
+        {
+            _context.HomeImages.Add(image);
+            await _context.SaveChangesAsync();
         }
     }
 }
