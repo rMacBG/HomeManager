@@ -39,7 +39,7 @@ namespace HomeManager.Services.Services.SignalR
                     senderId = message.SenderId,
                     content = message.Content,
                     sentAt = message.SentAt.ToString("dd/MM/yyyy"),
-                    status = (int)message.MessageStatus,
+                    messageStatus = (int)message.MessageStatus,
                     tempId = dto.TempId,
                 };
 
@@ -66,6 +66,12 @@ namespace HomeManager.Services.Services.SignalR
                     status = (int)message.Status
                 });
             }
+        }
+
+        public async Task JoinConversationGroup(string conversationId)
+        {
+            var connectionId = Context.ConnectionId;
+            await Groups.AddToGroupAsync(connectionId, conversationId);
         }
         public async Task MarkMessagesAsSeen(Guid conversationId)
         {

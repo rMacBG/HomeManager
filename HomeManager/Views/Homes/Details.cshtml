@@ -186,6 +186,15 @@
 
             document.getElementById("conversationId").value = conversationId;
 
+            if (connection.state === "Connected") {
+                try {
+                    await connection.invoke("JoinConversationGroup", conversationId);
+                    console.log("Joined SignalR group for conversation:", conversationId);
+                } catch (err) {
+                    console.error("Failed to join SignalR group:", err);
+                }
+            }
+
             const list = document.getElementById("messagesList");
             list.innerHTML = "";
 
@@ -267,7 +276,7 @@
 
         connection.on("ReceiveMessage", (message) => {
             const isSelf = message.senderId === currentUserId;
-
+            console.log("Message Received");
             if (isSelf && message.tempId) {
                 const tempEl = document.getElementById(message.tempId);
 
@@ -283,6 +292,17 @@
                     return;
                 }
             }
+            connection.onreconnected(async () => {
+                const conversationId = document.getElementById("conversationId")?.value;
+                if (conversationId) {
+                    try {
+                        await connection.invoke("JoinConversationGroup", conversationId);
+                        console.log("Re-joined group after reconnect:", conversationId);
+                    } catch (err) {
+                        console.error("Failed to re-join group:", err);
+                    }
+                }
+            });
 
             const li = document.createElement("div");
             li.innerHTML = `
