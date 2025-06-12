@@ -1,4 +1,5 @@
 ﻿using HomeManager.Data.Data.Models;
+using HomeManager.Data.Data.ViewModels;
 using HomeManager.Services.Services;
 using HomeManager.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +8,7 @@ using System.Security.Claims;
 
 namespace HomeManager.Controllers
 {
+    [Route("Chat")]
     public class ConversationController : Controller
     {
         
@@ -20,15 +22,70 @@ namespace HomeManager.Controllers
                  _homeService = homeService;
                  _conversationService = conversationService;
         }
-        [HttpGet]
+
+        [Authorize]
+        
+        [HttpGet("Index")]
+        public async Task<IActionResult> Index()
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdStr == null)
+            {
+                return Forbid();
+            }
+            Guid userId = Guid.Parse(userIdStr);
+
+            var conversations = await _conversationService.GetUserConversationsForUserIdAsync(userId);
+
+            
+            var viewModel = conversations.Select(c =>
+            {
+                var otherParticipantId = c.ParticipantsIds.FirstOrDefault(p => p != userId);
+                return new ConversationListItemViewModel
+                {
+                    ConversationId = c.Id,
+                    
+                    OtherParticipantName = "yes", 
+                    CreatedAt = c.CreatedAt
+                };
+            }).OrderByDescending(x => x.CreatedAt);
+
+            return View("~/Views/Chat/Index.cshtml", viewModel);
+        }
+        [HttpGet("Messages")]
         [Authorize]
         public async Task<JsonResult> GetMessages(Guid conversationId)
         {
             var messages = await _messageService.GetMessagesAsync(conversationId);
             return Json(messages);
         }
+        [HttpGet("Conversation/{id}")]
         [Authorize]
-        [HttpGet("api/conversations/for-home/{homeId}")]
+        public async Task<IActionResult> Conversation(Guid id)
+        {
+            var conversation = await _conversationService.GetConversationDetailsAsync(id);
+            if (conversation == null)
+            {
+                return NotFound();
+            }
+
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            Guid currentUserId = Guid.Parse(userIdStr);
+            var otherParticipantId = conversation.UsersConversations.FirstOrDefault(u => u.UserId != currentUserId)?.UserId;
+
+           
+            var viewModel = new ConversationDetailsViewModel
+            {
+                ConversationId = conversation.Id,
+                Messages = conversation.Messages.OrderBy(m => m.SentAt).ToList(),
+                CurrentUserId = currentUserId,
+                OtherParticipantName = "Other Party"  
+            };
+
+            return View("~/Views/Chat/Conversation.cshtml", viewModel);
+        }
+        [Authorize]
+        [HttpGet("ForHome/{homeId}")]
         public async Task<IActionResult> GetOrCreateConversation(Guid homeId)
         {
             try
@@ -47,6 +104,23 @@ namespace HomeManager.Controllers
 
             }
 
+        }
+
+        [HttpGet("api/conversations/user")]
+        [Authorize]
+        public async Task<IActionResult> GetUserConversations()
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdStr == null)
+            {
+                return Unauthorized();
+            }
+
+            Guid userId = Guid.Parse(userIdStr);
+            var conversations = await _conversationService.GetUserConversationsForUserIdAsync(userId);
+
+            
+            return Ok(conversations);
         }
     }
 }

@@ -1,0 +1,386 @@
+﻿@using System.Security.Claims
+@model HomeManager.Data.Data.ViewModels.HomeDetailsViewModel
+<style>
+    #chatContainer {
+        display: none !important;
+        border: 1px solid #ccc;
+        padding: 1rem;
+        background: #f9f9f9;
+        min-height: 200px;
+        width: 300px;
+    }
+
+    <style >
+    .chat-popup {
+        display: none;
+        position: fixed;
+        bottom: 0;
+        right: 20px;
+        width: 300px;
+        background: white;
+        border: 1px solid #ccc;
+        box-shadow: 0 0 10px rgba(0,0,0,.3);
+        z-index: 1000;
+        border-radius: 10px;
+    }
+
+    .chat-header {
+        padding: 10px;
+        background: #007bff;
+        color: white;
+        font-weight: bold;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-radius: 10px 10px 0 0;
+    }
+
+    .chat-body {
+        height: 200px;
+        padding: 10px;
+        background: #f9f9f9;
+    }
+
+    .chat-footer {
+        display: flex;
+        padding: 10px;
+        border-top: 1px solid #ddd;
+        gap: 5px;
+    }
+
+        .chat-footer input {
+            flex: 1;
+            padding: 5px;
+        }
+
+        .chat-footer button {
+            padding: 5px 10px;
+        }
+
+    .close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        cursor: pointer;
+    }
+
+    .fixed-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        padding: 5px;
+    }
+
+    .message {
+        margin: 10px;
+        display: flex;
+    }
+
+        .message.self {
+            justify-content: flex-end;
+        }
+
+
+        .message.other {
+            justify-content: flex-start;
+        }
+
+
+    max-width: 70%;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f1f0f0;
+    position: relative;
+    }
+
+
+    .message.self .message-bubble {
+        background-color: #4aef0a;
+    }
+
+
+    .message-author {
+        font-weight: bold;
+        margin-bottom: 3px;
+    }
+
+
+    .message-content {
+        margin-bottom: 2px;
+    }
+
+    .message-status {
+        font-size: 0.8em;
+        color: gray;
+        text-align: right;
+    }
+</style>
+</style>
+
+<div id="chatContainer">
+    
+    <div id="chatBox" class="chat-popup">
+        <div class="chat-header">
+            <span>Chat with Dealer</span>
+            <p>Debug UserId: @User.FindFirst(ClaimTypes.NameIdentifier)?.Value</p>
+            <button id="closeChatBtn" class="close-btn">&times;</button>
+        </div>
+
+        <div class="chat-body" id="messagesList" style="overflow-y:auto;"></div>
+        <div class="chat-footer">
+            <br />
+            <input type="text" id="messageInput" placeholder="Type a message..." />
+            <input type="hidden" id="senderId" value='@User.FindFirst(ClaimTypes.NameIdentifier)?.Value' />
+            <input type="hidden" id="conversationId" />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+<script>
+    const currentUserId = document.getElementById("senderId")?.value;
+    window.startConnection = async function () {
+        if (window.connection.state === "Connected" || window.connection.state === "Connecting") {
+            console.log("Already connected or connecting.");
+            return;
+        }
+
+        try {
+            await window.connection.start();
+            console.log("SignalR connected. State:", window.connection.state);
+        } catch (err) {
+            console.error("Connection failed, retrying in 5s", err);
+            setTimeout(window.startConnection, 5000);
+        }
+    };
+
+    // Create and expose the connection globally.
+    window.connection = new signalR.HubConnectionBuilder()
+        .withUrl("/hubs/chat")
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+
+    // Immediately start the connection.
+    window.startConnection();
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const openChatBtn = document.getElementById("openChatBtn");
+        const closeChatBtn = document.getElementById("closeChatBtn");
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const openChatBtn = document.getElementById("openChatBtn");
+            const closeChatBtn = document.getElementById("closeChatBtn");
+
+            if (openChatBtn) {
+                openChatBtn.addEventListener("click", async () => {
+                    console.log("Open Chat button clicked");
+                    await window.prepareChat("@Model.Home.Id");
+                });
+            }
+
+            if (closeChatBtn) {
+                closeChatBtn.addEventListener("click", () => {
+                    document.getElementById("chatContainer").style.display = "none";
+                });
+            }
+        });
+    });
+
+    window.prepareChat = async function (homeId) {
+
+        if (window.connection.state !== "Connected") {
+            console.log("Connection state is", window.connection.state, ". Waiting for connection...");
+            await window.startConnection();
+        }
+
+        
+
+        const res = await fetch(`/Chat/ForHome/${homeId}`, { credentials: 'include' });
+        if (!res.ok) {
+            const errorText = await res.text();
+            alert("Error: " + errorText);
+            return;
+        }
+        const data = await res.json();
+        const conversationId = data.conversationId;
+
+        // Before joining group, ensure connection is still ready.
+        if (window.connection.state !== "Connected") {
+            console.log("Connection state is", window.connection.state, ". Waiting further...");
+            await window.startConnection();
+        }
+
+        try {
+            await window.connection.invoke("JoinConversationGroup", conversationId);
+            console.log("Joined SignalR group for conversation:", conversationId);
+        } catch (err) {
+            console.error("Failed to join SignalR group:", err);
+        }
+
+        // Fetch messages and update UI, etc.
+        const messagesRes = await fetch(`/Chat/Messages?conversationId=${conversationId}`);
+        if (!messagesRes.ok) {
+            const errorText = await messagesRes.text();
+            console.error("Failed to get messages:", errorText);
+            return;
+        }
+
+        let messages;
+        try {
+            messages = await messagesRes.json();
+        } catch (err) {
+            console.error("Failed to parse JSON:", err);
+            return;
+        }
+
+        if (!Array.isArray(messages)) {
+            console.error("Expected array of messages but got:", messages);
+            return;
+        }
+
+        document.getElementById("conversationId").value = conversationId;
+        document.getElementById("chatContainer").style.display = "block";
+
+        const list = document.getElementById("messagesList");
+        list.innerHTML = "";
+        messages.forEach(msg => {
+            const isSelf = msg.senderId === document.getElementById("senderId").value;
+            const li = document.createElement("div");
+            li.classList.add("message", isSelf ? "self" : "other");
+            const displayName = isSelf ? "You" : (msg.senderName ? msg.senderName : "Dealer");
+            li.innerHTML = `
+                    <div class="message-bubble">
+                        <div class="message-author">${displayName}:</div>
+                        <div class="message-content">${msg.content}</div>
+                        <div class="message-status">[${window.getMessageStatusText(msg.status)}]</div>
+                    </div>
+                `;
+            list.appendChild(li);
+        });
+
+        try {
+            await window.connection.invoke("MarkAsSeen", conversationId);
+        } catch (err) {
+            console.error("Failed to mark messages as seen", err);
+        }
+    };
+
+    window.getMessageStatusText = function (messageStatus) {
+        const num = parseInt(messageStatus ?? 0);
+        switch (num) {
+            case 0: return "Pending";
+            case 1: return "Sent";
+            case 2: return "Delivered";
+            case 3: return "Seen";
+            case 4: return "Failed";
+            default: return `Unknown (${messageStatus})`;
+        }
+    };
+
+
+
+    function sendMessage() {
+        const msg = document.getElementById("messageInput").value;
+        const conversationId = document.getElementById("conversationId")?.value;
+
+        if (!msg || !conversationId || !currentUserId) {
+            console.error("Missing fields for message sending.");
+            return;
+        }
+
+        const tempId = "msg_" + Date.now();
+
+        const messageDto = {
+            conversationId: conversationId,
+            senderId: currentUserId,
+            content: msg,
+            sentAt: new Date().toISOString(),
+            status: 0,
+            tempId: tempId
+        };
+
+        const li = document.createElement("div");
+        li.id = tempId;
+        li.dataset.content = msg;
+        li.dataset.temp = "true";
+        li.innerHTML = `<strong>You:</strong> ${msg} <span class="status-text status-text-${tempId}" style="font-size:0.8em; color: gray;">[${getMessageStatusText(0)}]</span>`;
+        document.getElementById("messagesList").appendChild(li);
+        document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
+
+        window.connection.invoke("SendMessage", messageDto)
+            .then(() => console.log("Message sent"))
+            .catch(err => console.error("SignalR SendMessage failed:", err));
+
+        document.getElementById("messageInput").value = "";
+    }
+
+    window.connection.on("ReceiveMessage", async (message) => {
+        const isSelf = message.senderId === currentUserId;
+        const li = document.createElement("div");
+        console.log("Message Received");
+        li.classList.add("message", isSelf ? "self" : "other");
+        const displayName = isSelf ? "You" : (message.senderName ? message.senderName : "Dealer");
+        if (isSelf && message.tempId) {
+            const tempEl = document.getElementById(message.tempId);
+
+            if (tempEl) {
+                const statusEl = tempEl.querySelector("span.status-text");
+                if (statusEl) {
+                    statusEl.className = `status-text status-text-${message.messageId}`;
+                    statusEl.textContent = `[${getMessageStatusText(message.messageStatus)}]`;
+                }
+
+                tempEl.dataset.temp = "false";
+                tempEl.id = message.messageId;
+                return;
+            }
+        }
+
+        li.innerHTML = `
+                                    <div class="message-bubble">
+                                        <div class="message-author">${displayName}:</div>
+                                        <div class="message-content">${message.content}</div>
+                                        <div class="message-status">[${getMessageStatusText(isSelf ? message.status : message.status)}]</div>
+                                    </div>
+                                `;
+        document.getElementById("messagesList").appendChild(li);
+        document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
+
+        if (!isSelf) {
+            try {
+                await window.connection.invoke("MarkAsDelivered", message.messageId);
+            } catch (err) {
+                console.error("Failed to mark as delivered", err);
+            }
+        }
+    });
+
+    window.connection.on("ReceiveMessageStatusUpdate", (data) => {
+        const statusEl = document.querySelector(`.status-text-${data.messageId}`);
+        if (statusEl) {
+            statusEl.textContent = `[${getMessageStatusText(data.status)}]`;
+        }
+    });
+
+    window.connection.onreconnected(async () => {
+        const conversationId = document.getElementById("conversationId")?.value;
+        if (conversationId) {
+            try {
+                await window.connection.invoke("JoinConversationGroup", conversationId);
+                console.log("Re-joined group after reconnect:", conversationId);
+            } catch (err) {
+                console.error("Failed to re-join group:", err);
+            }
+        }
+    });
+
+    window.startConnection();
+
+
+
+</script>
+

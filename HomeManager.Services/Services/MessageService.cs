@@ -108,6 +108,17 @@ namespace HomeManager.Services.Services
             return messages;
         }
 
+        public async Task UpdateMessageStatusAsync(Guid messageId, MessageStatus status)
+        {
+            var message = await _messageRepository.GetByIdAsync(messageId);
+            if (message == null)
+                throw new Exception("Message not found");
+
+            message.Status = status;
+            await _messageRepository.UpdateAsync(message);
+           
+        }
+
     }
 
 }

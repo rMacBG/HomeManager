@@ -27,6 +27,7 @@ namespace HomeManager.Services.Repositories
         {
             return await _context.Conversations
                 .Include(c => c.UsersConversations)
+                .Include(c => c.Messages)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
 

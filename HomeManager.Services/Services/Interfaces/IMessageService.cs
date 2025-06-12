@@ -1,5 +1,6 @@
 ﻿using HomeManager.Data.Data.Dtos;
 using HomeManager.Data.Data.Models;
+using HomeManager.Data.Data.Models.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace HomeManager.Services.Services.Interfaces
         Task<Message?> GetMessageByIdAsync(Guid messageId);
         Task MarkMessagesAsSeenAsync(Guid conversationId, Guid userId);
         Task MarkAsDeliveredAsync(Guid messageId);
+        Task UpdateMessageStatusAsync(Guid messageId, MessageStatus status);
         Task<IEnumerable<Message>> MarkAllAsSeenAsync(Guid conversationId, Guid receiverId);
 
     }

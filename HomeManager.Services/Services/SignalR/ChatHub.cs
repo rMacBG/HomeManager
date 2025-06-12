@@ -1,4 +1,5 @@
 ﻿using HomeManager.Data.Data.Dtos;
+using HomeManager.Data.Data.Models;
 using HomeManager.Data.Data.Models.Enums;
 using HomeManager.Services.Repositories.Interfaces;
 using HomeManager.Services.Services.Interfaces;
@@ -73,22 +74,30 @@ namespace HomeManager.Services.Services.SignalR
             var connectionId = Context.ConnectionId;
             await Groups.AddToGroupAsync(connectionId, conversationId);
         }
-        public async Task MarkMessagesAsSeen(Guid conversationId)
+        public async Task MarkAsDelivered(Guid messageId)
         {
-            var userId = Context.UserIdentifier;
-            var unseen = await _messageRepository.GetUnseenMessagesAsync(conversationId, Guid.Parse(userId));
+            await _messageService.UpdateMessageStatusAsync(messageId, MessageStatus.Delivered);
 
-            foreach (var msg in unseen)
+            var message = await _messageService.GetMessageByIdAsync(messageId);
+            if (message != null)
             {
-                msg.Status = MessageStatus.Seen;
-                await _messageRepository.UpdateAsync(msg);
-
-                await Clients.User(msg.SenderId.ToString())
-                             .SendAsync("UpdateMessageStatus", new
-                             {
-                                 messageId = msg.Id,
-                                 status = msg.Status
-                             });
+                await Clients.Group(message.ConversationId.ToString()).SendAsync("ReceiveMessageStatusUpdate", new
+                {
+                    messageId = messageId,
+                    status = (int)MessageStatus.Delivered
+                });
+            }
+        }
+        public async Task MarkAsSeen(Guid ConversationId)
+        {
+            try
+            {
+                var userId = Context.UserIdentifier;
+                await _messageService.UpdateMessageStatusAsync(ConversationId, MessageStatus.Seen);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in MarkAsSeen for conversation {ConversationId}: {ex.Message}");
             }
         }
 

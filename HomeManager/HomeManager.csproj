@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Views\Chat\Index.cshtml" />
     <Content Remove="Views\Homes\Edit.cshtml" />
     <Content Remove="wwwroot\js\SearchEngine.js" />
   </ItemGroup>
@@ -33,6 +34,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Chat\Index.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Homes\Details.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Homes\Edit.cshtml" />
     <_ContentIncludedByDefault Remove="wwwroot\js\SearchEngine.js" />
@@ -43,8 +45,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="Views\Chat\Index.cshtml" />
     <None Include="Views\Homes\Edit.cshtml" />
     <None Include="wwwroot\js\SearchEngine.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Views\Chat\Index.cshtml" />
   </ItemGroup>
 
 </Project>

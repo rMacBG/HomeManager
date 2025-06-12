@@ -58,8 +58,12 @@ namespace HomeManager.Services.Services
             Console.WriteLine($"Logged-in User ID: {userId}");
             Console.WriteLine($"Home Landlord ID: {home.LandlordId}");
 
-            if (home == null || home.LandlordId == userId)
-                throw new InvalidOperationException("Invalid home or cannot start a conversation with yourself.");
+            //if (home == null || home.LandlordId == userId)
+            //    throw new InvalidOperationException("Invalid home or cannot start a conversation with yourself.");
+            if (userId == home.LandlordId)
+            {
+                throw new InvalidOperationException("Cannot send messages to yourself.");
+            }
 
             return await GetOrCreateConversationAsync(userId, home.LandlordId);
         }
@@ -100,6 +104,16 @@ namespace HomeManager.Services.Services
                 Console.WriteLine("Error creating convo: " + ex);
                 throw;
             }
+        }
+
+        public async Task<Conversation> GetConversationDetailsAsync(Guid conversationId)
+        {
+            var conversation = await _conversationRepository.GetByIdAsync(conversationId);
+            if (conversation == null)
+            {
+                throw new Exception("Conversation not found");
+            }
+            return conversation;
         }
     }
 }

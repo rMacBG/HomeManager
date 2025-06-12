@@ -1,0 +1,24 @@
+﻿@using HomeManager.Data.Data.ViewModels
+@model IEnumerable<ConversationListItemViewModel>
+
+<h2>My Chats</h2>
+
+@if (!Model.Any())
+{
+    <p>You do not have any active conversations.</p>
+}
+else
+{
+    <ul class="conversation-list">
+        @foreach (var conversation in Model)
+        {
+            <li>
+                <a href="@Url.Action("Conversation", "Conversation", new { id = conversation.ConversationId })">
+                    <strong>@conversation.OtherParticipantName</strong>
+                    <br />
+                    <small>@conversation.CreatedAt.ToString("g")</small>
+                </a>
+            </li>
+        }
+    </ul>
+}

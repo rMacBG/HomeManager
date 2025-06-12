@@ -1,5 +1,6 @@
 ﻿@using System.Security.Claims
 @model HomeManager.Data.Data.ViewModels.HomeDetailsViewModel
+
 <h2>@Model.Home.HomeName</h2>
 <p>@Model.Home.HomeDescription</p>
 <p>Location: @Model.Home.HomeLocation</p>
@@ -66,6 +67,50 @@
         border-radius: 8px; 
         padding: 5px;
     }
+
+    .message {
+        margin: 10px;
+        display: flex;
+    }
+
+        .message.self {
+            justify-content: flex-end;
+        }
+
+        
+        .message.other {
+            justify-content: flex-start;
+        }
+
+   
+        max-width: 70%;
+        padding: 10px;
+        border-radius: 8px;
+        background-color: #f1f0f0;
+        position: relative;
+    }
+
+   
+    .message.self .message-bubble {
+        background-color: #4aef0a;
+    }
+
+   
+    .message-author {
+        font-weight: bold;
+        margin-bottom: 3px;
+    }
+
+   
+    .message-content {
+        margin-bottom: 2px;
+    }
+
+    .message-status {
+        font-size: 0.8em;
+        color: gray;
+        text-align: right;
+    }
 </style>
 <!-- Embed Google Maps -->
 <iframe
@@ -102,8 +147,12 @@
     {
     <p>No conversation found.</p>
     } </p>
+@await Html.PartialAsync("_ChatBox")
+
 <button id="openChatBtn" class="btn btn-primary mt-3">Ask the Dealer</button>
-<div id="chatSection">
+<button id="closeChatBtn" class="btn btn-secondary mt-3">Close Chat</button>
+
+@* <div id="chatSection">
     
     <div id="chatBox" class="chat-popup">
         <div class="chat-header">
@@ -125,11 +174,32 @@
             <button onclick="sendMessage()">Send</button>
         </div>
     </div>
-</div>
+</div> *@
 
 @section Scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
+    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script> *@
     <script>
+        window.onload = function () {
+            const openChatBtn = document.getElementById("openChatBtn");
+            if (openChatBtn) {
+                openChatBtn.addEventListener("click", async () => {
+                    await window.prepareChat("@Model.Home.Id");
+                });
+            } else {
+                console.error("openChatBtn element not found.");
+            }
+
+            const closeChatBtn = document.getElementById("closeChatBtn");
+            if (closeChatBtn) {
+                closeChatBtn.addEventListener("click", () => {
+                    document.getElementById("chatBox").style.display = "none";
+                });
+            } else {
+                console.error("closeChatBtn element not found.");
+            }
+        }
+    </script>
+   @*  <script>
         async function startConnection() {
             try {
                 await connection.start();
@@ -151,7 +221,8 @@
         }
 
         async function prepareChat(homeId) {
-            const res = await fetch(`/api/conversations/for-home/${homeId}`, {
+           
+            const res = await fetch(`/Chat/ForHome/${homeId}`, {
                 credentials: 'include'
             });
 
@@ -163,7 +234,8 @@
 
             const data = await res.json();
             const conversationId = data.conversationId;
-            const messagesRes = await fetch(`/Conversation/GetMessages?conversationId=${conversationId}`);
+
+            const messagesRes = await fetch(`/Chat/Messages?conversationId=${conversationId}`);
 
             if (!messagesRes.ok) {
                 const errorText = await messagesRes.text();
@@ -188,6 +260,7 @@
 
             if (connection.state === "Connected") {
                 try {
+                    // Ensure you use the same method name as defined in your hub.
                     await connection.invoke("JoinConversationGroup", conversationId);
                     console.log("Joined SignalR group for conversation:", conversationId);
                 } catch (err) {
@@ -197,21 +270,26 @@
 
             const list = document.getElementById("messagesList");
             list.innerHTML = "";
-
-            
-
             document.getElementById("chatBox").style.display = "block";
 
             messages.forEach(msg => {
-                const div = document.createElement("div");
                 const isSelf = msg.senderId === currentUserId;
+                const li = document.createElement("div");
+                li.classList.add("message", isSelf ? "self" : "other");
 
-               
-                const status = msg.status ?? msg.messageStatus ?? 0;
+                const displayName = isSelf ? "You" : (msg.senderName ? msg.senderName : "Dealer");
 
-                div.innerHTML = `<strong>${isSelf ? "You" : "Dealer"}:</strong> ${msg.content} <span class="status-text" style="font-size:0.8em; color: gray;">[${getMessageStatusText(status)}]</span>`;
-                list.appendChild(div);
+                li.innerHTML = `
+                <div class="message-bubble">
+                    <div class="message-author">${displayName}:</div>
+                    <div class="message-content">${msg.content}</div>
+                    <div class="message-status">[${getMessageStatusText(msg.status)}]</div>
+                </div>
+            `;
+                document.getElementById("messagesList").appendChild(li);
             });
+
+            await connection.invoke("MarkAsSeen", conversationId);
         }
 
         function getMessageStatusText(messageStatus) {
@@ -260,9 +338,6 @@
             li.id = tempId;
             li.dataset.content = msg;
             li.dataset.temp = "true";
-            li.id = tempId;
-            li.dataset.content = msg;
-            li.dataset.temp = "true";
             li.innerHTML = `<strong>You:</strong> ${msg} <span class="status-text status-text-${tempId}" style="font-size:0.8em; color: gray;">[${getMessageStatusText(0)}]</span>`;
             document.getElementById("messagesList").appendChild(li);
             document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
@@ -274,9 +349,12 @@
             document.getElementById("messageInput").value = "";
         }
 
-        connection.on("ReceiveMessage", (message) => {
+        connection.on("ReceiveMessage", async (message) => {
             const isSelf = message.senderId === currentUserId;
+            const li = document.createElement("div");
             console.log("Message Received");
+            li.classList.add("message", isSelf ? "self" : "other");
+            const displayName = isSelf ? "You" : (message.senderName ? message.senderName : "Dealer");
             if (isSelf && message.tempId) {
                 const tempEl = document.getElementById(message.tempId);
 
@@ -292,29 +370,49 @@
                     return;
                 }
             }
-            connection.onreconnected(async () => {
-                const conversationId = document.getElementById("conversationId")?.value;
-                if (conversationId) {
-                    try {
-                        await connection.invoke("JoinConversationGroup", conversationId);
-                        console.log("Re-joined group after reconnect:", conversationId);
-                    } catch (err) {
-                        console.error("Failed to re-join group:", err);
-                    }
-                }
-            });
+            
+            
 
-            const li = document.createElement("div");
             li.innerHTML = `
-                <strong>${isSelf ? "You" : "Dealer"}:</strong> ${message.content}
-                <span class="status-text status-text-${message.messageId}" style="font-size: 0.8em; color: gray;">[${getMessageStatusText(message.status)}]</span>
-            `;
+                        <div class="message-bubble">
+                            <div class="message-author">${displayName}:</div>
+                            <div class="message-content">${message.content}</div>
+                            <div class="message-status">[${getMessageStatusText(isSelf ? message.status : message.status)}]</div>
+                        </div>
+                    `;
             document.getElementById("messagesList").appendChild(li);
             document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
+
+            if (!isSelf) {
+                try {
+                    await connection.invoke("MarkAsDelivered", message.messageId);
+                } catch (err) {
+                    console.error("Failed to mark as delivered", err);
+                }
+            }
+        });
+
+        connection.on("ReceiveMessageStatusUpdate", (data) => {
+            const statusEl = document.querySelector(`.status-text-${data.messageId}`);
+            if (statusEl) {
+                statusEl.textContent = `[${getMessageStatusText(data.status)}]`;
+            }
+        });
+
+        connection.onreconnected(async () => {
+            const conversationId = document.getElementById("conversationId")?.value;
+            if (conversationId) {
+                try {
+                    await connection.invoke("JoinConversationGroup", conversationId);
+                    console.log("Re-joined group after reconnect:", conversationId);
+                } catch (err) {
+                    console.error("Failed to re-join group:", err);
+                }
+            }
         });
 
         startConnection();
 
        
-    </script>
+    </script> *@ 
 }
