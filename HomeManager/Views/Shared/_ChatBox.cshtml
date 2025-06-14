@@ -2,7 +2,7 @@
 @model HomeManager.Data.Data.ViewModels.HomeDetailsViewModel
 <style>
     #chatContainer {
-        display: none !important;
+        display: none;
         border: 1px solid #ccc;
         padding: 1rem;
         background: #f9f9f9;
@@ -121,7 +121,6 @@
 </style>
 
 <div id="chatContainer">
-    
     <div id="chatBox" class="chat-popup">
         <div class="chat-header">
             <span>Chat with Dealer</span>
@@ -170,24 +169,26 @@
     document.addEventListener("DOMContentLoaded", function () {
         const openChatBtn = document.getElementById("openChatBtn");
         const closeChatBtn = document.getElementById("closeChatBtn");
+        const chatContainer = document.getElementById("chatContainer");
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const openChatBtn = document.getElementById("openChatBtn");
-            const closeChatBtn = document.getElementById("closeChatBtn");
+        if (openChatBtn) {
+            openChatBtn.addEventListener("click", async () => {
+                console.log("Open Chat button clicked");
+                const homeId = openChatBtn.dataset.homeId;
+                await window.prepareChat(homeId);
+                // await window.prepareChat("@Model.Home.Id");
+            }, { once: true});
+        } else {
+            console.warn("openChatBtn not found in DOM");
+        }
 
-            if (openChatBtn) {
-                openChatBtn.addEventListener("click", async () => {
-                    console.log("Open Chat button clicked");
-                    await window.prepareChat("@Model.Home.Id");
-                });
-            }
-
-            if (closeChatBtn) {
-                closeChatBtn.addEventListener("click", () => {
-                    document.getElementById("chatContainer").style.display = "none";
-                });
-            }
-        });
+        if (closeChatBtn) {
+            closeChatBtn.addEventListener("click", () => {
+                chatContainer.style.display = "none";
+            });
+        } else {
+            console.warn("closeChatBtn not found in DOM");
+        }
     });
 
     window.prepareChat = async function (homeId) {
@@ -244,6 +245,10 @@
 
         document.getElementById("conversationId").value = conversationId;
         document.getElementById("chatContainer").style.display = "block";
+        if (!chatContainer) {
+            console.error("chatContainer not found in DOM");
+            return;
+        }
 
         const list = document.getElementById("messagesList");
         list.innerHTML = "";
@@ -377,9 +382,6 @@
             }
         }
     });
-
-    window.startConnection();
-
 
 
 </script>

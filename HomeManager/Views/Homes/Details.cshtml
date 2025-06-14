@@ -149,7 +149,7 @@
     } </p>
 @await Html.PartialAsync("_ChatBox")
 
-<button id="openChatBtn" class="btn btn-primary mt-3">Ask the Dealer</button>
+<button id="openChatBtn" data-home-id="@Model.Home.Id" class="btn btn-primary mt-3">Ask the Dealer</button>
 <button id="closeChatBtn" class="btn btn-secondary mt-3">Close Chat</button>
 
 @* <div id="chatSection">
