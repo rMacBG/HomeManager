@@ -121,7 +121,7 @@
 </style>
 
 <div id="chatContainer">
-    <div id="chatBox" class="chat-popup">
+    <div id="chatPopup" class="chat-popup">
         <div class="chat-header">
             <span>Chat with Dealer</span>
             <p>Debug UserId: @User.FindFirst(ClaimTypes.NameIdentifier)?.Value</p>
@@ -157,19 +157,19 @@
         }
     };
 
-    // Create and expose the connection globally.
+    
     window.connection = new signalR.HubConnectionBuilder()
         .withUrl("/hubs/chat")
         .configureLogging(signalR.LogLevel.Information)
         .build();
 
-    // Immediately start the connection.
+    
     window.startConnection();
 
     document.addEventListener("DOMContentLoaded", function () {
         const openChatBtn = document.getElementById("openChatBtn");
         const closeChatBtn = document.getElementById("closeChatBtn");
-        const chatContainer = document.getElementById("chatContainer");
+        const chatContainer = document.getElementById("chatPopup");
 
         if (openChatBtn) {
             openChatBtn.addEventListener("click", async () => {
@@ -244,7 +244,7 @@
         }
 
         document.getElementById("conversationId").value = conversationId;
-        document.getElementById("chatContainer").style.display = "block";
+        document.getElementById("chatPopup").style.display = "block";
         if (!chatContainer) {
             console.error("chatContainer not found in DOM");
             return;
