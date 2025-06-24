@@ -9,8 +9,6 @@
         min-height: 200px;
         width: 300px;
     }
-
-    <style >
     .chat-popup {
         display: none;
         position: fixed;
@@ -89,15 +87,17 @@
         }
 
 
-    max-width: 70%;
-    padding: 10px;
-    border-radius: 8px;
-    background-color: #f1f0f0;
-    position: relative;
+    .message-bubble {
+        max-width: 70%;
+        padding: 10px;
+        border-radius: 8px;
+        background-color: #f1f0f0;
+        position: relative;
     }
 
 
     .message.self .message-bubble {
+
         background-color: #4aef0a;
     }
 
@@ -117,7 +117,6 @@
         color: gray;
         text-align: right;
     }
-</style>
 </style>
 
 <div id="chatContainer">
@@ -176,8 +175,7 @@
                 console.log("Open Chat button clicked");
                 const homeId = openChatBtn.dataset.homeId;
                 await window.prepareChat(homeId);
-                // await window.prepareChat("@Model.Home.Id");
-            }, { once: true});
+            });
         } else {
             console.warn("openChatBtn not found in DOM");
         }
@@ -191,86 +189,64 @@
         }
     });
 
+    let chatLoading = false;
+
     window.prepareChat = async function (homeId) {
-
-        if (window.connection.state !== "Connected") {
-            console.log("Connection state is", window.connection.state, ". Waiting for connection...");
-            await window.startConnection();
-        }
-
-        
-
-        const res = await fetch(`/Chat/ForHome/${homeId}`, { credentials: 'include' });
-        if (!res.ok) {
-            const errorText = await res.text();
-            alert("Error: " + errorText);
+        if (chatLoading) {
+            console.log("Chat is already being prepared. Ignoring extra click.");
             return;
         }
-        const data = await res.json();
-        const conversationId = data.conversationId;
 
-        // Before joining group, ensure connection is still ready.
-        if (window.connection.state !== "Connected") {
-            console.log("Connection state is", window.connection.state, ". Waiting further...");
-            await window.startConnection();
-        }
+        chatLoading = true;
 
         try {
+            if (window.connection.state !== "Connected") {
+                console.log("Connection state is", window.connection.state, ". Waiting for connection...");
+                await window.startConnection();
+            }
+
+            const res = await fetch(`/Chat/ForHome/${homeId}`, { credentials: 'include' });
+            if (!res.ok) {
+                const errorText = await res.text();
+                alert("Error: " + errorText);
+                return;
+            }
+
+            const data = await res.json();
+            const conversationId = data.conversationId;
+
             await window.connection.invoke("JoinConversationGroup", conversationId);
             console.log("Joined SignalR group for conversation:", conversationId);
-        } catch (err) {
-            console.error("Failed to join SignalR group:", err);
-        }
 
-        // Fetch messages and update UI, etc.
-        const messagesRes = await fetch(`/Chat/Messages?conversationId=${conversationId}`);
-        if (!messagesRes.ok) {
-            const errorText = await messagesRes.text();
-            console.error("Failed to get messages:", errorText);
-            return;
-        }
+            const messagesRes = await fetch(`/Chat/Messages?conversationId=${conversationId}`);
+            const messages = await messagesRes.json();
 
-        let messages;
-        try {
-            messages = await messagesRes.json();
-        } catch (err) {
-            console.error("Failed to parse JSON:", err);
-            return;
-        }
+            document.getElementById("conversationId").value = conversationId;
+            document.getElementById("chatContainer").style.display = "block";
+            document.getElementById("chatPopup").style.display = "block";
 
-        if (!Array.isArray(messages)) {
-            console.error("Expected array of messages but got:", messages);
-            return;
-        }
-
-        document.getElementById("conversationId").value = conversationId;
-        document.getElementById("chatPopup").style.display = "block";
-        if (!chatContainer) {
-            console.error("chatContainer not found in DOM");
-            return;
-        }
-
-        const list = document.getElementById("messagesList");
-        list.innerHTML = "";
-        messages.forEach(msg => {
-            const isSelf = msg.senderId === document.getElementById("senderId").value;
-            const li = document.createElement("div");
-            li.classList.add("message", isSelf ? "self" : "other");
-            const displayName = isSelf ? "You" : (msg.senderName ? msg.senderName : "Dealer");
-            li.innerHTML = `
+            const list = document.getElementById("messagesList");
+            list.innerHTML = "";
+            messages.forEach(msg => {
+                const isSelf = msg.senderId === document.getElementById("senderId").value;
+                const li = document.createElement("div");
+                li.classList.add("message", isSelf ? "self" : "other");
+                const displayName = isSelf ? "You" : (msg.senderName || "Dealer");
+                li.innerHTML = `
                     <div class="message-bubble">
                         <div class="message-author">${displayName}:</div>
                         <div class="message-content">${msg.content}</div>
                         <div class="message-status">[${window.getMessageStatusText(msg.status)}]</div>
                     </div>
                 `;
-            list.appendChild(li);
-        });
+                list.appendChild(li);
+            });
 
-        try {
             await window.connection.invoke("MarkAsSeen", conversationId);
         } catch (err) {
-            console.error("Failed to mark messages as seen", err);
+            console.error("Error in prepareChat:", err);
+        } finally {
+            chatLoading = false;
         }
     };
 

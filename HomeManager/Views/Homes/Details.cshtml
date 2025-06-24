@@ -152,8 +152,61 @@
 <button id="openChatBtn" data-home-id="@Model.Home.Id" class="btn btn-primary mt-3">Ask the Dealer</button>
 <button id="closeChatBtn" class="btn btn-secondary mt-3">Close Chat</button>
 
-@* <div id="chatSection">
-    
+
+
+@section Scripts {
+     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script> -->
+    <script>
+        window.onload = function () {
+            const openChatBtn = document.getElementById("openChatBtn");
+            if (openChatBtn) {
+                openChatBtn.addEventListener("click", async () => {
+                    console.log("Click fired, waiting for prepareChat...");
+
+                    // Wait until prepareChat is available (max 2 seconds)
+                    const waitForPrepareChat = new Promise((resolve, reject) => {
+                        let retries = 0;
+                        const interval = setInterval(() => {
+                            if (typeof window.prepareChat === "function") {
+                                clearInterval(interval);
+                                resolve();
+                            } else if (++retries > 20) {
+                                clearInterval(interval);
+                                reject("prepareChat not available");
+                            }
+                        }, 100);
+                    });
+
+                    try {
+                        await waitForPrepareChat;
+                        await window.prepareChat("@Model.Home.Id");
+                    } catch (err) {
+                        console.error("Error calling prepareChat:", err);
+                    }
+                });
+            } else {
+                console.error("openChatBtn element not found.");
+            }
+
+            const closeChatBtn = document.getElementById("closeChatBtn");
+            if (closeChatBtn) {
+                closeChatBtn.addEventListener("click", () => {
+                    const chatPopup = document.getElementById("chatPopup");
+                    if (chatPopup) {
+                        chatPopup.style.display = "none";
+                    } else {
+                        console.warn("chatPopup not found.");
+                    }
+                });
+            } else {
+                console.error("closeChatBtn element not found.");
+            }
+        };
+    </script>
+}
+
+    @* <div id="chatSection">
+
     <div id="chatBox" class="chat-popup">
         <div class="chat-header">
             <span>Chat with Dealer</span>
@@ -165,40 +218,16 @@
         <div class="chat-body" id="messagesList" style="overflow-y:auto;"></div>
         <div class="chat-footer">
             <br />
-            
+
             <input type="text" id="messageInput" placeholder="Type a message..." />
             <input type="hidden" id="senderId" value='@User.FindFirst(ClaimTypes.NameIdentifier)?.Value' />
             <input type="hidden" id="conversationId" />
-            
+
 
             <button onclick="sendMessage()">Send</button>
         </div>
     </div>
 </div> *@
-
-@section Scripts {
-    @* <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script> *@
-    <script>
-        window.onload = function () {
-            const openChatBtn = document.getElementById("openChatBtn");
-            if (openChatBtn) {
-                openChatBtn.addEventListener("click", async () => {
-                    await window.prepareChat("@Model.Home.Id");
-                });
-            } else {
-                console.error("openChatBtn element not found.");
-            }
-
-            const closeChatBtn = document.getElementById("closeChatBtn");
-            if (closeChatBtn) {
-                closeChatBtn.addEventListener("click", () => {
-                    document.getElementById("chatBox").style.display = "none";
-                });
-            } else {
-                console.error("closeChatBtn element not found.");
-            }
-        }
-    </script>
    @*  <script>
         async function startConnection() {
             try {
@@ -415,4 +444,4 @@
 
        
     </script> *@ 
-}
+
