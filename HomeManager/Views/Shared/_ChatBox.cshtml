@@ -119,7 +119,6 @@
     }
 </style>
 
-<div id="chatContainer">
     <div id="chatPopup" class="chat-popup">
         <div class="chat-header">
             <span>Chat with Dealer</span>
@@ -136,7 +135,7 @@
             <button onclick="sendMessage()">Send</button>
         </div>
     </div>
-</div>
+
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
 <script>
@@ -222,7 +221,7 @@
             const messages = await messagesRes.json();
 
             document.getElementById("conversationId").value = conversationId;
-            document.getElementById("chatContainer").style.display = "block";
+            //document.getElementById("chatContainer").style.display = "block";
             document.getElementById("chatPopup").style.display = "block";
 
             const list = document.getElementById("messagesList");
@@ -288,9 +287,23 @@
         li.id = tempId;
         li.dataset.content = msg;
         li.dataset.temp = "true";
-        li.innerHTML = `<strong>You:</strong> ${msg} <span class="status-text status-text-${tempId}" style="font-size:0.8em; color: gray;">[${getMessageStatusText(0)}]</span>`;
+        li.classList.add("message", "self");
+
+        li.innerHTML = `
+        <div class="message-bubble">
+            <div class="message-author">You:</div>
+            <div class="message-content">${msg}</div>
+            <div class="message-status">
+                    <span class="status-text status-text-${tempId}" style="font-size:0.8em; color: gray;">[${getMessageStatusText(0)}]</span>
+            </div>
+        </div>
+    `;
         document.getElementById("messagesList").appendChild(li);
         document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
+
+
+
+
 
         window.connection.invoke("SendMessage", messageDto)
             .then(() => console.log("Message sent"))
