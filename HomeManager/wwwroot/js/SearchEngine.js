@@ -4,14 +4,13 @@
     const resultsDiv = document.getElementById("searchResults");
 
     form.addEventListener("submit", async function (e) {
-        e.preventDefault(); // Prevent form submission
+        e.preventDefault();
 
         const query = input.value.trim();
         if (query.length < 2) {
             resultsDiv.innerHTML = "";
             return;
         }
-
         try {
             const res = await fetch(`/Search/GetResults?query=${encodeURIComponent(query)}`);
             if (!res.ok) {
@@ -25,7 +24,7 @@
             } else {
                 data.forEach(item => {
                     const div = document.createElement("div");
-                    // Display the result with name and type
+                    
                     div.textContent = `${item.name} (${item.type})`;
                     resultsDiv.appendChild(div);
                 });
