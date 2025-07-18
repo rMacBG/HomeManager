@@ -168,7 +168,7 @@
         const openChatBtn = document.getElementById("openChatBtn");
         const closeChatBtn = document.getElementById("closeChatBtn");
         const chatContainer = document.getElementById("chatPopup");
-
+        const messageInput = document.getElementById("messageInput");
         if (openChatBtn) {
             openChatBtn.addEventListener("click", async () => {
                 console.log("Open Chat button clicked");
@@ -185,6 +185,15 @@
             });
         } else {
             console.warn("closeChatBtn not found in DOM");
+        }
+
+        if (messageInput) {
+            messageInput.addEventListener("keydown", function (e) {
+                if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
         }
     });
 
@@ -230,14 +239,19 @@
                 const isSelf = msg.senderId === document.getElementById("senderId").value;
                 const li = document.createElement("div");
                 li.classList.add("message", isSelf ? "self" : "other");
+
                 const displayName = isSelf ? "You" : (msg.senderName || "Dealer");
+                const statusHtml = isSelf
+                    ? `<div class="message-status">[${window.getMessageStatusText(msg.status)}]</div>`
+                    : ''; // hide status for received messages
+
                 li.innerHTML = `
-                    <div class="message-bubble">
-                        <div class="message-author">${displayName}:</div>
-                        <div class="message-content">${msg.content}</div>
-                        <div class="message-status">[${window.getMessageStatusText(msg.status)}]</div>
-                    </div>
-                `;
+            <div class="message-bubble">
+                <div class="message-author">${displayName}:</div>
+                <div class="message-content">${msg.content}</div>
+                ${statusHtml}
+            </div>
+        `;
                 list.appendChild(li);
             });
 

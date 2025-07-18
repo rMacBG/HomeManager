@@ -12,7 +12,7 @@ namespace HomeManager.Services.Services.Interfaces
     public interface IMessageService
     {
         Task<MessageDto> SendMessageAsync(CreateMessageDto dto);
-        Task<IEnumerable<MessageDto>> GetMessagesAsync(Guid conversationId);
+        Task<IEnumerable<MessageDto>> GetMessagesAsync(Guid conversationId, Guid currentUserId);
         Task<Message?> GetMessageByIdAsync(Guid messageId);
         Task MarkMessagesAsSeenAsync(Guid conversationId, Guid userId);
         Task MarkAsDeliveredAsync(Guid messageId);

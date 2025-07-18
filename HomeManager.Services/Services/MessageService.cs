@@ -19,7 +19,7 @@ namespace HomeManager.Services.Services
         {
             _messageRepository = messageRepository;
         }
-        public async Task<IEnumerable<MessageDto>> GetMessagesAsync(Guid conversationId)
+        public async Task<IEnumerable<MessageDto>> GetMessagesAsync(Guid conversationId, Guid currentUserId)
         {
             var messages = await _messageRepository.GetByConversationIdAsync(conversationId);
 
@@ -29,7 +29,11 @@ namespace HomeManager.Services.Services
                 Content = x.Content,
                 SenderId = x.SenderId,
                 ReceiverId = x.ReceiverId,
-                MessageStatus = (Data.Data.Models.Enums.MessageStatus)(int)x.Status,
+                MessageStatus = x.SenderId == currentUserId
+            ? (Data.Data.Models.Enums.MessageStatus)(int)x.Status
+            : (x.Status >= MessageStatus.Delivered
+                ? (Data.Data.Models.Enums.MessageStatus)(int)x.Status
+                : MessageStatus.Sent),
                 SentAt = x.SentAt,
             });
 

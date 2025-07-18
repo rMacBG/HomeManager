@@ -54,9 +54,9 @@ namespace HomeManager.Controllers
         }
         [HttpGet("Messages")]
         [Authorize]
-        public async Task<JsonResult> GetMessages(Guid conversationId)
+        public async Task<JsonResult> GetMessages(Guid conversationId, Guid currentUserId)
         {
-            var messages = await _messageService.GetMessagesAsync(conversationId);
+            var messages = await _messageService.GetMessagesAsync(conversationId, currentUserId);
             return Json(messages);
         }
         [HttpGet("Conversation/{id}")]
