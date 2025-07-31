@@ -28,8 +28,8 @@ namespace HomeManager.Controllers
             var homes = await _homeService.SearchHomesAsync(query);
             var users = await _userService.SearchUsersAsync(query);
 
-            var homeResults = homes.Select(h => new SearchResultDto { Name = h.HomeName, Type = "Home" });
-            var userResults = users.Select(u => new SearchResultDto { Name = u.Username, Type = "User" });
+            var homeResults = homes.Select(h => new SearchResultDto { Id = h.Id, Name = h.HomeName, Type = "Home" });
+            var userResults = users.Select(u => new SearchResultDto { Id = u.Id, Name = u.Username, Type = "User" });
             var combined = homeResults.Concat(userResults);
 
             return Json(combined);
