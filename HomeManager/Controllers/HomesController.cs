@@ -44,7 +44,7 @@ namespace HomeManager.Controllers
 
             return View(homes);
         }
-
+        [Route("Homes/Details/{id:guid}")]
         public async Task<IActionResult> Details(Guid id)
         {
             var home = await _homeService.GetByIdAsync(id);

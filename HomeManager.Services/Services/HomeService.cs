@@ -187,8 +187,9 @@ namespace HomeManager.Services.Services
             var homes = await _homeRepository.SearchAsync(query);
             return homes.Select(h => new HomeDto
             {
-                HomeName = h.HomeName,
                 Id = h.Id,
+                HomeName = h.HomeName,
+                
             });
         }
 

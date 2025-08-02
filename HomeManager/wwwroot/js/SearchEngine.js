@@ -35,7 +35,7 @@
 //        }
 //    });
 //});
-
+console.log("SearchEngine.js is loaded!");
 document.addEventListener("DOMContentLoaded", function () {
     const form = document.getElementById("searchForm");
     const input = document.getElementById("searchInput");
@@ -63,25 +63,25 @@ document.addEventListener("DOMContentLoaded", function () {
                 resultsDiv.textContent = "No results found.";
             } else {
                 data.forEach(item => {
+                    console.log("item:", item);
                     const link = document.createElement("a");
+                    link.textContent = `${item.name} (${item.type})`;
+                    link.style.display = "block";
+                    link.style.cursor = "pointer";
 
-                    // Route by type
+                    console.log("Rendering link with ID:", item.id); // 🔍 Debug line
+
                     if (item.type === "Home") {
-                        link.href = `/Homes/Details/${encodeURIComponent(item.name)}`;
+                        link.href = `/Homes/Details/${item.id}`;
                     } else if (item.type === "User") {
-                        link.href = `/Users/Profile/${encodeURIComponent(item.name)}`;
+                        link.href = `/Users/Profile/${item.id}`;
                     } else {
                         link.href = "#";
                     }
 
-                    link.textContent = `${item.name} (${item.type})`;
-                    link.classList.add("search-result-link");
-                    link.style.display = "block"; // Makes each result appear on a new line
-
                     resultsDiv.appendChild(link);
                 });
 
-                // Optional: add "View all results" link
                 const viewAll = document.createElement("a");
                 viewAll.href = `/Search/List?query=${encodeURIComponent(query)}`;
                 viewAll.textContent = "View all results";
