@@ -1,5 +1,5 @@
 ﻿@using System.Security.Claims
-@* @model HomeManager.Data.Data.ViewModels.HomeDetailsViewModel *@
+@model HomeManager.Data.Data.ViewModels.HomeDetailsViewModel
 <style>
     #chatContainer {
         display: none;
@@ -121,8 +121,9 @@
 
     <div id="chatPopup" class="chat-popup">
         <div class="chat-header">
-            <span>Chat with Dealer</span>
-            <p>Debug UserId: @User.FindFirst(ClaimTypes.NameIdentifier)?.Value</p>
+            <span>Chat with </span>
+        <p>Debug User Name: @Model.OtherParticipantName</p>
+               @*  @User.FindFirst(ClaimTypes.NameIdentifier)?.Value *@</p>
             <button id="closeChatBtn" class="close-btn">&times;</button>
         </div>
 
@@ -241,17 +242,17 @@
                 li.classList.add("message", isSelf ? "self" : "other");
 
                 const displayName = isSelf ? "You" : (msg.senderName || "Dealer");
-                const statusHtml = isSelf
-                    ? `<div class="message-status">[${window.getMessageStatusText(msg.status)}]</div>`
-                    : ''; // hide status for received messages
+                    const statusHtml = isSelf
+        ? `<div class="message-status">[${window.getMessageStatusText(msg.status)}]</div>`
+        : '';
 
-                li.innerHTML = `
-            <div class="message-bubble">
-                <div class="message-author">${displayName}:</div>
-                <div class="message-content">${msg.content}</div>
-                ${statusHtml}
-            </div>
-        `;
+    li.innerHTML = `
+        <div class="message-bubble">
+            <div class="message-author">${displayName}:</div>
+            <div class="message-content">${msg.content}</div>
+            ${statusHtml}
+        </div>
+    `;
                 list.appendChild(li);
             });
 
@@ -348,23 +349,27 @@
             }
         }
 
-        li.innerHTML = `
-                                    <div class="message-bubble">
-                                        <div class="message-author">${displayName}:</div>
-                                        <div class="message-content">${message.content}</div>
-                                        <div class="message-status">[${getMessageStatusText(isSelf ? message.status : message.status)}]</div>
-                                    </div>
-                                `;
+            li.innerHTML = `
+        <div class="message-bubble">
+            <div class="message-author">${displayName}:</div>
+            <div class="message-content">${message.content}</div>
+            ${isSelf ? `<div class="message-status">[${getMessageStatusText(message.status)}]</div>` : ''}
+        </div>
+    `;
         document.getElementById("messagesList").appendChild(li);
         document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
 
         if (!isSelf) {
-            try {
-                await window.connection.invoke("MarkAsDelivered", message.messageId);
-            } catch (err) {
-                console.error("Failed to mark as delivered", err);
+        try {
+            await window.connection.invoke("MarkAsDelivered", message.messageId);
+            const convoId = document.getElementById("conversationId")?.value;
+            if (convoId) {
+                await window.connection.invoke("MarkAsSeen", convoId);
             }
+        } catch (err) {
+            console.error("Failed to mark as delivered or seen", err);
         }
+    }
     });
 
     window.connection.on("ReceiveMessageStatusUpdate", (data) => {

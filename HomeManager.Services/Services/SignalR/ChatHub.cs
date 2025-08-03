@@ -92,8 +92,16 @@ namespace HomeManager.Services.Services.SignalR
         {
             try
             {
-                var userId = Context.UserIdentifier;
-                await _messageService.UpdateMessageStatusAsync(ConversationId, MessageStatus.Seen);
+                var updatedMessages = await _messageService.UpdateMessagesStatusAsync(ConversationId);
+
+                foreach (var msg in updatedMessages)
+                {
+                    await Clients.Group(ConversationId.ToString()).SendAsync("ReceiveMessageStatusUpdate", new
+                    {
+                        messageId = msg.Id,
+                        status = (int)msg.Status
+                    });
+                }
             }
             catch (Exception ex)
             {

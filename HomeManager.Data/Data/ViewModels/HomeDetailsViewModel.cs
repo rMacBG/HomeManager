@@ -13,6 +13,7 @@ namespace HomeManager.Data.Data.ViewModels
 
         public ConversationDto Conversation { get; set; }
 
+        public string OtherParticipantName { get; set; }
         public IEnumerable<MessageDto> Messages { get; set; }
     }
 }

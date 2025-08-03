@@ -11,20 +11,20 @@ namespace HomeManager.Controllers
     [Route("Chat")]
     public class ConversationController : Controller
     {
-        
+
         private readonly IMessageService _messageService;
         private readonly IHomeService _homeService;
         private readonly IConversationService _conversationService;
 
-        public ConversationController( IMessageService messageService, IHomeService homeService, IConversationService conversationService)
+        public ConversationController(IMessageService messageService, IHomeService homeService, IConversationService conversationService)
         {
-                 _messageService = messageService;
-                 _homeService = homeService;
-                 _conversationService = conversationService;
+            _messageService = messageService;
+            _homeService = homeService;
+            _conversationService = conversationService;
         }
 
         [Authorize]
-        
+
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
@@ -37,15 +37,15 @@ namespace HomeManager.Controllers
 
             var conversations = await _conversationService.GetUserConversationsForUserIdAsync(userId);
 
-            
+
             var viewModel = conversations.Select(c =>
             {
                 var otherParticipantId = c.ParticipantsIds.FirstOrDefault(p => p != userId);
                 return new ConversationListItemViewModel
                 {
                     ConversationId = c.Id,
-                    
-                    OtherParticipantName = "yes", 
+
+                    OtherParticipantName = "yes",
                     CreatedAt = c.CreatedAt
                 };
             }).OrderByDescending(x => x.CreatedAt);
@@ -73,13 +73,15 @@ namespace HomeManager.Controllers
             Guid currentUserId = Guid.Parse(userIdStr);
             var otherParticipantId = conversation.UsersConversations.FirstOrDefault(u => u.UserId != currentUserId)?.UserId;
 
-           
+            var otherUser = conversation.UsersConversations
+                .FirstOrDefault(uc => uc.UserId != currentUserId)?.User;
+
             var viewModel = new ConversationDetailsViewModel
             {
                 ConversationId = conversation.Id,
                 Messages = conversation.Messages.OrderBy(m => m.SentAt).ToList(),
                 CurrentUserId = currentUserId,
-                OtherParticipantName = "Other Party"  
+                OtherParticipantName = otherUser?.FullName ?? otherUser?.Username ?? "Unknown"
             };
 
             return View("~/Views/Chat/Conversation.cshtml", viewModel);
@@ -88,20 +90,50 @@ namespace HomeManager.Controllers
         [HttpGet("ForHome/{homeId}")]
         public async Task<IActionResult> GetOrCreateConversation(Guid homeId)
         {
+            //try
+            //{
+            //    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            //    if (userId == null) return Unauthorized();
+
+            //    var conversationId = await _conversationService.GetOrCreateConversationForHomeAsync(homeId, Guid.Parse(userId));
+
+            //    return Ok(new { conversationId });
+            //}
+            //catch (Exception ex)
+            //{
+            //    return StatusCode(500, new { error = ex.Message });
+
+            //}
             try
             {
-                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (userIdStr == null) return Unauthorized();
 
-                if (userId == null) return Unauthorized();
+                var userId = Guid.Parse(userIdStr);
 
-                var conversationId = await _conversationService.GetOrCreateConversationForHomeAsync(homeId, Guid.Parse(userId));
+                var conversationId = await _conversationService.GetOrCreateConversationForHomeAsync(homeId, userId);
 
-                return Ok(new { conversationId });
+                var conversation = await _conversationService.GetConversationDetailsAsync(conversationId);
+                if (conversation == null)
+                {
+                    return NotFound("Conversation not found.");
+                }
+
+                var otherUser = conversation.UsersConversations
+                        .FirstOrDefault(uc => uc.UserId != userId)?.User;
+
+                var otherUserName = otherUser?.FullName ?? otherUser?.Username ?? "Unknown";
+
+                return Ok(new
+                {
+                    conversationId,
+                    otherUserName
+                });
             }
             catch (Exception ex)
             {
                 return StatusCode(500, new { error = ex.Message });
-
             }
 
         }
@@ -119,7 +151,7 @@ namespace HomeManager.Controllers
             Guid userId = Guid.Parse(userIdStr);
             var conversations = await _conversationService.GetUserConversationsForUserIdAsync(userId);
 
-            
+
             return Ok(conversations);
         }
     }

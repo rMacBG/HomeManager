@@ -123,6 +123,32 @@ namespace HomeManager.Services.Services
            
         }
 
+        public async Task<List<MessageDto>> UpdateMessagesStatusAsync(Guid ConversationId)
+        {
+            var messages = await _messageRepository.GetByConversationIdAsync(ConversationId);
+
+            var unseenMessages = messages
+                .Where(m => m.Status < MessageStatus.Seen)
+                .ToList();
+
+            foreach (var message in unseenMessages)
+            {
+                message.Status = MessageStatus.Seen;
+                await _messageRepository.UpdateAsync(message);
+            }
+
+            var messagesList = unseenMessages.Select(m => new MessageDto
+            {
+                Id = m.Id,
+                Content = m.Content,
+                SenderId = m.SenderId,
+                ReceiverId = m.ReceiverId,
+                SentAt = m.SentAt,
+                MessageStatus = (Data.Data.Models.Enums.MessageStatus)(int)m.Status
+            }).ToList();
+
+            return messagesList;
+        }
     }
 
 }
