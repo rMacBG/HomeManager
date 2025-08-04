@@ -20,3 +20,69 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+btn-homemanager {
+    background: linear-gradient(90deg, #4e54c8, #8f94fb);
+    color: #fff;
+    border: none;
+    border-radius: 25px;
+    padding: 0.5rem 1.5rem;
+    transition: background 0.3s;
+}
+
+.btn-homemanager:hover {
+    background: linear-gradient(90deg, #8f94fb, #4e54c8);
+    color: #fff;
+}
+
+.home-card {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+    transition: transform 0.2s;
+    background: #fff;
+}
+
+    .home-card:hover {
+        transform: translateY(-4px) scale(1.02);
+        box-shadow: 0 6px 20px rgba(78,84,200,0.15);
+    }
+
+.home-card-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.navbar-nav .nav-link.active, .navbar-nav .nav-link:hover {
+    color: #4e54c8 !important;
+    font-weight: 600;
+    background: #f0f2ff;
+    border-radius: 8px;
+}
+
+.navbar-nav .nav-link {
+    margin-right: 0.5rem;
+    transition: background 0.2s, color 0.2s;
+}
+
+#searchInput {
+    border-radius: 20px;
+    border: 1px solid #ddd;
+    padding: 0.4rem 1rem;
+    width: 200px;
+    transition: border 0.2s;
+}
+
+    #searchInput:focus {
+        border: 1.5px solid #4e54c8;
+        outline: none;
+    }
+
+#searchResults {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 1px solid #eee;
+    margin-top: 0.2rem;
+}
