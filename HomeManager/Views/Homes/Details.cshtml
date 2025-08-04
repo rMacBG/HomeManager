@@ -148,7 +148,7 @@
     <p>No conversation found.</p>
     } </p>
 @await Html.PartialAsync("_ChatBox")
-
+<div id="chatBoxContainer"></div>
 <button id="openChatBtn" data-home-id="@Model.Home.Id" class="btn btn-primary mt-3">Ask the Dealer</button>
 <button id="closeChatBtn" class="btn btn-secondary mt-3">Close Chat</button>
 
@@ -163,7 +163,7 @@
                 openChatBtn.addEventListener("click", async () => {
                     console.log("Click fired, waiting for prepareChat...");
 
-                    // Wait until prepareChat is available (max 2 seconds)
+                    
                     const waitForPrepareChat = new Promise((resolve, reject) => {
                         let retries = 0;
                         const interval = setInterval(() => {
@@ -203,7 +203,27 @@
             }
         };
     </script>
+
+    @* <script>
+    document.getElementById("openChatBtn").addEventListener("click", function () {
+        const homeId = this.getAttribute("data-home-id");
+        fetch(`/Homes/ChatBoxPartial?homeId=${homeId}`)
+            .then(response => {
+                if (!response.ok) throw new Error("Failed to load chat box.");
+                return response.text();
+            })
+            .then(html => {
+                document.getElementById("chatBoxContainer").innerHTML = html;
+                
+            })
+            .catch(err => {
+                alert("Could not load chat: " + err);
+            });
+    });
+</script> *@
 }
+
+
 
     @* <div id="chatSection">
 

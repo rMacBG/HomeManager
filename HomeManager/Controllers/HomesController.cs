@@ -116,5 +116,33 @@ namespace HomeManager.Controllers
             await _homeService.DeleteAsync(id);
             return RedirectToAction(nameof(Index));
         }
+
+        //[HttpGet]
+        //public async Task<IActionResult> ChatBoxPartial(Guid homeId)
+        //{
+        //    // Get the home details
+        //    var home = await _homeService.GetByIdAsync(homeId);
+        //    if (home == null)
+        //        return NotFound();
+
+        //    // Get the current user ID
+        //    var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+        //    // Find the conversation for this home and user, or create one if needed
+        //    var conversation = await _conversationService.GetOrCreateConversationAsync(homeId, userId);
+
+        //    // Get the other participant's name (e.g., the landlord or dealer)
+        //    var otherParticipant = await _userService.GetOtherParticipantInConversationAsync(conversation, userId);
+
+        //    // Build the view model
+        //    var viewModel = new HomeDetailsViewModel
+        //    {
+        //        Home = home,
+        //        Conversation = conversation,
+        //        OtherParticipantName = otherParticipant?.FullName ?? "Dealer"
+        //    };
+
+        //    return PartialView("_ChatBox", viewModel);
+        //}
     }
 }
