@@ -21,6 +21,9 @@ namespace HomeManager.Data.Data.Dtos
         [Length(7, 15, ErrorMessage = "Password must be between 7 and 15 characters long!")]
         public string Password { get; set; }
         [Required]
+        [Compare("Password")]
+        public string ConfirmPassword { get; set; }
+        [Required]
         [RegularExpression(@"^(\+\d{1,3}\s?)?\(?\d{3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$", ErrorMessage ="Invalid phone format!")]
         [MaxLength(20)]
         public string PhoneNumber { get; set; }

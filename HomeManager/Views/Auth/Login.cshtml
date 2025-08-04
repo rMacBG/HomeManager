@@ -2,23 +2,35 @@
     ViewData["Title"] = "Login";
 }
 
-<h2>Login</h2>
-
-<form asp-action="Login" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-
-    <div class="form-group">
-        <label>Username</label>
-        <input name="username" class="form-control" />
+<div class="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+    <div class="card shadow-lg p-4" style="min-width: 350px; max-width: 400px; width: 100%;">
+        <div class="text-center mb-4">
+            <span class="display-4" style="color: #4e54c8;">
+                <i class="bi bi-person-circle"></i>
+            </span>
+            <h2 class="fw-bold mb-0" style="color: #4e54c8;">Login</h2>
+            <p class="text-muted small">Welcome back! Please sign in to your account.</p>
+        </div>
+        <form asp-action="Login" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+            <div class="mb-3">
+                <label class="form-label">Username</label>
+                <input name="username" class="form-control" placeholder="Enter your username" autocomplete="username" />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Password</label>
+                <input name="password" type="password" class="form-control" placeholder="Enter your password" autocomplete="current-password" />
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-homemanager btn-lg">Login</button>
+            </div>
+        </form>
+        <div class="mt-3 text-center">
+            <span class="text-muted">Don't have an account?</span>
+            <a asp-controller="Auth" asp-action="Register" class="text-decoration-none" style="color: #4e54c8;">Register</a>
+        </div>
     </div>
-
-    <div class="form-group">
-        <label>Password</label>
-        <input name="password" type="password" class="form-control" />
-    </div>
-
-    <button type="submit" class="btn btn-primary">Login</button>
-</form>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
