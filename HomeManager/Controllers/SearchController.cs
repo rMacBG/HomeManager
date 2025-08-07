@@ -1,4 +1,5 @@
 ﻿using HomeManager.Data.Data.Dtos;
+using HomeManager.Data.Data.ViewModels;
 using HomeManager.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -38,8 +39,20 @@ namespace HomeManager.Controllers
 
             return Json(combined.ToList());
         }
+
+        public async Task<IActionResult> List(string query)
+        {
+            var homes = await _homeService.SearchHomesAsync(query);
+            var users = await _userService.SearchUsersAsync(query);
+            var viewModel = new SearchResultsViewModel
+            {
+                Query = query,
+                HomeResults = homes.ToList(),
+                UserResults = users.ToList()
+            };
+            return View(viewModel);
+        }
     }
 
 }
-    
 

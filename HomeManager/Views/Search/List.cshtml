@@ -1,0 +1,35 @@
+﻿@model HomeManager.Data.Data.ViewModels.SearchResultsViewModel
+@{
+    ViewData["Title"] = "Search Results";
+}
+<h2>Search Results for "@Model.Query"</h2>
+
+@if (Model.HomeResults.Any())
+{
+    <h3>Homes</h3>
+    <ul>
+        @foreach (var home in Model.HomeResults)
+        {
+            <li>
+                <a asp-controller="Homes" asp-action="Details" asp-route-id="@home.Id">@home.HomeName</a>
+                - @home.HomeLocation
+            </li>
+        }
+    </ul>
+}
+@if (Model.UserResults.Any())
+{
+    <h3>Users</h3>
+    <ul>
+        @foreach (var user in Model.UserResults)
+        {
+            <li>
+                <a asp-controller="Users" asp-action="Profile" asp-route-id="@user.Id">@user.Username</a>
+            </li>
+        }
+    </ul>
+}
+@if (!Model.HomeResults.Any() && !Model.UserResults.Any())
+{
+    <p>No results found.</p>
+}

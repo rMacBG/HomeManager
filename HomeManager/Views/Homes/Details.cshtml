@@ -155,7 +155,7 @@
 
 
 @section Scripts {
-     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script> -->
+     @* <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script> -->
     <script>
         window.onload = function () {
             const openChatBtn = document.getElementById("openChatBtn");
@@ -202,9 +202,9 @@
                 console.error("closeChatBtn element not found.");
             }
         };
-    </script>
+    </script> *@
 
-    @* <script>
+    <script>
     document.getElementById("openChatBtn").addEventListener("click", function () {
         const homeId = this.getAttribute("data-home-id");
         fetch(`/Homes/ChatBoxPartial?homeId=${homeId}`)
@@ -220,7 +220,7 @@
                 alert("Could not load chat: " + err);
             });
     });
-</script> *@
+</script>
 }
 
 

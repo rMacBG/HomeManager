@@ -149,6 +149,21 @@ namespace HomeManager.Services.Services
 
             return messagesList;
         }
+
+        public async Task<IEnumerable<MessageDto>> GetUnseenMessagesAsync(Guid conversationId, Guid receiverId)
+        {
+            var messages = await _messageRepository.GetUnseenMessagesAsync(conversationId, receiverId);
+            return messages.Select(m => new MessageDto
+            {
+                Id = m.Id,
+                ConversationId = m.ConversationId,
+                SenderId = m.SenderId,
+                ReceiverId = m.ReceiverId,
+                Content = m.Content,
+                SentAt = m.SentAt,
+                MessageStatus = m.Status
+            });
+        }
     }
 
 }

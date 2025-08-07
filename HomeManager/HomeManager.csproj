@@ -54,4 +54,8 @@
     <UpToDateCheckInput Remove="Views\Chat\Index.cshtml" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\Search\" />
+  </ItemGroup>
+
 </Project>

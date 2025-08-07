@@ -88,24 +88,25 @@ namespace HomeManager.Services.Services.SignalR
                 });
             }
         }
-        public async Task MarkAsSeen(Guid ConversationId)
+        public async Task MarkAsSeen(Guid conversationId, Guid userId)
         {
             try
             {
-                var updatedMessages = await _messageService.UpdateMessagesStatusAsync(ConversationId);
+                await _messageService.MarkMessagesAsSeenAsync(conversationId, userId);
 
+                var updatedMessages = await _messageService.GetUnseenMessagesAsync(conversationId, userId);
                 foreach (var msg in updatedMessages)
                 {
-                    await Clients.Group(ConversationId.ToString()).SendAsync("ReceiveMessageStatusUpdate", new
+                    await Clients.Group(conversationId.ToString()).SendAsync("ReceiveMessageStatusUpdate", new
                     {
                         messageId = msg.Id,
-                        status = (int)msg.Status
+                        status = (int)MessageStatus.Seen
                     });
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in MarkAsSeen for conversation {ConversationId}: {ex.Message}");
+                Console.WriteLine($"Error in MarkAsSeen for conversation {conversationId}: {ex.Message}");
             }
         }
 

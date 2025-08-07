@@ -1,5 +1,6 @@
 ﻿using HomeManager.Data.Data.Dtos;
 using HomeManager.Data.Data.Models;
+using HomeManager.Data.Data.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,8 @@ namespace HomeManager.Services.Services.Interfaces
         Task<Guid> GetOrCreateConversationForHomeAsync(Guid homeId, Guid userId);
         Task<Guid> GetOrCreateConversationAsync(Guid userId1, Guid userId2);
         Task<Conversation> GetConversationDetailsAsync(Guid conversationId);
+
+        Task<HomeDetailsViewModel> GetChatBoxViewModelAsync(Guid homeId, Guid userId);
 
     }
 

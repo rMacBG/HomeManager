@@ -1,5 +1,6 @@
 ﻿using HomeManager.Data.Data.Dtos;
 using HomeManager.Data.Data.Models;
+using HomeManager.Data.Data.ViewModels;
 using HomeManager.Services.Repositories;
 using HomeManager.Services.Repositories.Interfaces;
 using HomeManager.Services.Services.Interfaces;
@@ -114,6 +115,56 @@ namespace HomeManager.Services.Services
                 throw new Exception("Conversation not found");
             }
             return conversation;
+        }
+
+        public async Task<HomeDetailsViewModel> GetChatBoxViewModelAsync(Guid homeId, Guid userId)
+        {
+            var home = await _homeRepository.GetByIdAsync(homeId);
+            if (home == null)
+                return null;
+
+            if (home.LandlordId == userId)
+                throw new InvalidOperationException("Cannot start a conversation with yourself.");
+
+            var conversationId = await GetOrCreateConversationAsync(userId, home.LandlordId);
+            var conversation = await GetConversationDetailsAsync(conversationId);
+
+            var conversationDto = new ConversationDto
+            {
+                Id = conversation.Id,
+                ParticipantsIds = conversation.UsersConversations.Select(uc => uc.User.Id),
+                CreatedAt = conversation.StartedAt
+            };
+
+            var homeDto = new HomeDto
+            {
+                Id = home.Id,
+                HomeName = home.HomeName,
+                HomeLocation = home.HomeLocation,
+                HomeType = home.HomeType,
+                HomeDescription = home.HomeDescription,
+                HomeDealType = home.HomeDealType,
+                HomePrice = home.HomePrice,
+                LandlordId = home.LandlordId,
+                ConversationId = conversation.Id,
+                Images = home.Images?.Select(img => new HomeImageDto
+                {
+                    FilePath = img.FilePath,
+                }).ToList() ?? new List<HomeImageDto>()
+            };
+
+            var otherUser = conversation.UsersConversations
+                .Select(uc => uc.User)
+                .FirstOrDefault(u => u.Id != userId);
+
+            var otherParticipantName = otherUser?.FullName ?? otherUser?.Username ?? "Dealer";
+
+            return new HomeDetailsViewModel
+            {
+                Home = homeDto,
+                Conversation = conversationDto,
+                OtherParticipantName = otherParticipantName
+            };
         }
     }
 }

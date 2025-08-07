@@ -21,5 +21,7 @@ namespace HomeManager.Services.Services.Interfaces
         Task<List<MessageDto>> UpdateMessagesStatusAsync(Guid ConversationId);
         Task<IEnumerable<Message>> MarkAllAsSeenAsync(Guid conversationId, Guid receiverId);
 
+        Task<IEnumerable<MessageDto>> GetUnseenMessagesAsync(Guid conversationId, Guid receiverId);
+
     }
 }

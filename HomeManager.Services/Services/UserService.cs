@@ -96,5 +96,13 @@ namespace HomeManager.Services.Services
                 Id = u.Id,
             });
         }
+
+        public Guid? GetCurrentUserId()
+        {
+            var userIdStr = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (Guid.TryParse(userIdStr, out var userId))
+                return userId;
+            return null;
+        }
     }
 }

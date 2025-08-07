@@ -96,4 +96,47 @@ document.addEventListener("DOMContentLoaded", function () {
             resultsDiv.textContent = "An error occurred during search.";
         }
     });
+
+    input.addEventListener("keyup", async function (e) {
+        const query = input.value.trim();
+        resultsDiv.innerHTML = "";
+
+        if (query.length < 2) {
+            return;
+        }
+
+        try {
+            const res = await fetch(`/Search/GetResults?query=${encodeURIComponent(query)}`);
+            if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+            const data = await res.json();
+
+            if (data.length === 0) {
+                resultsDiv.textContent = "No results found.";
+            } else {
+                data.slice(0, 6).forEach(item => {
+                    const link = document.createElement("a");
+                    link.textContent = `${item.name} (${item.type})`;
+                    link.style.display = "block";
+                    link.style.cursor = "pointer";
+                    link.href = item.type === "Home"
+                        ? `/Homes/Details/${item.id}`
+                        : item.type === "User"
+                            ? `/Users/Profile/${item.id}`
+                            : "#";
+                    resultsDiv.appendChild(link);
+                });
+
+                const viewAll = document.createElement("a");
+                viewAll.href = `/Search/List?query=${encodeURIComponent(query)}`;
+                viewAll.textContent = "View all results";
+                viewAll.style.display = "block";
+                viewAll.style.marginTop = "10px";
+                viewAll.style.fontWeight = "bold";
+                resultsDiv.appendChild(viewAll);
+            }
+        } catch (err) {
+            console.error("Search failed:", err);
+            resultsDiv.textContent = "An error occurred during search.";
+        }
+    });
 });

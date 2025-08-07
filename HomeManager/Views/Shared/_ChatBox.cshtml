@@ -122,8 +122,7 @@
     <div id="chatPopup" class="chat-popup">
         <div class="chat-header">
             <span>Chat with </span>
-        <p>Debug User Name: @Model.OtherParticipantName</p>
-               @*  @User.FindFirst(ClaimTypes.NameIdentifier)?.Value *@</p>
+            @* <p>Debug User Name: @Model.OtherParticipantName</p> *@
             <button id="closeChatBtn" class="close-btn">&times;</button>
         </div>
 
@@ -223,6 +222,9 @@
 
             const data = await res.json();
             const conversationId = data.conversationId;
+const otherUserName = data.otherUserName;
+
+document.querySelector("#chatPopup .chat-header span").textContent = "Chat with " + otherUserName;
 
             await window.connection.invoke("JoinConversationGroup", conversationId);
             console.log("Joined SignalR group for conversation:", conversationId);
@@ -256,7 +258,7 @@
                 list.appendChild(li);
             });
 
-            await window.connection.invoke("MarkAsSeen", conversationId);
+            await window.connection.invoke("MarkAsSeen", conversationId, currentUserId);
         } catch (err) {
             console.error("Error in prepareChat:", err);
         } finally {
@@ -359,17 +361,17 @@
         document.getElementById("messagesList").appendChild(li);
         document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
 
-        if (!isSelf) {
-        try {
-            await window.connection.invoke("MarkAsDelivered", message.messageId);
-            const convoId = document.getElementById("conversationId")?.value;
-            if (convoId) {
-                await window.connection.invoke("MarkAsSeen", convoId);
+        if (!isSelf && message.receiverId === currentUserId) {
+            try {
+                await window.connection.invoke("MarkAsDelivered", message.messageId);
+                const convoId = document.getElementById("conversationId")?.value;
+                if (convoId) {
+                    await window.connection.invoke("MarkAsSeen", convoId, currentUserId);
+                }
+            } catch (err) {
+                console.error("Failed to mark as delivered or seen", err);
             }
-        } catch (err) {
-            console.error("Failed to mark as delivered or seen", err);
         }
-    }
     });
 
     window.connection.on("ReceiveMessageStatusUpdate", (data) => {
