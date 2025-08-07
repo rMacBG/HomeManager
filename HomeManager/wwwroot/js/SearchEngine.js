@@ -41,75 +41,28 @@ document.addEventListener("DOMContentLoaded", function () {
     const input = document.getElementById("searchInput");
     const resultsDiv = document.getElementById("searchResults");
 
-    form.addEventListener("submit", async function (e) {
+    form.addEventListener("submit", function(e) {
         e.preventDefault();
+    });
 
-        const query = input.value.trim();
-        resultsDiv.innerHTML = "";
-
-        if (query.length < 2) {
-            return;
-        }
-
-        try {
-            const res = await fetch(`/Search/GetResults?query=${encodeURIComponent(query)}`);
-            if (!res.ok) {
-                throw new Error(`HTTP error: ${res.status}`);
-            }
-
-            const data = await res.json();
-
-            if (data.length === 0) {
-                resultsDiv.textContent = "No results found.";
-            } else {
-                data.forEach(item => {
-                    console.log("item:", item);
-                    const link = document.createElement("a");
-                    link.textContent = `${item.name} (${item.type})`;
-                    link.style.display = "block";
-                    link.style.cursor = "pointer";
-
-                    console.log("Rendering link with ID:", item.id); // 🔍 Debug line
-
-                    if (item.type === "Home") {
-                        link.href = `/Homes/Details/${item.id}`;
-                    } else if (item.type === "User") {
-                        link.href = `/Users/Profile/${item.id}`;
-                    } else {
-                        link.href = "#";
-                    }
-
-                    resultsDiv.appendChild(link);
-                });
-
-                const viewAll = document.createElement("a");
-                viewAll.href = `/Search/List?query=${encodeURIComponent(query)}`;
-                viewAll.textContent = "View all results";
-                viewAll.style.display = "block";
-                viewAll.style.marginTop = "10px";
-                viewAll.style.fontWeight = "bold";
-
-                resultsDiv.appendChild(viewAll);
-            }
-        } catch (err) {
-            console.error("Search failed:", err);
-            resultsDiv.textContent = "An error occurred during search.";
+    input.addEventListener("keydown", function(e) {
+        if (e.key === "Enter") {
+            e.preventDefault();
         }
     });
 
     input.addEventListener("keyup", async function (e) {
         const query = input.value.trim();
         resultsDiv.innerHTML = "";
-
         if (query.length < 2) {
+            resultsDiv.style.display = "none";
             return;
         }
-
+        resultsDiv.style.display = "block";
         try {
             const res = await fetch(`/Search/GetResults?query=${encodeURIComponent(query)}`);
             if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
             const data = await res.json();
-
             if (data.length === 0) {
                 resultsDiv.textContent = "No results found.";
             } else {
@@ -125,7 +78,6 @@ document.addEventListener("DOMContentLoaded", function () {
                             : "#";
                     resultsDiv.appendChild(link);
                 });
-
                 const viewAll = document.createElement("a");
                 viewAll.href = `/Search/List?query=${encodeURIComponent(query)}`;
                 viewAll.textContent = "View all results";

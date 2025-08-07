@@ -85,6 +85,11 @@ btn-homemanager {
     box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     border: 1px solid #eee;
     margin-top: 0.2rem;
+    display: block !important;
+}
+
+#searchForm {
+    position: relative;
 }
 
 .btn-homemanager {
