@@ -1,8 +1,40 @@
-﻿@{
+﻿@using HomeManager.Data.Data.Dtos
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+@model List<HomeDto>
+
+<div id="estateCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="5000">
+    <div class="carousel-inner">
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            var estate = Model[i];
+            var imagePath = (estate.Images != null && estate.Images.Any())
+                ? estate.Images.First().FilePath
+                : "/images/placeholder.png";
+            <div class="carousel-item @(i == 0 ? "active" : "")">
+                <a href="@Url.Action("Details", "Homes", new { id = estate.Id })">
+                    <img src="@imagePath" class="d-block w-100 estate-img" alt="@estate.HomeName" style="max-height:300px;object-fit:cover;" />
+                    <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
+                        <h5>@estate.HomeName</h5>
+                        <p>@estate.HomeLocation</p>
+                        <p>@estate.HomePrice</p>
+                    </div>
+                </a>
+            </div>
+        }
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#estateCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#estateCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
 </div>

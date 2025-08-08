@@ -47,6 +47,7 @@ namespace HomeManager.Services.Services
                 HomeDealType = x.HomeDealType,
                 HomePrice = x.HomePrice,
                 LandlordId = x.LandlordId,
+                Images = x.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>()
             }).ToList();
         }
 
@@ -90,6 +91,7 @@ namespace HomeManager.Services.Services
                 HomeDealType = home.HomeDealType,
                 HomePrice = home.HomePrice,
                 LandlordId = home.LandlordId,
+                Images = home.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>()
             }) ?? new List<HomeDto>();
         }
 
@@ -220,5 +222,25 @@ namespace HomeManager.Services.Services
             return homeImage.FilePath;
         }
 
+        public async Task<List<HomeDto>> GetLatestEstatesAsync(int count)
+        {
+            var homes = await _homeRepository.GetAllAsync();
+            return homes
+                .OrderByDescending(x => x.AddedAt)
+                .Take(count)
+                .Select(x => new HomeDto
+                {
+                    Id = x.Id,
+                    HomeName = x.HomeName,
+                    HomeLocation = x.HomeLocation,
+                    HomeType = x.HomeType,
+                    HomeDescription = x.HomeDescription,
+                    HomeDealType = x.HomeDealType,
+                    HomePrice = x.HomePrice,
+                    LandlordId = x.LandlordId,
+                    Images = x.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>()
+                })
+                .ToList();
+        }
     }
 }

@@ -13,6 +13,7 @@
             <li>
                 <a asp-controller="Homes" asp-action="Details" asp-route-id="@home.Id">@home.HomeName</a>
                 - @home.HomeLocation
+                - @home.HomePrice.ToString("C")
             </li>
         }
     </ul>

@@ -105,3 +105,45 @@ btn-homemanager {
         background: linear-gradient(90deg, #8f94fb, #4e54c8);
         color: #fff;
     }
+
+.social-icon i {
+    color: #000 !important;
+    transition: color 0.2s;
+}
+
+.social-icon:hover i {
+    color: #4e54c8 !important;
+}
+
+.estate-marquee-wrapper {
+    overflow: hidden;
+    width: 100%;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+}
+
+.estate-marquee {
+    display: flex;
+    align-items: center;
+    animation: marquee 20s linear infinite;
+}
+
+.estate-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 150px;
+}
+
+.estate-img {
+    max-height: 300px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+
+@keyframes marquee {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+}

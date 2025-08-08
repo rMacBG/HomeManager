@@ -20,8 +20,11 @@ namespace HomeManager.Services.Repositories
         }
 
         public async Task<ICollection<Home>> GetAllAsync()
-        { 
-           return await _context.Homes.ToListAsync();
+        {
+            return await _context.Homes
+                .Include(h => h.Images)
+                .ToListAsync();
+                
         }
 
         public async Task<Home?> GetByIdAsync(Guid Id)

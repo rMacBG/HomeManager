@@ -23,5 +23,6 @@ namespace HomeManager.Services.Services.Interfaces
         Task DeleteAsync(Guid id);
         Task<string> UploadHomeImageAsync(Guid homeId, IFormFile file);
         Task<IEnumerable<HomeDto>> SearchHomesAsync(string query);
+        Task<List<HomeDto>> GetLatestEstatesAsync(int count);
     }
 }
