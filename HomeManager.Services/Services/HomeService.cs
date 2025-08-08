@@ -171,8 +171,31 @@ namespace HomeManager.Services.Services
             home.HomePrice = dto.HomePrice;
             
             home.LastModifiedAt = DateTime.UtcNow;
+            if (dto.UploadedImages != null && dto.UploadedImages.Any())
+            {
+                foreach (var image in dto.UploadedImages)
+                {
+                    if (image.Length > 0)
+                    {
+                        var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
+                        Directory.CreateDirectory(uploadsFolder);
 
-            
+                        var uniqueFileName = Guid.NewGuid() + Path.GetExtension(image.FileName);
+                        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await image.CopyToAsync(stream);
+                        }
+
+                        home.Images.Add(new HomeImage
+                        {
+                            FilePath = "/uploads/" + uniqueFileName
+                        });
+                    }
+                }
+            }
+
             await _homeRepository.UpdateAsync(home);
         }
 

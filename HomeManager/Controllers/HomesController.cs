@@ -12,7 +12,7 @@ using System.Security.Claims;
 
 namespace HomeManager.Controllers
 {
-    [Authorize(Roles = "Landlord,Seller, User")]
+    //[Authorize(Roles = "Landlord,Seller, User")]
     public class HomesController : Controller
     {
         private readonly IHomeService _homeService;
@@ -81,14 +81,25 @@ namespace HomeManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
-            if (!ModelState.IsValid)
-                return View(id);
-
             var home = await _homeService.GetByIdAsync(id);
-            var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
-            //await _homeService.EditAsync(home);
+            if (home == null)
+                return NotFound();
 
-            return View(home);
+            
+            var model = new EditHomeViewModel
+            {
+                Id = home.Id,
+                HomeName = home.HomeName,
+                HomeDescription = home.HomeDescription,
+                HomeLocation = home.HomeLocation,
+                HomePrice = home.HomePrice,
+                HomeType = home.HomeType,
+                HomeDealType = home.HomeDealType,
+                // Optionally, add existing images if you want to show them
+                ExistingImages = home.Images?.Select(i => i.FilePath).ToList() ?? new List<string>()
+            };
+
+            return View(model);
         }
 
         [HttpPost]
@@ -122,7 +133,7 @@ namespace HomeManager.Controllers
         {
             var userId = _userService.GetCurrentUserId();
             if (userId == null)
-                return Unauthorized();
+                return RedirectToAction("Register", "Auth");
 
             var viewModel = await _conversationService.GetChatBoxViewModelAsync(homeId, userId.Value);
             if (viewModel == null)

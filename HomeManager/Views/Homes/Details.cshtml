@@ -1,5 +1,7 @@
 ﻿@using System.Security.Claims
 @model HomeManager.Data.Data.ViewModels.HomeDetailsViewModel
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
 
 <h2>@Model.Home.HomeName</h2>
 <p>@Model.Home.HomeDescription</p>
@@ -149,61 +151,36 @@
     <p>No conversation found.</p>
     } </p>
 @await Html.PartialAsync("_ChatBox")
-<div id="chatBoxContainer"></div>
-<button id="openChatBtn" data-home-id="@Model.Home.Id" class="btn btn-primary mt-3">Ask the Dealer</button>
-<button id="closeChatBtn" class="btn btn-secondary mt-3">Close Chat</button>
-
-
+@if (User.Identity.IsAuthenticated)
+{
+    <button id="openChatBtn" data-home-id="@Model.Home.Id" class="btn btn-primary mt-3">Ask the Dealer</button>
+}
+else
+{
+    <button id="askDealerGuestBtn" class="btn btn-primary mt-3" type="button" data-bs-toggle="modal" data-bs-target="#registerModal">
+        Ask the Dealer
+    </button>
+    <div id="registerModal" class="modal fade" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Register to Chat</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>You need to register or log in to chat with the dealer.</p>
+                </div>
+                <div class="modal-footer">
+                    <button id="registerBtn" class="btn btn-primary">Register</button>
+                    <button id="loginBtn" class="btn btn-secondary">Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @section Scripts {
-     @* <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script> -->
-    <script>
-        window.onload = function () {
-            const openChatBtn = document.getElementById("openChatBtn");
-            if (openChatBtn) {
-                openChatBtn.addEventListener("click", async () => {
-                    console.log("Click fired, waiting for prepareChat...");
-
-                    
-                    const waitForPrepareChat = new Promise((resolve, reject) => {
-                        let retries = 0;
-                        const interval = setInterval(() => {
-                            if (typeof window.prepareChat === "function") {
-                                clearInterval(interval);
-                                resolve();
-                            } else if (++retries > 20) {
-                                clearInterval(interval);
-                                reject("prepareChat not available");
-                            }
-                        }, 100);
-                    });
-
-                    try {
-                        await waitForPrepareChat;
-                        await window.prepareChat("@Model.Home.Id");
-                    } catch (err) {
-                        console.error("Error calling prepareChat:", err);
-                    }
-                });
-            } else {
-                console.error("openChatBtn element not found.");
-            }
-
-            const closeChatBtn = document.getElementById("closeChatBtn");
-            if (closeChatBtn) {
-                closeChatBtn.addEventListener("click", () => {
-                    const chatPopup = document.getElementById("chatPopup");
-                    if (chatPopup) {
-                        chatPopup.style.display = "none";
-                    } else {
-                        console.warn("chatPopup not found.");
-                    }
-                });
-            } else {
-                console.error("closeChatBtn element not found.");
-            }
-        };
-    </script> *@
+     
 
     <script>
     document.getElementById("openChatBtn").addEventListener("click", function () {
@@ -222,6 +199,16 @@
             });
     });
 </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.getElementById("registerBtn")?.addEventListener("click", function () {
+                window.location.href = '@Url.Action("Register", "Auth")';
+            });
+            document.getElementById("loginBtn")?.addEventListener("click", function () {
+                window.location.href = '@Url.Action("Login", "Auth")';
+            });
+        });
+    </script>
 }
 
 
@@ -464,5 +451,55 @@
         startConnection();
 
        
-    </script> *@ 
+    </script>
+    @* <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script> -->
+    <script>
+        window.onload = function () {
+            const openChatBtn = document.getElementById("openChatBtn");
+            if (openChatBtn) {
+                openChatBtn.addEventListener("click", async () => {
+                    console.log("Click fired, waiting for prepareChat...");
+
+                    
+                    const waitForPrepareChat = new Promise((resolve, reject) => {
+                        let retries = 0;
+                        const interval = setInterval(() => {
+                            if (typeof window.prepareChat === "function") {
+                                clearInterval(interval);
+                                resolve();
+                            } else if (++retries > 20) {
+                                clearInterval(interval);
+                                reject("prepareChat not available");
+                            }
+                        }, 100);
+                    });
+
+                    try {
+                        await waitForPrepareChat;
+                        await window.prepareChat("@Model.Home.Id");
+                    } catch (err) {
+                        console.error("Error calling prepareChat:", err);
+                    }
+                });
+            } else {
+                console.error("openChatBtn element not found.");
+            }
+
+            const closeChatBtn = document.getElementById("closeChatBtn");
+            if (closeChatBtn) {
+                closeChatBtn.addEventListener("click", () => {
+                    const chatPopup = document.getElementById("chatPopup");
+                    if (chatPopup) {
+                        chatPopup.style.display = "none";
+                    } else {
+                        console.warn("chatPopup not found.");
+                    }
+                });
+            } else {
+                console.error("closeChatBtn element not found.");
+            }
+        };
+    </script> *@
+
+
 

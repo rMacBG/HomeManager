@@ -1,7 +1,7 @@
 ﻿@using HomeManager.Data.Data.Models.Enums
-@model HomeManager.Data.Data.Dtos.HomeDto
+@model HomeManager.Data.Data.ViewModels.EditHomeViewModel
 
-<form asp-action="Edit" method="post">
+<form asp-action="Edit" method="post" enctype="multipart/form-data">
     <input asp-for="HomeName" class="form-control" placeholder="Title" />
     <textarea asp-for="HomeDescription" class="form-control" placeholder="Description"></textarea>
     <input asp-for="HomeLocation" class="form-control" placeholder="Address" />
@@ -23,5 +23,10 @@
         <span asp-validation-for="HomeDealType" class="text-danger"></span>
     </div>
     <input asp-for="HomeLocation" class="form-control" placeholder="Google Maps Link or Coordinates" />
+    <div class="mb-3">
+        <label for="UploadedImages" class="form-label">Add Images</label>
+        <input type="file" name="UploadedImages" id="UploadedImages" multiple class="form-control" />
+    </div>
+
     <button type="submit" class="btn btn-primary">Save</button>
 </form>
