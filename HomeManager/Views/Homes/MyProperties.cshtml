@@ -2,39 +2,27 @@
 
 <h2>My Properties</h2>
 
-<a asp-action="Create" class="btn btn-primary">+ Add New Property</a>
+<a asp-action="Create" class="btn btn-hm mb-3">+ Add New Property</a>
 
 @if (Model != null && Model.Any())
 {
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Type</th>
-                <th>Price</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var home in Model)
-            {
-                <tr>
-                    <td>@home.HomeName</td>
-                    <td>@home.HomeDealType</td>
-                    <td>@home.HomePrice</td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@home.Id">Details</a>
-                        <a asp-action="Edit" asp-route-id="@home.Id">Edit</a> |
-                        <a asp-action="Delete" asp-route-id="@home.Id">Delete</a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    foreach (var home in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5>@home.HomeName</h5>
+                <p>@home.HomeDealType</p>
+                <p>@home.HomePrice</p>
+                <div class="d-flex gap-2">
+                    <a asp-action="Details" asp-route-id="@home.Id" class="btn btn-hm-details">Details</a>
+                    <a asp-action="Edit" asp-route-id="@home.Id" class="btn btn-hm-edit">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@home.Id" class="btn btn-hm-delete">Delete</a>
+                </div>
+            </div>
+        </div>
+    }
 }
 else
 {
     <p>You have not listed any properties yet.</p>
 }
-    </tbody>
-</table>

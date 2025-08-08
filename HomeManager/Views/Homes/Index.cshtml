@@ -3,17 +3,37 @@
 <h2>Available Homes</h2>
 @if (Model != null && Model.Any())
 {
+    var index = 0;
     foreach (var home in Model)
     {
-        <div class="card mb-3">
-            <div class="card-body">
-                <h5>@home.HomeName</h5>
-                <p>@home.HomeDescription</p>
-                <p>@home.HomePrice</p>
-                <!--<a href="@Url.Action("Details", "Home", new { id = home.Id })">View Details</a>-->
-                <a asp-action="Details" asp-route-id="@home.Id" class="btn btn-info">View Details</a>
+        var imagePath = (home.Images != null && home.Images.Any())
+            ? home.Images.First().FilePath
+            : "/images/placeholder.png";
+        <div class="card mb-3 home-card" style="min-height: 180px;">
+            <div class="d-flex" style="height: 180px;">
+                <div class="d-flex flex-column justify-content-between flex-grow-1 p-3">
+                    <h5>@home.HomeName</h5>
+                    <p>@home.HomeDescription</p>
+                    <p>@home.HomePrice</p>
+                    <a asp-action="Details" asp-route-id="@home.Id" class="btn btn-hm align-self-start">View Details</a>
+                </div>
+                <div class="home-card-img-container ms-3">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="@("#imgModal" + index)">
+                        <img src="@imagePath" alt="@home.HomeName" class="home-card-img fade-on-hover" />
+                    </a>
+                </div>
             </div>
         </div>
+        <div class="modal fade" id="@("imgModal" + index)" tabindex="-1" aria-labelledby="@("imgModalLabel" + index)" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content bg-transparent border-0">
+                    <div class="modal-body text-center p-0">
+                        <img src="@imagePath" alt="@home.HomeName" style="max-width:100%;max-height:80vh;border-radius:12px;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        index++;
     }
 }
 else

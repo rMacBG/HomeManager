@@ -6,6 +6,7 @@
 <h2>@Model.Home.HomeName</h2>
 <p>@Model.Home.HomeDescription</p>
 <p>Location: @Model.Home.HomeLocation</p>
+<p>Type: @Model.Home.HomeDealType</p>
 <p class="fw-bold text-warning">Price: @Model.Home.HomePrice.ToString("C")</p>
 <style>
     .chat-popup {
@@ -114,6 +115,22 @@
         color: gray;
         text-align: right;
     }
+
+    .fade-on-hover {
+        transition: transform 0.3s;
+    }
+
+    .fade-on-hover:hover {
+        transform: scale(1.05);
+    }
+
+    .zoomable-image {
+        transition: transform 0.3s;
+    }
+
+    .zoomable-image:hover {
+        transform: scale(1.2);
+    }
 </style>
 <!-- Embed Google Maps -->
 <iframe
@@ -128,11 +145,25 @@
 <div class="row mt-4">
     @if (Model.Home.Images?.Any() == true)
     {
+        var imgIndex = 0;
         foreach (var image in Model.Home.Images)
         {
             <div class="col-md-4 mb-3">
-                <img src="@image.FilePath" class="img-fluid fixed-image rounded shadow-sm" alt="Home Image" />
+                <a href="#" data-bs-toggle="modal" data-bs-target="@("#imgModal" + imgIndex)">
+                    <img src="@image.FilePath" class="img-fluid fixed-image rounded shadow-sm fade-on-hover" alt="Home Image" />
+                </a>
+                
+                <div class="modal fade" id="@("imgModal" + imgIndex)" tabindex="-1" aria-labelledby="@("imgModalLabel" + imgIndex)" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content bg-transparent border-0">
+                            <div class="modal-body text-center p-0">
+                                <img src="@image.FilePath" alt="Home Image" class="img-fluid zoomable-image" style="max-width:100%;max-height:80vh;border-radius:12px;cursor:zoom-in;" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
+            imgIndex++;
         }
     }
     else

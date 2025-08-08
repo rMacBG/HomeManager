@@ -17,7 +17,7 @@
             var imagePath = (estate.Images != null && estate.Images.Any())
                 ? estate.Images.First().FilePath
                 : "/images/placeholder.png";
-            <div class="carousel-item @(i == 0 ? "active" : "")">
+            <div class="carousel-item @(i == 0 ? "active" : "")" data-aos="fade-up">
                 <a href="@Url.Action("Details", "Homes", new { id = estate.Id })">
                     <img src="@imagePath" class="d-block w-100 estate-img" alt="@estate.HomeName" style="max-height:300px;object-fit:cover;" />
                     <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-50 rounded">
@@ -38,3 +38,9 @@
         <span class="visually-hidden">Next</span>
     </button>
 </div>
+
+<link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+<script>
+  AOS.init();
+</script>

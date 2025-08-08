@@ -19,6 +19,14 @@ html {
 
 body {
   margin-bottom: 60px;
+  opacity: 0;
+  transition: opacity 0.5s;
+  background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
+  min-height: 100vh;
+}
+
+body.loaded {
+  opacity: 1;
 }
 
 btn-homemanager {
@@ -32,6 +40,63 @@ btn-homemanager {
 
 .btn-homemanager:hover {
     background: linear-gradient(90deg, #8f94fb, #4e54c8);
+    color: #fff;
+}
+
+.btn-hm {
+    background-color: #4f46e5;
+    color: #fff;
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.btn-hm:hover, .btn-hm:focus {
+    transform: scale(1.05);
+    box-shadow: 0 4px 16px #a21caf33;
+}
+
+.btn-hm-edit {
+    background: linear-gradient(90deg, #5e72eb 0%, #c4b5fd 100%); 
+    color: #fff;
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+.btn-hm-edit:hover, .btn-hm-edit:focus {
+    background: linear-gradient(90deg, #6d28d9 0%, #a21caf 100%);
+    color: #fff;
+}
+
+.btn-hm-details {
+    background: linear-gradient(90deg, #4ade80 0%, #c4b5fd 100%); 
+    color: #fff;
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+.btn-hm-details:hover, .btn-hm-details:focus {
+    background: linear-gradient(90deg, #6d28d9 0%, #a21caf 100%); 
+    color: #fff;
+}
+
+.btn-hm-delete {
+    background: linear-gradient(90deg, #dc2626 0%, #a21caf 100%);
+    color: #fff;
+    border: none;
+    border-radius: 0.375rem;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+.btn-hm-delete:hover, .btn-hm-delete:focus {
+    background: linear-gradient(90deg, #b91c1c 0%, #6d28d9 100%);
     color: #fff;
 }
 
@@ -49,10 +114,20 @@ btn-homemanager {
         box-shadow: 0 6px 20px rgba(78,84,200,0.15);
     }
 
+.home-card-img-container {
+    width: 180px;
+    min-width: 140px;
+    height: 100%;
+    display: flex;
+    align-items: stretch;
+}
+
 .home-card-img {
     width: 100%;
-    height: 180px;
+    height: 100%;
     object-fit: cover;
+    border-radius: 8px;
+    transition: opacity 0.3s;
 }
 
 .navbar-nav .nav-link.active, .navbar-nav .nav-link:hover {
@@ -146,4 +221,133 @@ btn-homemanager {
 @keyframes marquee {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
+}
+
+.parallax {
+    background-image: url('/images/estates-bg.jpg');
+    min-height: 400px;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.navbar {
+    background-color: #4f46e5;
+}
+
+.footer {
+    background-color: #312e81;
+    color: #fff;
+    padding: 1rem 0;
+    text-align: center;
+}
+
+h1, h5 {
+    color: #4f46e5;
+}
+
+.carousel-caption {
+    background: rgba(49, 46, 129, 0.7);
+}
+
+.create-form-animate {
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 0.6s forwards;
+}
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.form-control {
+    border-radius: 12px;
+    border: 1.5px solid #e0e7ff;
+    box-shadow: 0 2px 8px rgba(78,84,200,0.07);
+    background: #f8f9fa;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    font-size: 1rem;
+}
+
+.form-control:focus {
+    border-color: #a21caf;
+    box-shadow: 0 0 0 2px #a21caf33, 0 4px 16px #a21caf22;
+    background: #f3e8ff;
+}
+
+textarea.form-control {
+    min-height: 100px;
+    resize: vertical;
+}
+
+input[type="file"].form-control {
+    padding: 0.4rem;
+    background: #ede9fe;
+    border-radius: 12px;
+    border: 1.5px solid #c4b5fd;
+}
+
+input[type="file"].form-control:focus {
+    border-color: #a21caf;
+    background: #f3e8ff;
+}
+
+.form-floating-label {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.form-floating-label input,
+.form-floating-label textarea,
+.form-floating-label select {
+    width: 100%;
+    padding: 1.2rem 0.75rem 0.5rem 0.75rem;
+    border-radius: 12px;
+    border: 1.5px solid #e0e7ff;
+    background: #f8f9fa;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.form-floating-label label {
+    position: absolute;
+    top: 1rem;
+    left: 0.75rem;
+    color: #6d28d9;
+    font-size: 1rem;
+    pointer-events: none;
+    transition: 0.2s;
+    background: transparent;
+}
+
+.form-floating-label input:focus + label,
+.form-floating-label input:not(:placeholder-shown) + label,
+.form-floating-label textarea:focus + label,
+.form-floating-label textarea:not(:placeholder-shown) + label,
+.form-floating-label select:focus + label,
+.form-floating-label select:not([value=""]) + label {
+    top: 0.2rem;
+    left: 0.65rem;
+    font-size: 0.85rem;
+    color: #a21caf;
+    background: #f8f9fa;
+    padding: 0 0.2rem;
+}
+
+.fade-on-hover {
+    transition: opacity 0.3s;
+}
+
+.fade-on-hover:hover {
+    opacity: 0.7;
+}
+
+.zoomable-image {
+    transition: transform 0.3s;
+}
+.zoomable-image.zoomed {
+    transform: scale(2);
+    cursor: zoom-out;
 }
