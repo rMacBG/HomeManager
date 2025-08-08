@@ -10,7 +10,7 @@
 else
 {
     <ul class="conversation-list">
-        @await Html.PartialAsync("_ChatBox")
+        @*await Html.PartialAsync("_ChatBox") *@
         @foreach (var conversation in Model)
         {
             <li>
@@ -26,50 +26,27 @@ else
         }
     </ul>
 }
+
+<div id="chatBoxContainer"></div>
+
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll(".open-chat-link").forEach(function (link) {
                 link.addEventListener("click", async function () {
                     const conversationId = this.dataset.conversationId;
-
-                    try {
-                        if (window.connection.state !== "Connected") {
-                            await window.startConnection();
-                        }
-
-                        await window.connection.invoke("JoinConversationGroup", conversationId);
-                        console.log("Joined SignalR group for conversation:", conversationId);
-
-                        const messagesRes = await fetch(`/Chat/Messages?conversationId=${conversationId}`);
-                        const messages = await messagesRes.json();
-
-                        document.getElementById("conversationId").value = conversationId;
-                        document.getElementById("chatPopup").style.display = "block";
-
-                        const list = document.getElementById("messagesList");
-                        list.innerHTML = "";
-
-                        messages.forEach(function (msg) {
-                            const isSelf = msg.senderId === document.getElementById("senderId").value;
-                            const li = document.createElement("div");
-                            li.classList.add("message", isSelf ? "self" : "other");
-                            const displayName = isSelf ? "You" : (msg.senderName || "Dealer");
-
-                            li.innerHTML = `
-                                        <div class="message-bubble">
-                                            <div class="message-author">${displayName}:</div>
-                                            <div class="message-content">${msg.content}</div>
-                                            <div class="message-status">[${window.getMessageStatusText(msg.status)}]</div>
-                                        </div>
-                                    `;
-                            list.appendChild(li);
-                        });
-
-                        await window.connection.invoke("MarkAsSeen", conversationId);
-                    } catch (err) {
-                        console.error("Error loading chat:", err);
-                    }
+                        console.log("Clicked conversation link. ID:", conversationId);
+                    fetch(`/Chat/ChatBoxPartial?conversationId=${conversationId}`)
+    .then(response => {
+        if (!response.ok) throw new Error("Failed to load chat box.");
+        return response.text();
+    })
+    .then(html => {
+        document.getElementById("chatBoxContainer").innerHTML = html;
+    })
+    .catch(err => {
+        alert("Could not load chat: " + err);
+    });
                 });
             });
         });

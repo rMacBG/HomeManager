@@ -104,13 +104,11 @@ namespace HomeManager.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        [Authorize(Roles = "Landlord,Seller,Admin")]
-        public async Task<IActionResult> Edit(Guid id, CreateHomeDto dto)
+        public async Task<IActionResult> Edit(Guid id, EditHomeViewModel model)
         {
-            if (!ModelState.IsValid) return View(dto);
-            var userId = User.FindFirst("nameidentifier")?.Value;
+            if (!ModelState.IsValid) return View(model);
 
-            await _homeService.UpdateAsync(id, dto);
+            await _homeService.UpdateAsync(id, model);
             return RedirectToAction(nameof(Index));
         }
         [HttpGet]

@@ -501,5 +501,15 @@ else
         };
     </script> *@
 
+@{
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var ownerId = Model.Home.LandlordId.ToString();
+}
+
+@if (User.Identity.IsAuthenticated && currentUserId == ownerId)
+{
+    <a asp-action="Edit" asp-route-id="@Model.Home.Id" class="btn btn-warning mt-3">Edit Estate</a>
+}
+
 
 

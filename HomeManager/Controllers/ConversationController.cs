@@ -1,4 +1,5 @@
-﻿using HomeManager.Data.Data.Models;
+﻿using HomeManager.Data.Data.Dtos;
+using HomeManager.Data.Data.Models;
 using HomeManager.Data.Data.ViewModels;
 using HomeManager.Services.Services;
 using HomeManager.Services.Services.Interfaces;
@@ -90,21 +91,6 @@ namespace HomeManager.Controllers
         [HttpGet("ForHome/{homeId}")]
         public async Task<IActionResult> GetOrCreateConversation(Guid homeId)
         {
-            //try
-            //{
-            //    var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            //    if (userId == null) return Unauthorized();
-
-            //    var conversationId = await _conversationService.GetOrCreateConversationForHomeAsync(homeId, Guid.Parse(userId));
-
-            //    return Ok(new { conversationId });
-            //}
-            //catch (Exception ex)
-            //{
-            //    return StatusCode(500, new { error = ex.Message });
-
-            //}
             try
             {
                 var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -153,6 +139,44 @@ namespace HomeManager.Controllers
 
 
             return Ok(conversations);
+        }
+        [HttpGet("ChatBoxPartial")]
+        [Authorize]
+        public async Task<IActionResult> ChatBoxPartial(Guid conversationId)
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdStr == null) return Unauthorized();
+
+            var conversation = await _conversationService.GetConversationDetailsAsync(conversationId);
+            if (conversation == null) return NotFound();
+
+            var otherUser = conversation.UsersConversations
+                .FirstOrDefault(uc => uc.UserId != Guid.Parse(userIdStr))?.User;
+
+            var viewModel = new HomeDetailsViewModel
+            {
+                Home = null, // or fetch the home if relevant
+                Conversation = new ConversationDto
+                {
+                    Id = conversation.Id,
+                    ParticipantsIds = conversation.UsersConversations.Select(uc => uc.UserId),
+                    CreatedAt = conversation.StartedAt
+                },
+                OtherParticipantName = otherUser?.FullName ?? otherUser?.Username ?? "Unknown",
+                Messages = conversation.Messages.Select(m => new MessageDto
+                {
+                    Id = m.Id,
+                    ConversationId = m.ConversationId,
+                    SenderId = m.SenderId,
+                    ReceiverId = m.ReceiverId,
+                    Content = m.Content,
+                    SentAt = m.SentAt,
+                    MessageStatus = m.Status,
+
+                })
+            };
+
+            return PartialView("_ChatBox", viewModel);
         }
     }
 }

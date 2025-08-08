@@ -28,5 +28,16 @@
         <input type="file" name="UploadedImages" id="UploadedImages" multiple class="form-control" />
     </div>
 
+    @for (int i = 0; i < Model.ExistingImages.Count; i++)
+    {
+        <div class="mb-2">
+            <img src="@Model.ExistingImages[i]" alt="Estate Image" style="max-width:150px;max-height:100px;" class="me-2" />
+            <label>
+                <input type="checkbox" name="ImagesToRemove" value="@Model.ExistingImages[i]" />
+                Remove
+            </label>
+        </div>
+    }
+
     <button type="submit" class="btn btn-primary">Save</button>
 </form>

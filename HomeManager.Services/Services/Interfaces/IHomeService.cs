@@ -19,7 +19,7 @@ namespace HomeManager.Services.Services.Interfaces
         Task<HomeDto> GetByIdAsync(Guid id);
         Task<HomeDto> EditAsync(HomeDto dto);
         Task<Guid> CreateAsync(CreateHomeDto dto);
-        Task UpdateAsync(Guid id, CreateHomeDto dto);
+        Task UpdateAsync(Guid id, EditHomeViewModel dto);
         Task DeleteAsync(Guid id);
         Task<string> UploadHomeImageAsync(Guid homeId, IFormFile file);
         Task<IEnumerable<HomeDto>> SearchHomesAsync(string query);

@@ -19,5 +19,6 @@ namespace HomeManager.Data.Data.ViewModels
         public DealType HomeDealType { get; set; }
         public List<IFormFile> UploadedImages { get; set; } = new();
         public List<string> ExistingImages { get; set; } = new();
+        public List<string> ImagesToRemove { get; set; } = new(); 
     }
 }

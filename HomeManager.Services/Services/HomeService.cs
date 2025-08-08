@@ -157,20 +157,32 @@ namespace HomeManager.Services.Services
             return home.Id;
         }
 
-        public async Task UpdateAsync(Guid id, CreateHomeDto dto)
+        public async Task UpdateAsync(Guid id, EditHomeViewModel dto)
         {
             var home = await _homeRepository.GetByIdAsync(id)
                 ?? throw new Exception("Home not Found!");
-           
-            
+
             home.HomeName = dto.HomeName;
             home.HomeLocation = dto.HomeLocation;
             home.HomeType = dto.HomeType;
             home.HomeDescription = dto.HomeDescription;
             home.HomeDealType = dto.HomeDealType;
             home.HomePrice = dto.HomePrice;
-            
             home.LastModifiedAt = DateTime.UtcNow;
+
+            
+            if (dto.ImagesToRemove != null && dto.ImagesToRemove.Any())
+            {
+                home.Images.RemoveAll(img => dto.ImagesToRemove.Contains(img.FilePath));
+                foreach (var filePath in dto.ImagesToRemove)
+                {
+                    var physicalPath = Path.Combine(_env.WebRootPath, filePath.TrimStart('/'));
+                    if (System.IO.File.Exists(physicalPath))
+                        System.IO.File.Delete(physicalPath);
+                }
+            }
+
+            
             if (dto.UploadedImages != null && dto.UploadedImages.Any())
             {
                 foreach (var image in dto.UploadedImages)
