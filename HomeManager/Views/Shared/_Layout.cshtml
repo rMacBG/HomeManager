@@ -11,6 +11,7 @@
     var isAuthenticated = User.Identity.IsAuthenticated;
     var username = User.Identity.Name;
     var role = User.FindFirst(ClaimTypes.Role)?.Value;
+    var name = User.FindFirst("FullName")?.Value ?? username;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -78,7 +79,7 @@
                         {
                             <li class="nav-item d-flex align-items-center ms-2">
                                 <span class="nav-link text-dark">
-                                    Hello, @username
+                                    Hello, @username (@name)
                                     @if (User.IsInRole("User"))
                                     {
                                         <span style="color:forestgreen">(@role)</span>
