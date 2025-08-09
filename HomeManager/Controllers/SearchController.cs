@@ -42,15 +42,17 @@ namespace HomeManager.Controllers
             return Json(combined.ToList());
         }
 
-        public async Task<IActionResult> List(string query)
+        public async Task<IActionResult> List(string query, string homeType,decimal? minPrice, decimal? maxPrice)
         {
-            var homes = await _homeService.SearchHomesAsync(query);
-            var users = await _userService.SearchUsersAsync(query);
+            var homes = await _homeService.FilteredSearchAsync(query, homeType, minPrice, maxPrice);
             var viewModel = new SearchResultsViewModel
             {
                 Query = query,
+                HomeType = homeType,
+                MinPrice = minPrice,
+                MaxPrice = maxPrice,
                 HomeResults = homes.ToList(),
-                UserResults = users.ToList()
+                UserResults = string.IsNullOrWhiteSpace(query) ? new List<UserDto>() : (await _userService.SearchUsersAsync(query)).ToList()
             };
             return View(viewModel);
         }

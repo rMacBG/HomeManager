@@ -1,22 +1,59 @@
 ﻿@model HomeManager.Data.Data.ViewModels.SearchResultsViewModel
 @{
     ViewData["Title"] = "Search Results";
+    var summary = !string.IsNullOrWhiteSpace(Model.Query) ? Model.Query : "All Estates";
+    if (!string.IsNullOrWhiteSpace(Model.HomeType))
+    {
+        summary += $" | Type: {Model.HomeType}";
+    }
+    if (Model.MinPrice.HasValue)
+    {
+        summary += $" | Min Price: {Model.MinPrice.Value}";
+    }
+    if (Model.MaxPrice.HasValue)
+    {
+        summary += $" | Max Price: {Model.MaxPrice.Value}";
+    }
 }
-<h2>Search Results for "@Model.Query"</h2>
+<h2>Search Results for "@summary"</h2>
 
 @if (Model.HomeResults.Any())
 {
     <h3>Homes</h3>
-    <ul>
-        @foreach (var home in Model.HomeResults)
-        {
-            <li>
-                <a asp-controller="Homes" asp-action="Details" asp-route-id="@home.Id">@home.HomeName</a>
-                - @home.HomeLocation
-                - @home.HomePrice.ToString("C")
-            </li>
-        }
-    </ul>
+    
+        var index = 0;
+    
+    @foreach (var home in Model.HomeResults)
+    {
+        var imagePath = (home.Images != null && home.Images.Any())
+            ? home.Images.First().FilePath
+            : "/images/placeholder.png";
+        <div class="card mb-3 home-card" style="min-height: 180px;">
+            <div class="d-flex" style="height: 180px;">
+                <div class="d-flex flex-column justify-content-between flex-grow-1 p-3">
+                    <h5>@home.HomeName</h5>
+                    <p>@home.HomeDescription</p>
+                    <p>@home.HomePrice</p>
+                    <a asp-controller="Homes" asp-action="Details" asp-route-id="@home.Id" class="btn btn-hm align-self-start">View Details</a>
+                </div>
+                <div class="home-card-img-container ms-3">
+                    <a href="#" data-bs-toggle="modal" data-bs-target="@("#imgModalSearch" + index)">
+                        <img src="@imagePath" alt="@home.HomeName" class="home-card-img fade-on-hover" />
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade" id="@("imgModalSearch" + index)" tabindex="-1" aria-labelledby="@("imgModalLabelSearch" + index)" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content bg-transparent border-0">
+                    <div class="modal-body text-center p-0">
+                        <img src="@imagePath" alt="@home.HomeName" style="max-width:100%;max-height:80vh;border-radius:12px;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        index++;
+    }
 }
 @if (Model.UserResults.Any())
 {

@@ -278,7 +278,7 @@ namespace HomeManager.Services.Services
                 .ToList();
         }
 
-        public async Task<IEnumerable<HomeDto>> FilteredSearchAsync(string query, string homeType, int? minPrice, int? maxPrice)
+        public async Task<IEnumerable<HomeDto>> FilteredSearchAsync(string query, string homeType, decimal? minPrice, decimal? maxPrice)
         {
             var estates = await _homeRepository.GetAllAsync();
 
