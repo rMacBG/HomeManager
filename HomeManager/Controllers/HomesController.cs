@@ -95,7 +95,6 @@ namespace HomeManager.Controllers
                 HomePrice = home.HomePrice,
                 HomeType = home.HomeType,
                 HomeDealType = home.HomeDealType,
-                // Optionally, add existing images if you want to show them
                 ExistingImages = home.Images?.Select(i => i.FilePath).ToList() ?? new List<string>()
             };
 

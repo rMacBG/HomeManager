@@ -277,5 +277,36 @@ namespace HomeManager.Services.Services
                 })
                 .ToList();
         }
+
+        public async Task<IEnumerable<HomeDto>> FilteredSearchAsync(string query, string homeType, int? minPrice, int? maxPrice)
+        {
+            var estates = await _homeRepository.GetAllAsync();
+
+            if (!string.IsNullOrWhiteSpace(query))
+                estates = estates.Where(e => e.HomeName.Contains(query, StringComparison.OrdinalIgnoreCase)
+                                     || e.HomeDescription.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (!string.IsNullOrWhiteSpace(homeType))
+                estates = estates.Where(e => e.HomeType.ToString() == homeType).ToList();
+
+            if (minPrice.HasValue)
+                estates = estates.Where(e => e.HomePrice >= minPrice.Value).ToList();
+
+            if (maxPrice.HasValue)
+                estates = estates.Where(e => e.HomePrice <= maxPrice.Value).ToList();
+
+            return estates.Select(e => new HomeDto
+            {
+                Id = e.Id,
+                HomeName = e.HomeName,
+                HomeLocation = e.HomeLocation,
+                HomeType = e.HomeType,
+                HomeDescription = e.HomeDescription,
+                HomeDealType = e.HomeDealType,
+                HomePrice = e.HomePrice,
+                LandlordId = e.LandlordId,
+                Images = e.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>()
+            });
+        }
     }
 }

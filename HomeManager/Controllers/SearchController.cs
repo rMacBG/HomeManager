@@ -1,7 +1,9 @@
 ﻿using HomeManager.Data.Data.Dtos;
+using HomeManager.Data.Data.Models.Enums;
 using HomeManager.Data.Data.ViewModels;
 using HomeManager.Services.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace HomeManager.Controllers
 {
@@ -51,6 +53,12 @@ namespace HomeManager.Controllers
                 UserResults = users.ToList()
             };
             return View(viewModel);
+        }
+        [Route("Search/AdvancedSearchList")]
+        public async Task<IActionResult> AdvancedSearchList(string query, string homeType, int? minPrice, int? maxPrice)
+        {
+            var results = await _homeService.FilteredSearchAsync(query, homeType, minPrice, maxPrice);
+            return View(results);
         }
     }
 

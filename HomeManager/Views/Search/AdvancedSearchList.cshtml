@@ -1,0 +1,43 @@
+﻿@using HomeManager.Data.Data.Models.Enums
+@model IEnumerable<HomeManager.Data.Data.Dtos.HomeDto>
+
+<h2>Advanced Estate Search</h2>
+<form method="get" asp-controller="Search" asp-action="List" class="row g-3 mb-4">
+    <div class="col-md-3">
+        <input type="text" name="query" class="form-control" placeholder="Search by name or description" />
+    </div>
+    <div class="col-md-2">
+        <select name="homeType" class="form-control">
+            <option value="">All Types</option>
+            @foreach (var type in Enum.GetValues(typeof(HomeType)))
+            {
+                <option value="@type">@type</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <input type="number" name="minPrice" class="form-control" placeholder="Min Price" />
+    </div>
+    <div class="col-md-2">
+        <input type="number" name="maxPrice" class="form-control" placeholder="Max Price" />
+    </div>
+    <div class="col-md-2">
+        <button type="submit" class="btn btn-hm w-100">Search</button>
+    </div>
+</form>
+
+@if (Model.Any())
+{
+    <ul>
+    @foreach (var home in Model)
+    {
+        <li>
+            @home.HomeName - @home.HomeLocation - @home.HomePrice.ToString("C")
+        </li>
+    }
+    </ul>
+}
+else
+{
+    <p>No results found.</p>
+}
