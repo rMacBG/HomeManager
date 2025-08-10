@@ -12,6 +12,8 @@ namespace HomeManager.Services.Services.Interfaces
     public interface IUserService
     {
         Task<ICollection<UserDto>> GetAllAsync();
+
+        Task<User> GetByIdAsync(Guid id);
         Task<User?> GetCurrentUserAsync();
         Guid? GetCurrentIdAsync();
         bool IsAuthenticated();

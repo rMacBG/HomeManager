@@ -11,6 +11,7 @@ namespace HomeManager.Data.Data.ViewModels
     {
         public HomeDto Home { get; set; }
 
+        public string OwnerName { get; set; }
         public ConversationDto Conversation { get; set; }
 
         public string OtherParticipantName { get; set; }

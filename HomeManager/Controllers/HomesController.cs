@@ -7,6 +7,7 @@ using Humanizer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Identity.Client;
 using System.Composition.Convention;
 using System.Security.Claims;
 
@@ -48,6 +49,7 @@ namespace HomeManager.Controllers
         public async Task<IActionResult> Details(Guid id)
         {
             var home = await _homeService.GetByIdAsync(id);
+            var owner = await _userService.GetByIdAsync(home.LandlordId);
 
             if (home == null)
                 return NotFound();
@@ -55,6 +57,8 @@ namespace HomeManager.Controllers
             var viewModel = new HomeDetailsViewModel
             {
                 Home = home,
+                OwnerName = owner?.FullName ?? owner?.Username ?? "Unknown"
+
             };
 
             return View(viewModel);

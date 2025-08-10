@@ -36,6 +36,14 @@ namespace HomeManager.Services.Services
             return null;
         }
 
+        public async Task<User> GetByIdAsync(Guid id)
+        {
+            var user = await _userRepository.GetByIdAsync(id);
+
+            return user;
+
+        }
+
         public async Task<User?> GetCurrentUserAsync()
         {
             var userId = GetCurrentIdAsync();

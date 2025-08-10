@@ -4,10 +4,12 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 <h2>@Model.Home.HomeName</h2>
+<p>Dealer Name: @Model.OwnerName</p>
 <p>@Model.Home.HomeDescription</p>
 <p>Location: @Model.Home.HomeLocation</p>
 <p>Type: @Model.Home.HomeDealType</p>
 <p class="fw-bold text-warning">Price: @Model.Home.HomePrice.ToString("C")</p>
+
 <style>
     .chat-popup {
         display: none;
@@ -132,7 +134,6 @@
         transform: scale(1.2);
     }
 </style>
-<!-- Embed Google Maps -->
 <iframe
     width="600"
     height="450"
@@ -209,6 +210,8 @@ else
         </div>
     </div>
 }
+
+<div id="chatBoxContainer"></div>
 
 @section Scripts {
      

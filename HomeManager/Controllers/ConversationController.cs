@@ -155,7 +155,7 @@ namespace HomeManager.Controllers
 
             var viewModel = new HomeDetailsViewModel
             {
-                Home = null, // or fetch the home if relevant
+                Home = null, 
                 Conversation = new ConversationDto
                 {
                     Id = conversation.Id,

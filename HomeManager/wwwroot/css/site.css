@@ -18,7 +18,7 @@ html {
 }
 
 body {
-  margin-bottom: 60px;
+  margin-bottom: 0px;
   opacity: 0;
   transition: opacity 0.5s;
   background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);
@@ -241,6 +241,7 @@ btn-homemanager {
     color: #fff;
     padding: 1rem 0;
     text-align: center;
+    flex-shrink: 0;
 }
 
 h1, h5 {
@@ -350,4 +351,8 @@ input[type="file"].form-control:focus {
 .zoomable-image.zoomed {
     transform: scale(2);
     cursor: zoom-out;
+}
+
+.carousel-item {
+    transition: transform 0.6s ease-in-out !important;
 }
