@@ -18,6 +18,11 @@ namespace HomeManager.Data.Data.Dtos
         public string FullName { get; set; }
 
         [Required]
+        [EmailAddress]
+        [MaxLength(120)]
+        public string Email { get; set; }
+
+        [Required]
         [Length(7, 15, ErrorMessage = "Password must be between 7 and 15 characters long!")]
         public string Password { get; set; }
         [Required]

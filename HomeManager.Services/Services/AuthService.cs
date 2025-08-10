@@ -13,6 +13,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using MailKit.Net.Smtp;
+using MimeKit;
+using MailKit.Security;
 
 namespace HomeManager.Services.Services
 {
@@ -26,6 +29,12 @@ namespace HomeManager.Services.Services
             _userRepository = userRepository;
             _configuration = configuration;
         }
+
+        public async Task<User?> FindUserByEmailAsync(string email)
+        {
+            return await _userRepository.GetByEmailAsync(email);
+        }
+
         public async Task<AuthResult> LoginAsync(string username, string password)
         {
             var user = await _userRepository.GetUsernameAsync(username);
@@ -63,6 +72,7 @@ namespace HomeManager.Services.Services
                 Id = Guid.NewGuid(),
                 Username = dto.Username,
                 FullName = dto.FullName,
+                Email = dto.Email,
                 PhoneNumber = dto.PhoneNumber,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                 Role = dto.Role = Role.User
@@ -75,6 +85,56 @@ namespace HomeManager.Services.Services
                 Success = true,
                 Token = GenerateJwtToken(user)
             };
+        }
+
+        public async Task SavePasswordResetTokenAsync(Guid userId, string token)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null) return;
+            user.PasswordResetToken = token;
+            user.PasswordResetTokenExpiry = DateTime.UtcNow.AddHours(1); // Token valid for 1 hour
+            await _userRepository.UpdateAsync(user);
+        }
+
+        public async Task SendPasswordResetEmailAsync(string email, string resetLink)
+        {
+            var smtpHost = _configuration["Smtp:Host"];
+            var smtpPort = int.Parse(_configuration["Smtp:Port"]);
+            var smtpUser = _configuration["Smtp:User"];
+            var smtpPass = _configuration["Smtp:Pass"];
+            var fromEmail = _configuration["Smtp:From"];
+
+            var message = new MimeMessage();
+            message.From.Add(MailboxAddress.Parse(fromEmail));
+            message.To.Add(MailboxAddress.Parse(email));
+            message.Subject = "Password Reset Request";
+            message.Body = new TextPart("plain")
+            {
+                Text = $"Click the link to reset your password: {resetLink}"
+            };
+
+            using var client = new SmtpClient();
+            await client.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.SslOnConnect); // For port 465
+            await client.AuthenticateAsync(smtpUser, smtpPass);
+            await client.SendAsync(message);
+            await client.DisconnectAsync(true);
+        }
+
+        public async Task UpdatePasswordAsync(Guid userId, string newPassword)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null) return;
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            user.PasswordResetToken = null;
+            user.PasswordResetTokenExpiry = null;
+            await _userRepository.UpdateAsync(user);
+        }
+
+        public async Task<Guid?> ValidatePasswordResetTokenAsync(string token)
+        {
+            var user = await _userRepository.GetAllAsync();
+            var match = user.FirstOrDefault(u => u.PasswordResetToken == token && u.PasswordResetTokenExpiry > DateTime.UtcNow);
+            return match?.Id;
         }
 
         private string GenerateJwtToken(User user)

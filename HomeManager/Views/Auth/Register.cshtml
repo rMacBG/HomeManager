@@ -30,6 +30,11 @@
                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
             </div>
             <div class="mb-3">
+                <label for="Email" class="form-label">Email</label>
+                <input asp-for="Email" class="form-control" placeholder="Your email address" autocomplete="email" id="Email" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="mb-3">
                 <label for="Password" class="form-label">Password</label>
                 <input asp-for="Password" class="form-control" type="password" placeholder="Create a password" autocomplete="new-password" id="Password" />
                 <span asp-validation-for="Password" class="text-danger"></span>

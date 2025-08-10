@@ -12,6 +12,7 @@ namespace HomeManager.Services.Repositories.Interfaces
         Task<ICollection<User>> GetAllAsync();
         Task<User?> GetUsernameAsync(string username);
         Task<User?> GetByIdAsync(Guid id);
+        Task<User?> GetByEmailAsync(string email);
         Task<bool> ExistsByUsernameAsync(string username);
         Task AddAsync(User user);
         Task<IEnumerable<User>> SearchUsersAsync(string query);

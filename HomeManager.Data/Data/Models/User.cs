@@ -20,6 +20,11 @@ namespace HomeManager.Data.Data.Models
         [Required]
         [MaxLength(75)]
         public string FullName { get; set; } = null!;
+
+        //[Required]
+        [MaxLength(120)]
+        [EmailAddress]
+        public string? Email { get; set; }
         [Required]
         [MaxLength(200)]
         public string PasswordHash { get; set; }
@@ -27,6 +32,9 @@ namespace HomeManager.Data.Data.Models
         [MaxLength(25)]
         public string PhoneNumber { get; set; } = null!;
         public Role Role { get; set; }
+
+        public string? PasswordResetToken { get; set; }
+        public DateTime? PasswordResetTokenExpiry { get; set; }
 
         public ICollection<UserConversation> UsersConversations { get; set; }
     }

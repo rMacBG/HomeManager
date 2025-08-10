@@ -73,5 +73,10 @@ namespace HomeManager.Services.Repositories
                 .Where(u => u.Username.Contains(query) || u.FullName.Contains(query))
                 .ToListAsync();
         }
+
+        public async Task<User?> GetByEmailAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Username == email || u.Email == email);
+        }
     }
 }

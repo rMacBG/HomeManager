@@ -80,11 +80,56 @@ namespace HomeManager.Controllers
 
             return RedirectToAction("Index", "Home");
         }
-
+        [HttpGet("Logout")]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Index", "Home");
+            //return RedirectToAction("Login");
+        }
+
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            var user = await _authService.FindUserByEmailAsync(email); 
+            if (user != null)
+            {
+                var token = Guid.NewGuid().ToString(); 
+                await _authService.SavePasswordResetTokenAsync(user.Id, token); 
+
+                var resetLink = Url.Action("ResetPassword", "Auth", new { token }, Request.Scheme);
+                await _authService.SendPasswordResetEmailAsync(email, resetLink); 
+            }
+
+            ViewBag.Message = "A reset link has been sent to your e-mail address.";
+            return View();
+        }
+
+        [HttpGet("ResetPassword")]
+        public IActionResult ResetPassword(string token)
+        {
+            return View(model: token);
+        }
+
+        [HttpPost("ResetPassword")]
+        public async Task<IActionResult> ResetPassword(string token, string newPassword)
+        {
+            var userId = await _authService.ValidatePasswordResetTokenAsync(token); 
+            if (userId != null)
+            {
+                await _authService.UpdatePasswordAsync(userId.Value, newPassword); 
+                ViewBag.Message = "Your password has been reset. You can now log in.";
+            }
+            else
+            {
+                ViewBag.Message = "Invalid or expired reset link.";
+            }
+            return View();
         }
     }
 }
