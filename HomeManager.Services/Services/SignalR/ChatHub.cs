@@ -110,6 +110,12 @@ namespace HomeManager.Services.Services.SignalR
             }
         }
 
+        public async Task SendTyping(string conversationId)
+        {
+            var userName = Context.User?.Identity?.Name ?? "Someone";
+            await Clients.Group(conversationId).SendAsync("ReceiveTyping", userName);
+        }
+
         public override async Task OnConnectedAsync()
         {
             var userIdClaim = Context.User?.FindFirst("nameidentifier")?.Value;

@@ -166,5 +166,10 @@ namespace HomeManager.Services.Services
                 OtherParticipantName = otherParticipantName
             };
         }
+
+        public async Task<IEnumerable<Conversation>> GetUserConversationsWithDetailsAsync(Guid userId)
+        {
+            return await _conversationRepository.GetUserConversationsWithDetailsAsync(userId);
+        }
     }
 }

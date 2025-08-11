@@ -15,5 +15,7 @@ namespace HomeManager.Data.Data.Models
         public ICollection<Message> Messages { get; set; }
         public ICollection<UserConversation> UsersConversations { get; set; }
 
+        public Guid? HomeId { get; set; }
+        public Home? Home { get; set; }
     }
 }

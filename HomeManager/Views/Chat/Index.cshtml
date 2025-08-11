@@ -24,6 +24,7 @@ else
                             <span class="badge bg-danger ms-2">@conversation.UnreadCount</span>
                         }
                     </div>
+                    <span class="last-message text-truncate d-block mt-1 text-secondary" style="max-width: 300px;">@conversation.LastMessagePreview</span>
                 </div>
                 <a href="javascript:void(0);" data-conversation-id="@conversation.ConversationId" class="open-chat-link btn btn-sm btn-primary ms-2">Open Chat</a>
             </li>
@@ -35,22 +36,25 @@ else
 
 @section Scripts {
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+                document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll(".open-chat-link").forEach(function (link) {
                 link.addEventListener("click", async function () {
                     const conversationId = this.dataset.conversationId;
-                        console.log("Clicked conversation link. ID:", conversationId);
                     fetch(`/Chat/ChatBoxPartial?conversationId=${conversationId}`)
-    .then(response => {
-        if (!response.ok) throw new Error("Failed to load chat box.");
-        return response.text();
-    })
-    .then(html => {
-        document.getElementById("chatBoxContainer").innerHTML = html;
-    })
-    .catch(err => {
-        alert("Could not load chat: " + err);
-    });
+                        .then(response => {
+                            if (!response.ok) throw new Error("Failed to load chat box.");
+                            return response.text();
+                        })
+                        .then(html => {
+                            document.getElementById("chatBoxContainer").innerHTML = "";
+                           
+                            document.getElementById("chatBoxContainer").innerHTML = html;
+                            setupChatFeatureEvents();
+                            if (window.prepareChatBox) window.prepareChatBox();
+                        })
+                        .catch(err => {
+                            alert("Could not load chat: " + err);
+                        });
                 });
             });
         });

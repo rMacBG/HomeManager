@@ -12,54 +12,74 @@
     .chat-popup {
         display: none;
         position: fixed;
-        bottom: 0;
-        right: 20px;
-        width: 300px;
-        background: white;
-        border: 1px solid #ccc;
-        box-shadow: 0 0 10px rgba(0,0,0,.3);
+        bottom: 24px;
+        right: 24px;
+        width: 350px;
+        max-width: 95vw;
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.18);
         z-index: 1000;
-        border-radius: 10px;
+        overflow: hidden;
+        border: none;
     }
-
     .chat-header {
-        padding: 10px;
-        background: #007bff;
-        color: white;
-        font-weight: bold;
+        position: sticky;
+        top: 0;
+        background: linear-gradient(90deg, #007bff 60%, #0056b3 100%);
+        color: #fff;
+        padding: 16px;
+        font-size: 1.1em;
+        font-weight: 600;
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        border-radius: 10px 10px 0 0;
+        justify-content: space-between;
+        border-radius: 16px 16px 0 0;
     }
 
     .chat-body {
-        height: 200px;
-        padding: 10px;
-        background: #f9f9f9;
+        height: 260px;
+        padding: 12px;
+        background: #f6f8fa;
+        overflow-y: auto;
     }
 
     .chat-footer {
+        position: relative;
+        background: #f6f8fa;
+        padding: 12px;
         display: flex;
-        padding: 10px;
-        border-top: 1px solid #ddd;
-        gap: 5px;
+        gap: 8px;
+        border-top: 1px solid #eaeaea;
     }
 
         .chat-footer input {
             flex: 1;
-            padding: 5px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            padding: 8px;
+            font-size: 1em;
         }
 
         .chat-footer button {
-            padding: 5px 10px;
+            border-radius: 8px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .chat-footer button:hover {
+            background: #0056b3;
         }
 
     .close-btn {
         background: none;
         border: none;
-        color: white;
-        font-size: 20px;
+        color: #fff;
+        font-size: 1.5em;
         cursor: pointer;
     }
 
@@ -73,8 +93,9 @@
     }
 
     .message {
-        margin: 10px;
         display: flex;
+        align-items: flex-end;
+        margin-bottom: 10px;
     }
 
         .message.self {
@@ -88,311 +109,69 @@
 
 
     .message-bubble {
-        max-width: 70%;
-        padding: 10px;
-        border-radius: 8px;
-        background-color: #f1f0f0;
+        max-width: 75%;
+        padding: 10px 14px;
+        border-radius: 12px;
+        background: #e3f2fd;
+        color: #222;
         position: relative;
+        font-size: 0.98em;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
 
 
     .message.self .message-bubble {
 
-        background-color: #4aef0a;
+        background: #007bff;
+        color: #fff;
     }
 
 
     .message-author {
-        font-weight: bold;
-        margin-bottom: 3px;
+        font-weight: 500;
+        margin-bottom: 2px;
+        font-size: 0.95em;
     }
 
 
-    .message-content {
-        margin-bottom: 2px;
+    .message-timestamp {
+        font-size: 0.8em;
+        color: #888;
+        margin-left: 8px;
+        margin-top: 2px;
+        display: inline-block;
     }
 
     .message-status {
         font-size: 0.8em;
-        color: gray;
+        color: #bbb;
         text-align: right;
+        margin-top: 2px;
     }
 </style>
 
-    <div id="chatPopup" class="chat-popup">
-        <div class="chat-header">
-            <span>Chat with </span>
-            @* <p>Debug User Name: @Model.OtherParticipantName</p> *@
-            <button id="closeChatBtn" class="close-btn">&times;</button>
-        </div>
-
-        <div class="chat-body" id="messagesList" style="overflow-y:auto;"></div>
-        <div class="chat-footer">
-            <br />
-            <input type="text" id="messageInput" placeholder="Type a message..." />
-            <input type="hidden" id="senderId" value='@User.FindFirst(ClaimTypes.NameIdentifier)?.Value' />
-            <input type="hidden" id="conversationId" />
-            <button onclick="sendMessage()">Send</button>
-        </div>
+<div id="chatPopup" class="chat-popup">
+    <div class="chat-header">
+        <span>Chat with @Model.OtherParticipantName</span>
+        <button id="closeChatBtn" class="close-btn">&times;</button>
     </div>
-
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script>
-<script>
-    const currentUserId = document.getElementById("senderId")?.value;
-    window.startConnection = async function () {
-        if (window.connection.state === "Connected" || window.connection.state === "Connecting") {
-            console.log("Already connected or connecting.");
-            return;
-        }
-
-        try {
-            await window.connection.start();
-            console.log("SignalR connected. State:", window.connection.state);
-        } catch (err) {
-            console.error("Connection failed, retrying in 5s", err);
-            setTimeout(window.startConnection, 5000);
-        }
-    };
-
-    
-    window.connection = new signalR.HubConnectionBuilder()
-        .withUrl("/hubs/chat")
-        .configureLogging(signalR.LogLevel.Information)
-        .build();
-
-    
-    window.startConnection();
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const openChatBtn = document.getElementById("openChatBtn");
-        const closeChatBtn = document.getElementById("closeChatBtn");
-        const chatContainer = document.getElementById("chatPopup");
-        const messageInput = document.getElementById("messageInput");
-        if (openChatBtn) {
-            openChatBtn.addEventListener("click", async () => {
-                console.log("Open Chat button clicked");
-                const homeId = openChatBtn.dataset.homeId;
-                await window.prepareChat(homeId);
-            });
-        } else {
-            console.warn("openChatBtn not found in DOM");
-        }
-
-        if (closeChatBtn) {
-            closeChatBtn.addEventListener("click", () => {
-                chatContainer.style.display = "none";
-            });
-        } else {
-            console.warn("closeChatBtn not found in DOM");
-        }
-
-        if (messageInput) {
-            messageInput.addEventListener("keydown", function (e) {
-                if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    sendMessage();
-                }
-            });
-        }
-    });
-
-    let chatLoading = false;
-
-    window.prepareChat = async function (homeId) {
-        if (chatLoading) {
-            console.log("Chat is already being prepared. Ignoring extra click.");
-            return;
-        }
-
-        chatLoading = true;
-
-        try {
-            if (window.connection.state !== "Connected") {
-                console.log("Connection state is", window.connection.state, ". Waiting for connection...");
-                await window.startConnection();
-            }
-
-            const res = await fetch(`/Chat/ForHome/${homeId}`, { credentials: 'include' });
-            if (!res.ok) {
-                const errorText = await res.text();
-                alert("Error: " + errorText);
-                return;
-            }
-
-            const data = await res.json();
-            const conversationId = data.conversationId;
-const otherUserName = data.otherUserName;
-
-document.querySelector("#chatPopup .chat-header span").textContent = "Chat with " + otherUserName;
-
-            await window.connection.invoke("JoinConversationGroup", conversationId);
-            console.log("Joined SignalR group for conversation:", conversationId);
-
-            const messagesRes = await fetch(`/Chat/Messages?conversationId=${conversationId}`);
-            const messages = await messagesRes.json();
-
-            document.getElementById("conversationId").value = conversationId;
-            //document.getElementById("chatContainer").style.display = "block";
-            document.getElementById("chatPopup").style.display = "block";
-
-            const list = document.getElementById("messagesList");
-            list.innerHTML = "";
-            messages.forEach(msg => {
-                const isSelf = msg.senderId === document.getElementById("senderId").value;
-                const li = document.createElement("div");
-                li.classList.add("message", isSelf ? "self" : "other");
-
-                const displayName = isSelf ? "You" : (msg.senderName || "Dealer");
-                    const statusHtml = isSelf
-        ? `<div class="message-status">[${window.getMessageStatusText(msg.status)}]</div>`
-        : '';
-
-    li.innerHTML = `
-        <div class="message-bubble">
-            <div class="message-author">${displayName}:</div>
-            <div class="message-content">${msg.content}</div>
-            ${statusHtml}
+    <div class="chat-body" id="messagesList"></div>
+    <div class="chat-footer" style="position:relative;">
+        <button type="button" class="btn-hm" id="menuBtn">&#8942;</button>
+        <div id="chatMenu" style="display:none;position:absolute;bottom:56px;right:0;background:#fff;border-radius:12px;box-shadow:0 2px 8px #a21caf22;padding:12px;z-index:1100;">
+            <button type="button" class="btn-hm" id="emojiBtn">&#128515; Emoji</button>
+            <emoji-picker id="emojiPicker" style="display:none;"></emoji-picker>
+            <input type="file" id="fileInput" class="form-control" style="max-width:120px;" accept="image/*" />
         </div>
-    `;
-                list.appendChild(li);
-            });
-
-            await window.connection.invoke("MarkAsSeen", conversationId, currentUserId);
-        } catch (err) {
-            console.error("Error in prepareChat:", err);
-        } finally {
-            chatLoading = false;
+        <input type="text" id="messageInput" placeholder="Type a message..." autocomplete="off" />
+        <input type="hidden" id="senderId" value='@User.FindFirst(ClaimTypes.NameIdentifier)?.Value' />
+        @if (Model.Conversation != null)
+        {
+            <input type="hidden" id="conversationId" value="@Model.Conversation.Id" />
         }
-    };
+        <button class="btn-hm" onclick="sendMessage()">Send</button>
+    </div>
+</div>
+<div id="typingIndicator" style="font-size:0.9em;color:#a21caf;margin:4px 0 0 8px;display:none;">Dealer is typing...</div>
 
-    window.getMessageStatusText = function (messageStatus) {
-        const num = parseInt(messageStatus ?? 0);
-        switch (num) {
-            case 0: return "Pending";
-            case 1: return "Sent";
-            case 2: return "Delivered";
-            case 3: return "Seen";
-            case 4: return "Failed";
-            default: return `Unknown (${messageStatus})`;
-        }
-    };
-
-
-
-    function sendMessage() {
-        const msg = document.getElementById("messageInput").value;
-        const conversationId = document.getElementById("conversationId")?.value;
-
-        if (!msg || !conversationId || !currentUserId) {
-            console.error("Missing fields for message sending.");
-            return;
-        }
-
-        const tempId = "msg_" + Date.now();
-
-        const messageDto = {
-            conversationId: conversationId,
-            senderId: currentUserId,
-            content: msg,
-            sentAt: new Date().toISOString(),
-            status: 0,
-            tempId: tempId
-        };
-
-        const li = document.createElement("div");
-        li.id = tempId;
-        li.dataset.content = msg;
-        li.dataset.temp = "true";
-        li.classList.add("message", "self");
-
-        li.innerHTML = `
-        <div class="message-bubble">
-            <div class="message-author">You:</div>
-            <div class="message-content">${msg}</div>
-            <div class="message-status">
-                    <span class="status-text status-text-${tempId}" style="font-size:0.8em; color: gray;">[${getMessageStatusText(0)}]</span>
-            </div>
-        </div>
-    `;
-        document.getElementById("messagesList").appendChild(li);
-        document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
-
-
-
-
-
-        window.connection.invoke("SendMessage", messageDto)
-            .then(() => console.log("Message sent"))
-            .catch(err => console.error("SignalR SendMessage failed:", err));
-
-        document.getElementById("messageInput").value = "";
-    }
-
-    window.connection.on("ReceiveMessage", async (message) => {
-        const isSelf = message.senderId === currentUserId;
-        const li = document.createElement("div");
-        console.log("Message Received");
-        li.classList.add("message", isSelf ? "self" : "other");
-        const displayName = isSelf ? "You" : (message.senderName ? message.senderName : "Dealer");
-        if (isSelf && message.tempId) {
-            const tempEl = document.getElementById(message.tempId);
-
-            if (tempEl) {
-                const statusEl = tempEl.querySelector("span.status-text");
-                if (statusEl) {
-                    statusEl.className = `status-text status-text-${message.messageId}`;
-                    statusEl.textContent = `[${getMessageStatusText(message.messageStatus)}]`;
-                }
-
-                tempEl.dataset.temp = "false";
-                tempEl.id = message.messageId;
-                return;
-            }
-        }
-
-            li.innerHTML = `
-        <div class="message-bubble">
-            <div class="message-author">${displayName}:</div>
-            <div class="message-content">${message.content}</div>
-            ${isSelf ? `<div class="message-status">[${getMessageStatusText(message.status)}]</div>` : ''}
-        </div>
-    `;
-        document.getElementById("messagesList").appendChild(li);
-        document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
-
-        if (!isSelf && message.receiverId === currentUserId) {
-            try {
-                await window.connection.invoke("MarkAsDelivered", message.messageId);
-                const convoId = document.getElementById("conversationId")?.value;
-                if (convoId) {
-                    await window.connection.invoke("MarkAsSeen", convoId, currentUserId);
-                }
-            } catch (err) {
-                console.error("Failed to mark as delivered or seen", err);
-            }
-        }
-    });
-
-    window.connection.on("ReceiveMessageStatusUpdate", (data) => {
-        const statusEl = document.querySelector(`.status-text-${data.messageId}`);
-        if (statusEl) {
-            statusEl.textContent = `[${getMessageStatusText(data.status)}]`;
-        }
-    });
-
-    window.connection.onreconnected(async () => {
-        const conversationId = document.getElementById("conversationId")?.value;
-        if (conversationId) {
-            try {
-                await window.connection.invoke("JoinConversationGroup", conversationId);
-                console.log("Re-joined group after reconnect:", conversationId);
-            } catch (err) {
-                console.error("Failed to re-join group:", err);
-            }
-        }
-    });
-
-
-</script>
 

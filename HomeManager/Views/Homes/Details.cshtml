@@ -192,7 +192,9 @@
     {
     <p>No conversation found.</p>
     } </p>
-@await Html.PartialAsync("_ChatBox")
+
+    @await Html.PartialAsync("_ChatBox", Model)
+
 @if (User.Identity.IsAuthenticated)
 {
     <button id="openChatBtn" data-home-id="@Model.Home.Id" class="btn btn-primary mt-3">Ask the Dealer</button>

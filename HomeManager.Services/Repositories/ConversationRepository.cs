@@ -39,6 +39,15 @@ namespace HomeManager.Services.Repositories
                 .Include(x => x.UsersConversations)
                 .ToListAsync();
         }
- 
+        public async Task<IEnumerable<Conversation>> GetUserConversationsWithDetailsAsync(Guid userId)
+        {
+            return await _context.Conversations
+                .Include(c => c.Home)
+                .Include(c => c.Messages)
+                .Include(c => c.UsersConversations)
+                    .ThenInclude(uc => uc.User)
+                .Where(c => c.UsersConversations.Any(uc => uc.UserId == userId))
+                .ToListAsync();
+        }
     }
 }

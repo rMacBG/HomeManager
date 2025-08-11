@@ -1,5 +1,6 @@
 ﻿using HomeManager.Data.Data.Dtos;
 using HomeManager.Data.Data.Models;
+using HomeManager.Data.Data.Models.Enums;
 using HomeManager.Data.Data.ViewModels;
 using HomeManager.Services.Services;
 using HomeManager.Services.Services.Interfaces;
@@ -25,7 +26,6 @@ namespace HomeManager.Controllers
         }
 
         [Authorize]
-
         [HttpGet("Index")]
         public async Task<IActionResult> Index()
         {
@@ -36,20 +36,26 @@ namespace HomeManager.Controllers
             }
             Guid userId = Guid.Parse(userIdStr);
 
-            var conversations = await _conversationService.GetUserConversationsForUserIdAsync(userId);
+            var conversations = await _conversationService.GetUserConversationsWithDetailsAsync(userId);
 
 
             var viewModel = conversations.Select(c =>
             {
-                var otherParticipantId = c.ParticipantsIds.FirstOrDefault(p => p != userId);
+                var lastMessage = c.Messages?.OrderByDescending(m => m.SentAt).FirstOrDefault();
                 return new ConversationListItemViewModel
                 {
                     ConversationId = c.Id,
-
-                    OtherParticipantName = "yes",
-                    CreatedAt = c.CreatedAt
+                    OtherParticipantName = c.UsersConversations?
+                        .FirstOrDefault(uc => uc.UserId != userId)?.User?.FullName
+                        ?? c.UsersConversations?.FirstOrDefault(uc => uc.UserId != userId)?.User?.Username
+                        ?? "Unknown",
+                    CreatedAt = c.StartedAt,
+                    HomeName = c.Home?.HomeName ?? "Unknown Home",
+                    HomeImageUrl = c.Home?.Images?.FirstOrDefault()?.FilePath ?? "/images/default-home.png",
+                    UnreadCount = c.Messages?.Count(m => m.ReceiverId == userId && (int)m.Status < (int)MessageStatus.Seen) ?? 0,
+                    LastMessagePreview = lastMessage != null ? lastMessage.Content : ""
                 };
-            }).OrderByDescending(x => x.CreatedAt);
+            }).OrderByDescending(x => x.CreatedAt).ToList();
 
             return View("~/Views/Chat/Index.cshtml", viewModel);
         }
@@ -155,7 +161,7 @@ namespace HomeManager.Controllers
 
             var viewModel = new HomeDetailsViewModel
             {
-                Home = null, 
+                Home = null,
                 Conversation = new ConversationDto
                 {
                     Id = conversation.Id,
@@ -172,11 +178,38 @@ namespace HomeManager.Controllers
                     Content = m.Content,
                     SentAt = m.SentAt,
                     MessageStatus = m.Status,
-
                 })
             };
 
             return PartialView("_ChatBox", viewModel);
+        }
+
+        [HttpPost("UploadFile")]
+        [Authorize]
+        public async Task<IActionResult> UploadFile(IFormFile file, Guid conversationId)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded.");
+
+            // Generate a unique filename and save to wwwroot/uploads
+            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "uploads");
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var fileName = $"{Guid.NewGuid()}_{Path.GetFileName(file.FileName)}";
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var url = $"/uploads/{fileName}";
+
+            // Optionally: Save a message with this file in the conversation (if you want to show it immediately)
+            // await _messageService.AddFileMessageAsync(conversationId, url, User.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+
+            return Json(new { url });
         }
     }
 }
