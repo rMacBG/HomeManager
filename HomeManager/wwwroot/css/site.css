@@ -337,22 +337,23 @@ input[type="file"].form-control:focus {
     padding: 0 0.2rem;
 }
 
-.fade-on-hover {
-    transition: opacity 0.3s;
-}
-
-.fade-on-hover:hover {
-    opacity: 0.7;
-}
-
 .zoomable-image {
     transition: transform 0.3s;
+    cursor: zoom-in;
 }
 .zoomable-image.zoomed {
     transform: scale(2);
     cursor: zoom-out;
-}
+  }
 
 .carousel-item {
     transition: transform 0.6s ease-in-out !important;
+}
+
+.fade-on-hover {
+    transition: transform 0.3s;
+}
+
+.fade-on-hover:hover {
+    transform: scale(1.05);
 }

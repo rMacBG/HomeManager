@@ -3,12 +3,16 @@
 @using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
 
-<h2>@Model.Home.HomeName</h2>
-<p>Dealer Name: @Model.OwnerName</p>
-<p>@Model.Home.HomeDescription</p>
-<p>Location: @Model.Home.HomeLocation</p>
-<p>Type: @Model.Home.HomeDealType</p>
-<p class="fw-bold text-warning">Price: @Model.Home.HomePrice.ToString("C")</p>
+<div class="card shadow-lg mb-4" style="border-radius:16px;">
+    <div class="card-body">
+        <h2 class="card-title text-primary">@Model.Home.HomeName</h2>
+        <h5 class="card-subtitle mb-2 text-muted">Dealer: <span class="fw-bold">@Model.OwnerName</span></h5>
+        <p class="card-text">@Model.Home.HomeDescription</p>
+        <p><i class="fa fa-map-marker-alt text-danger"></i> <strong>Location:</strong> @Model.Home.HomeLocation</p>
+        <p><strong>Type:</strong> @Model.Home.HomeDealType</p>
+        <p class="fw-bold text-warning">Price: @Model.Home.HomePrice.ToString("C")</p>
+    </div>
+</div>
 
 <style>
     .chat-popup {
@@ -128,10 +132,16 @@
 
     .zoomable-image {
         transition: transform 0.3s;
+        transform: scale(1); /* Ensure default scale */
     }
 
     .zoomable-image:hover {
         transform: scale(1.2);
+    }
+
+    .zoomable-image.zoomed {
+        transform: scale(3);
+        z-index: 1000;
     }
 </style>
 <iframe
@@ -143,22 +153,22 @@
     referrerpolicy="no-referrer-when-downgrade"
     src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=@Model.Home.HomeLocation">
 </iframe>
-<div class="row mt-4">
+<div class="row g-3 mb-4">
     @if (Model.Home.Images?.Any() == true)
     {
         var imgIndex = 0;
         foreach (var image in Model.Home.Images)
         {
-            <div class="col-md-4 mb-3">
+            <div class="col-md-4">
                 <a href="#" data-bs-toggle="modal" data-bs-target="@("#imgModal" + imgIndex)">
-                    <img src="@image.FilePath" class="img-fluid fixed-image rounded shadow-sm fade-on-hover" alt="Home Image" />
+                    <img src="@image.FilePath" class="img-fluid rounded shadow fade-on-hover" alt="Home Image" style="border:2px solid #eee;" />
                 </a>
                 
                 <div class="modal fade" id="@("imgModal" + imgIndex)" tabindex="-1" aria-labelledby="@("imgModalLabel" + imgIndex)" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content bg-transparent border-0">
                             <div class="modal-body text-center p-0">
-                                <img src="@image.FilePath" alt="Home Image" class="img-fluid zoomable-image" style="max-width:100%;max-height:80vh;border-radius:12px;cursor:zoom-in;" />
+                                <img src="@image.FilePath" alt="Home Image" class="img-fluid zoomable-image" style="max-width:100%;max-height:80vh;border-radius:12px;" />
                             </div>
                         </div>
                     </div>
@@ -243,297 +253,26 @@ else
             });
         });
     </script>
-}
 
-
-
-    @* <div id="chatSection">
-
-    <div id="chatBox" class="chat-popup">
-        <div class="chat-header">
-            <span>Chat with Dealer</span>
-            <p>Debug UserId: @User.FindFirst(ClaimTypes.NameIdentifier)?.Value</p>
-
-            <button id="closeChatBtn" class="close-btn">&times;</button>
-        </div>
-
-        <div class="chat-body" id="messagesList" style="overflow-y:auto;"></div>
-        <div class="chat-footer">
-            <br />
-
-            <input type="text" id="messageInput" placeholder="Type a message..." />
-            <input type="hidden" id="senderId" value='@User.FindFirst(ClaimTypes.NameIdentifier)?.Value' />
-            <input type="hidden" id="conversationId" />
-
-
-            <button onclick="sendMessage()">Send</button>
-        </div>
-    </div>
-</div> *@
-   @*  <script>
-        async function startConnection() {
-            try {
-                await connection.start();
-                console.log("SignalR connected");
-            } catch (err) {
-                console.error("Connection failed, retrying in 5s", err);
-                setTimeout(startConnection, 5000);
-            }
-        }
-        let connection = new signalR.HubConnectionBuilder()
-            .withUrl("/hubs/chat")
-            .configureLogging(signalR.LogLevel.Information)
-            .build();
-
-        const currentUserId = "@User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value";
-        const senderIdInput = document.getElementById("senderId");
-        if (senderIdInput) {
-            senderIdInput.value = currentUserId;
-        }
-
-        async function prepareChat(homeId) {
-           
-            const res = await fetch(`/Chat/ForHome/${homeId}`, {
-                credentials: 'include'
-            });
-
-            if (!res.ok) {
-                const errorText = await res.text();
-                alert("Error: " + errorText);
-                return;
-            }
-
-            const data = await res.json();
-            const conversationId = data.conversationId;
-
-            const messagesRes = await fetch(`/Chat/Messages?conversationId=${conversationId}`);
-
-            if (!messagesRes.ok) {
-                const errorText = await messagesRes.text();
-                console.error("Failed to get messages:", errorText);
-                return;
-            }
-
-            let messages;
-            try {
-                messages = await messagesRes.json();
-            } catch (err) {
-                console.error("Failed to parse JSON:", err);
-                return;
-            }
-
-            if (!Array.isArray(messages)) {
-                console.error("Expected array of messages but got:", messages);
-                return;
-            }
-
-            document.getElementById("conversationId").value = conversationId;
-
-            if (connection.state === "Connected") {
-                try {
-                    // Ensure you use the same method name as defined in your hub.
-                    await connection.invoke("JoinConversationGroup", conversationId);
-                    console.log("Joined SignalR group for conversation:", conversationId);
-                } catch (err) {
-                    console.error("Failed to join SignalR group:", err);
-                }
-            }
-
-            const list = document.getElementById("messagesList");
-            list.innerHTML = "";
-            document.getElementById("chatBox").style.display = "block";
-
-            messages.forEach(msg => {
-                const isSelf = msg.senderId === currentUserId;
-                const li = document.createElement("div");
-                li.classList.add("message", isSelf ? "self" : "other");
-
-                const displayName = isSelf ? "You" : (msg.senderName ? msg.senderName : "Dealer");
-
-                li.innerHTML = `
-                <div class="message-bubble">
-                    <div class="message-author">${displayName}:</div>
-                    <div class="message-content">${msg.content}</div>
-                    <div class="message-status">[${getMessageStatusText(msg.status)}]</div>
-                </div>
-            `;
-                document.getElementById("messagesList").appendChild(li);
-            });
-
-            await connection.invoke("MarkAsSeen", conversationId);
-        }
-
-        function getMessageStatusText(messageStatus) {
-            const num = parseInt(messageStatus ?? 0);
-
-            switch (num) {
-                case 0: return "Pending";
-                case 1: return "Sent";
-                case 2: return "Delivered";
-                case 3: return "Seen";
-                case 4: return "Failed";
-                default: return `Unknown (${messageStatus})`;
-            }
-        }
-        
-
-        document.getElementById("openChatBtn").addEventListener("click", async () => {
-            await prepareChat("@Model.Home.Id");
-        });
-
-        document.getElementById("closeChatBtn").addEventListener("click", () => {
-            document.getElementById("chatBox").style.display = "none";
-        });
-
-        function sendMessage() {
-            const msg = document.getElementById("messageInput").value;
-            const conversationId = document.getElementById("conversationId")?.value;
-
-            if (!msg || !conversationId || !currentUserId) {
-                console.error("Missing fields for message sending.");
-                return;
-            }
-
-            const tempId = "msg_" + Date.now();
-
-            const messageDto = {
-                conversationId: conversationId,
-                senderId: currentUserId,
-                content: msg,
-                sentAt: new Date().toISOString(),
-                status: 0,
-                tempId: tempId
-            };
-
-            const li = document.createElement("div");
-            li.id = tempId;
-            li.dataset.content = msg;
-            li.dataset.temp = "true";
-            li.innerHTML = `<strong>You:</strong> ${msg} <span class="status-text status-text-${tempId}" style="font-size:0.8em; color: gray;">[${getMessageStatusText(0)}]</span>`;
-            document.getElementById("messagesList").appendChild(li);
-            document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
-
-            connection.invoke("SendMessage", messageDto)
-                .then(() => console.log("Message sent"))
-                .catch(err => console.error("SignalR SendMessage failed:", err));
-
-            document.getElementById("messageInput").value = "";
-        }
-
-        connection.on("ReceiveMessage", async (message) => {
-            const isSelf = message.senderId === currentUserId;
-            const li = document.createElement("div");
-            console.log("Message Received");
-            li.classList.add("message", isSelf ? "self" : "other");
-            const displayName = isSelf ? "You" : (message.senderName ? message.senderName : "Dealer");
-            if (isSelf && message.tempId) {
-                const tempEl = document.getElementById(message.tempId);
-
-                if (tempEl) {
-                    const statusEl = tempEl.querySelector("span.status-text");
-                    if (statusEl) {
-                        statusEl.className = `status-text status-text-${message.messageId}`;
-                        statusEl.textContent = `[${getMessageStatusText(message.messageStatus)}]`;
-                    }
-
-                    tempEl.dataset.temp = "false";
-                    tempEl.id = message.messageId;
-                    return;
-                }
-            }
-            
-            
-
-            li.innerHTML = `
-                        <div class="message-bubble">
-                            <div class="message-author">${displayName}:</div>
-                            <div class="message-content">${message.content}</div>
-                            <div class="message-status">[${getMessageStatusText(isSelf ? message.status : message.status)}]</div>
-                        </div>
-                    `;
-            document.getElementById("messagesList").appendChild(li);
-            document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
-
-            if (!isSelf) {
-                try {
-                    await connection.invoke("MarkAsDelivered", message.messageId);
-                } catch (err) {
-                    console.error("Failed to mark as delivered", err);
-                }
-            }
-        });
-
-        connection.on("ReceiveMessageStatusUpdate", (data) => {
-            const statusEl = document.querySelector(`.status-text-${data.messageId}`);
-            if (statusEl) {
-                statusEl.textContent = `[${getMessageStatusText(data.status)}]`;
-            }
-        });
-
-        connection.onreconnected(async () => {
-            const conversationId = document.getElementById("conversationId")?.value;
-            if (conversationId) {
-                try {
-                    await connection.invoke("JoinConversationGroup", conversationId);
-                    console.log("Re-joined group after reconnect:", conversationId);
-                } catch (err) {
-                    console.error("Failed to re-join group:", err);
-                }
-            }
-        });
-
-        startConnection();
-
-       
-    </script>
-    @* <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.0/signalr.min.js"></script> -->
     <script>
-        window.onload = function () {
-            const openChatBtn = document.getElementById("openChatBtn");
-            if (openChatBtn) {
-                openChatBtn.addEventListener("click", async () => {
-                    console.log("Click fired, waiting for prepareChat...");
+    document.addEventListener('click', function (e) {
+        
+        if (
+            e.target.classList.contains('zoomable-image') &&
+            e.target.closest('.modal.show')
+        ) {
+            e.target.classList.toggle('zoomed');
+        }
+    });
 
-                    
-                    const waitForPrepareChat = new Promise((resolve, reject) => {
-                        let retries = 0;
-                        const interval = setInterval(() => {
-                            if (typeof window.prepareChat === "function") {
-                                clearInterval(interval);
-                                resolve();
-                            } else if (++retries > 20) {
-                                clearInterval(interval);
-                                reject("prepareChat not available");
-                            }
-                        }, 100);
-                    });
-
-                    try {
-                        await waitForPrepareChat;
-                        await window.prepareChat("@Model.Home.Id");
-                    } catch (err) {
-                        console.error("Error calling prepareChat:", err);
-                    }
-                });
-            } else {
-                console.error("openChatBtn element not found.");
-            }
-
-            const closeChatBtn = document.getElementById("closeChatBtn");
-            if (closeChatBtn) {
-                closeChatBtn.addEventListener("click", () => {
-                    const chatPopup = document.getElementById("chatPopup");
-                    if (chatPopup) {
-                        chatPopup.style.display = "none";
-                    } else {
-                        console.warn("chatPopup not found.");
-                    }
-                });
-            } else {
-                console.error("closeChatBtn element not found.");
-            }
-        };
-    </script> *@
+    document.querySelectorAll('.modal').forEach(modal => {
+        modal.addEventListener('hidden.bs.modal', function () {
+            const img = modal.querySelector('.zoomable-image');
+            if (img) img.classList.remove('zoomed');
+        });
+    });
+</script>
+}
 
 @{
     var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -544,6 +283,3 @@ else
 {
     <a asp-action="Edit" asp-route-id="@Model.Home.Id" class="btn btn-warning mt-3">Edit Estate</a>
 }
-
-
-
