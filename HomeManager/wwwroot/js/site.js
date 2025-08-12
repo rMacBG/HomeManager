@@ -46,9 +46,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-const connection = new signalR.HubConnectionBuilder()
-    .withUrl("/chathub")
-    .build();
+//const connection = new signalR.HubConnectionBuilder()
+//    .withUrl("/chathub")
+//    .build();
 
 connection.on("ReceiveNotification", function (message) {
     const notifArea = document.getElementById("notification-area");

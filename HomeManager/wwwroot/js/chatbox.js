@@ -46,14 +46,16 @@ document.addEventListener("DOMContentLoaded", function () {
         console.warn("closeChatBtn not found in DOM");
     }
 
-    if (messageInput) {
-        messageInput.addEventListener("keydown", function (e) {
-            if (e.key === "Enter" && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-    }
+if (messageInput) {
+    messageInput.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+} else {
+    console.warn("messageInput not found in DOM");
+}
 });
 
 let chatLoading = false;
@@ -91,14 +93,24 @@ window.prepareChat = async function (homeId) {
         const messagesRes = await fetch(`/Chat/Messages?conversationId=${conversationId}`);
         const messages = await messagesRes.json();
 
-        document.getElementById("conversationId").value = conversationId;
-        //document.getElementById("chatContainer").style.display = "block";
-        document.getElementById("chatPopup").style.display = "block";
+        const conversationIdInput = document.getElementById("conversationId");
+        const chatPopup = document.getElementById("chatPopup");
+        const senderIdInput = document.getElementById("senderId");
+        if (!senderIdInput) {
+            console.error("senderId not found in DOM");
+            return;
+        }
+        const currentUserId = senderIdInput.value;
+
+        conversationIdInput.value = conversationId;
+        chatPopup.style.display = "block";
+
+        await window.connection.invoke("MarkAsSeen", conversationId, currentUserId);
 
         const list = document.getElementById("messagesList");
         list.innerHTML = "";
         messages.forEach(msg => {
-            const isSelf = msg.senderId === document.getElementById("senderId").value;
+            const isSelf = msg.senderId === currentUserId; // <-- USE ONLY AFTER DECLARATION
             const li = document.createElement("div");
             li.classList.add("message", isSelf ? "self" : "other");
 
@@ -191,6 +203,7 @@ function sendMessage() {
 }
 
 window.connection.on("ReceiveMessage", async (message) => {
+    console.log("Message Received");
     const currentUserId = document.getElementById("senderId")?.value;
     const isSelf = message.senderId === currentUserId;
     const li = document.createElement("div");
@@ -198,14 +211,12 @@ window.connection.on("ReceiveMessage", async (message) => {
     const displayName = isSelf ? "You" : (message.senderName ? message.senderName : "Dealer");
     if (isSelf && message.tempId) {
         const tempEl = document.getElementById(message.tempId);
-
         if (tempEl) {
             const statusEl = tempEl.querySelector("span.status-text");
             if (statusEl) {
                 statusEl.className = `status-text status-text-${message.messageId}`;
                 statusEl.textContent = `[${getMessageStatusText(message.messageStatus)}]`;
             }
-
             tempEl.dataset.temp = "false";
             tempEl.id = message.messageId;
             return;
@@ -236,9 +247,12 @@ window.connection.on("ReceiveMessage", async (message) => {
 });
 
 window.connection.on("ReceiveMessageStatusUpdate", (data) => {
+    console.log("Status update received", data);
     const statusEl = document.querySelector(`.status-text-${data.messageId}`);
     if (statusEl) {
         statusEl.textContent = `[${getMessageStatusText(data.status)}]`;
+    } else {
+        console.warn("Status element not found for", data.messageId);
     }
 });
 

@@ -238,7 +238,9 @@ else
             })
             .then(html => {
                 document.getElementById("chatBoxContainer").innerHTML = html;
-                
+                    console.log(document.getElementById("senderId"))
+                if (window.setupChatFeatureEvents) window.setupChatFeatureEvents();
+                if (window.prepareChatBox) window.prepareChatBox();
             })
             .catch(err => {
                 alert("Could not load chat: " + err);

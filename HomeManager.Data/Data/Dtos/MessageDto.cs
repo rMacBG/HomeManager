@@ -18,6 +18,7 @@ namespace HomeManager.Data.Data.Dtos
         public string Content { get; set; }
         public DateTime SentAt { get; set; }
         public MessageStatus MessageStatus{ get; set; }
+        public string? ImageUrl { get; set; } 
 
         public int Status => (int)MessageStatus;
     }

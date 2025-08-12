@@ -41,7 +41,12 @@ namespace HomeManager.Services.Services
 
         public async Task MarkMessagesAsSeenAsync(Guid conversationId, Guid userId)
         {
-            //  var messages = await _messageRepository.GetUnseenMessages;
+            var messages = await _messageRepository.GetUnseenMessagesAsync(conversationId, userId);
+            foreach (var msg in messages)
+            {
+                msg.Status = MessageStatus.Seen;
+                await _messageRepository.UpdateAsync(msg);
+            }
         }
         public async Task<Message?> GetMessageByIdAsync(Guid messageId)
         {

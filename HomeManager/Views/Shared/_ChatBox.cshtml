@@ -1,5 +1,25 @@
 ﻿@using System.Security.Claims
+@using System
+
 @model HomeManager.Data.Data.ViewModels.HomeDetailsViewModel
+@* @functions {
+    // string FormatTimestamp(DateTime sentAt)
+    // {
+    //     var now = DateTime.Now;
+    //     if (sentAt.Date == now.Date)
+    //     {
+    //         return sentAt.ToLocalTime().ToString("HH:mm");
+    //     }
+    //     else if (sentAt.Date == now.AddDays(-1).Date)
+    //     {
+    //         return $"Yesterday, {sentAt.ToLocalTime():HH:mm}";
+    //     }
+    //     else
+    //     {
+    //         return sentAt.ToLocalTime().ToString("MMM dd, HH:mm");
+    //     }
+    // }
+} *@
 <style>
     #chatContainer {
         display: none;
@@ -110,43 +130,85 @@
 
     .message-bubble {
         max-width: 75%;
-        padding: 10px 14px;
+        padding: 12px 16px;
         border-radius: 12px;
         background: #e3f2fd;
         color: #222;
         position: relative;
-        font-size: 0.98em;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        font-size: 1em;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border: 1px solid #c4b5fd;
     }
 
 
     .message.self .message-bubble {
 
-        background: #007bff;
+        background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%);
         color: #fff;
+        border: 1px solid #4e54c8;
     }
 
 
     .message-author {
-        font-weight: 500;
+        font-weight: 600;
         margin-bottom: 2px;
         font-size: 0.95em;
+        color: #4e54c8;
+        display: block;
+    }
+
+
+    .message.self .message-author {
+        color: #fff;
     }
 
 
     .message-timestamp {
         font-size: 0.8em;
-        color: #888;
+        color: #6d28d9;
         margin-left: 8px;
         margin-top: 2px;
         display: inline-block;
+        font-weight: 500;
     }
+
+
+    .message.self .message-timestamp {
+        color: #e0e7ff;
+    }
+
 
     .message-status {
         font-size: 0.8em;
         color: #bbb;
         text-align: right;
         margin-top: 2px;
+    }
+
+
+    #imageModal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: rgba(0,0,0,0.8);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+        /* Use flex for centering */
+        display: flex;
+    }
+    #imageModal[style*="display: none"] {
+        display: none !important;
+    }
+    #modalImage {
+        max-width: 90vw;
+        max-height: 90vh;
+        transition: transform 0.3s;
+        cursor: zoom-in;
+        border-radius: 12px;
     }
 </style>
 
@@ -155,7 +217,35 @@
         <span>Chat with @Model.OtherParticipantName</span>
         <button id="closeChatBtn" class="close-btn">&times;</button>
     </div>
-    <div class="chat-body" id="messagesList"></div>
+    <div class="chat-body" id="messagesList">
+        @if (Model.Messages != null)
+        {
+            foreach (var msg in Model.Messages)
+            {
+                var isSelf = msg.SenderId.ToString() == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                <div class="message @(isSelf ? "self" : "other")">
+                    <div class="message-bubble">
+                        <span class="message-author">@((isSelf ? "You" : Model.OtherParticipantName))</span>
+                        <span class="message-timestamp">
+                          @*  @FormatTimestamp(msg.SentAt) *@
+                        </span>
+                        <br />
+                        @if (!string.IsNullOrEmpty(msg.ImageUrl))
+                        {
+                            <img src="@msg.ImageUrl" class="chat-image zoomable-image" alt="Sent image" style="max-width:180px;max-height:180px;cursor:zoom-in;border-radius:8px;margin:6px 0;" onclick="openImageModal(this.src)" />
+                        }
+                        @msg.Content
+                        <span class="message-status">
+                            <span class="status-text status-text-@msg.Id">[@msg.MessageStatus]</span>
+                        </span>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+    <div id="typingIndicator" style="font-size:0.9em;color:#a21caf;margin:4px 0 0 8px;display:none;">
+        @Model.OtherParticipantName is typing...
+    </div>
     <div class="chat-footer" style="position:relative;">
         <button type="button" class="btn-hm" id="menuBtn">&#8942;</button>
         <div id="chatMenu" style="display:none;position:absolute;bottom:56px;right:0;background:#fff;border-radius:12px;box-shadow:0 2px 8px #a21caf22;padding:12px;z-index:1100;">
@@ -172,6 +262,15 @@
         <button class="btn-hm" onclick="sendMessage()">Send</button>
     </div>
 </div>
-<div id="typingIndicator" style="font-size:0.9em;color:#a21caf;margin:4px 0 0 8px;display:none;">Dealer is typing...</div>
+
+
+
+<div id="imageModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:2000;align-items:center;justify-content:center;">
+    <span style="position:absolute;top:24px;right:32px;font-size:2em;color:#fff;cursor:pointer;" onclick="closeImageModal()">&times;</span>
+    <img id="modalImage" src="" style="max-width:90vw;max-height:90vh;transition:transform 0.3s;cursor:zoom-in;border-radius:12px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(1);" onclick="toggleZoom()" />
+</div>
+@section Scripts {
+    <script src="~/js/chatbox.js"></script>
+}
 
 
