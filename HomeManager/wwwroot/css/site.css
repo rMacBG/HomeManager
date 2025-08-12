@@ -347,13 +347,27 @@ input[type="file"].form-control:focus {
   }
 
 .carousel-item {
-    transition: transform 0.6s ease-in-out !important;
+    transition: opacity 1s ease-in-out;
+    opacity: 0;
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    
+    background: transparent !important;
+    border: none !important;
 }
 
-.fade-on-hover {
-    transition: transform 0.3s;
+.carousel-item.active {
+    opacity: 1;
+    position: relative;
+    z-index: 2;
 }
 
-.fade-on-hover:hover {
-    transform: scale(1.05);
+.carousel-inner {
+    position: relative;
+    min-height: 350px;
+    overflow: hidden;
+    background: transparent !important; 
 }
