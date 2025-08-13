@@ -2,24 +2,24 @@
 @using System
 
 @model HomeManager.Data.Data.ViewModels.HomeDetailsViewModel
-@* @functions {
-    // string FormatTimestamp(DateTime sentAt)
-    // {
-    //     var now = DateTime.Now;
-    //     if (sentAt.Date == now.Date)
-    //     {
-    //         return sentAt.ToLocalTime().ToString("HH:mm");
-    //     }
-    //     else if (sentAt.Date == now.AddDays(-1).Date)
-    //     {
-    //         return $"Yesterday, {sentAt.ToLocalTime():HH:mm}";
-    //     }
-    //     else
-    //     {
-    //         return sentAt.ToLocalTime().ToString("MMM dd, HH:mm");
-    //     }
-    // }
-} *@
+@functions {
+    string FormatTimestamp(DateTime sentAt)
+    {
+        var now = DateTime.Now;
+        if (sentAt.Date == now.Date)
+        {
+            return sentAt.ToLocalTime().ToString("HH:mm");
+        }
+        else if (sentAt.Date == now.AddDays(-1).Date)
+        {
+            return $"Yesterday, {sentAt.ToLocalTime():HH:mm}";
+        }
+        else
+        {
+            return sentAt.ToLocalTime().ToString("MMM dd, HH:mm");
+        }
+    }
+}
 <style>
     #chatContainer {
         display: none;
@@ -179,11 +179,29 @@
 
 
     .message-status {
-        font-size: 0.8em;
-        color: #bbb;
+        font-size: 0.95em;
+        font-weight: bold;
         text-align: right;
         margin-top: 2px;
+        /* Add a little padding for separation */
+        padding: 2px 0;
     }
+
+
+    .status-text {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: bold;
+        background: #e0e7ff;
+        color: #333;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .status-text[data-status="Pending"]    { background: #fff3cd; color: #856404; }
+    .status-text[data-status="Sent"]       { background: #cce5ff; color: #004085; }
+    .status-text[data-status="Delivered"]  { background: #d4edda; color: #155724; }
+    .status-text[data-status="Seen"]       { background: #d1c4e9; color: #4e54c8; }
+    .status-text[data-status="Failed"]     { background: #f8d7da; color: #721c24; }
 
 
     #imageModal {
@@ -227,7 +245,7 @@
                     <div class="message-bubble">
                         <span class="message-author">@((isSelf ? "You" : Model.OtherParticipantName))</span>
                         <span class="message-timestamp">
-                          @*  @FormatTimestamp(msg.SentAt) *@
+                           @FormatTimestamp(msg.SentAt)
                         </span>
                         <br />
                         @if (!string.IsNullOrEmpty(msg.ImageUrl))
@@ -236,7 +254,9 @@
                         }
                         @msg.Content
                         <span class="message-status">
-                            <span class="status-text status-text-@msg.Id">[@msg.MessageStatus]</span>
+                            <span class="status-text status-text-@msg.Id" data-status="@msg.MessageStatus.ToString()">
+    [@msg.MessageStatus]
+</span>
                         </span>
                     </div>
                 </div>

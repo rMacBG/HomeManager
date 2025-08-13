@@ -38,6 +38,7 @@ namespace HomeManager.Services.Services.SignalR
                 {
                     messageId = message.Id,
                     senderId = message.SenderId,
+                    receiverId = message.ReceiverId, 
                     content = message.Content,
                     sentAt = message.SentAt.ToString("dd/MM/yyyy"),
                     messageStatus = (int)message.MessageStatus,
@@ -92,10 +93,11 @@ namespace HomeManager.Services.Services.SignalR
         {
             try
             {
+                var unseenMessages = await _messageService.GetUnseenMessagesAsync(conversationId, userId);
+
                 await _messageService.MarkMessagesAsSeenAsync(conversationId, userId);
 
-                var updatedMessages = await _messageService.GetUnseenMessagesAsync(conversationId, userId);
-                foreach (var msg in updatedMessages)
+                foreach (var msg in unseenMessages)
                 {
                     await Clients.Group(conversationId.ToString()).SendAsync("ReceiveMessageStatusUpdate", new
                     {
@@ -103,6 +105,8 @@ namespace HomeManager.Services.Services.SignalR
                         status = (int)MessageStatus.Seen
                     });
                 }
+
+                await Clients.Group(conversationId.ToString()).SendAsync("ConversationSeen", conversationId, userId);
             }
             catch (Exception ex)
             {

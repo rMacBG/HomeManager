@@ -36,10 +36,18 @@ else
 
 @section Scripts {
     <script>
-                document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function () {
             document.querySelectorAll(".open-chat-link").forEach(function (link) {
                 link.addEventListener("click", async function () {
                     const conversationId = this.dataset.conversationId;
+
+                    // --- Remove unread badge immediately ---
+                    const parentLi = this.closest(".conversation-item");
+                    if (parentLi) {
+                        const badge = parentLi.querySelector(".badge.bg-danger");
+                        if (badge) badge.remove();
+                    }
+
                     fetch(`/Chat/ChatBoxPartial?conversationId=${conversationId}`)
                         .then(response => {
                             if (!response.ok) throw new Error("Failed to load chat box.");
@@ -47,7 +55,6 @@ else
                         })
                         .then(html => {
                             document.getElementById("chatBoxContainer").innerHTML = "";
-                           
                             document.getElementById("chatBoxContainer").innerHTML = html;
                             setupChatFeatureEvents();
                             if (window.prepareChatBox) window.prepareChatBox();

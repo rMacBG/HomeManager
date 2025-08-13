@@ -20,6 +20,15 @@ window.connection = new signalR.HubConnectionBuilder()
     .configureLogging(signalR.LogLevel.Information)
     .build();
 
+window.connection.on("ConversationSeen", function (conversationId, userId) {
+    document.querySelectorAll(`[data-conversation-id='${conversationId}']`).forEach(function (link) {
+        const parentLi = link.closest(".conversation-item");
+        if (parentLi) {
+            const badge = parentLi.querySelector(".badge.bg-danger");
+            if (badge) badge.remove();
+        }
+    });
+});
 
 window.startConnection();
 
@@ -46,16 +55,16 @@ document.addEventListener("DOMContentLoaded", function () {
         console.warn("closeChatBtn not found in DOM");
     }
 
-if (messageInput) {
-    messageInput.addEventListener("keydown", function (e) {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
-} else {
-    console.warn("messageInput not found in DOM");
-}
+    if (messageInput) {
+        messageInput.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    } else {
+        console.warn("messageInput not found in DOM");
+    }
 });
 
 let chatLoading = false;
@@ -235,9 +244,11 @@ window.connection.on("ReceiveMessage", async (message) => {
 
     if (!isSelf && message.receiverId === currentUserId) {
         try {
-            await window.connection.invoke("MarkAsDelivered", message.messageId);
+            console.log("Calling MarkAsDelivered for message:", message.messageId);
+            await window.connection.invoke("MarkAsDelivered", message.messageId); //to be removed later
             const convoId = document.getElementById("conversationId")?.value;
             if (convoId) {
+                console.log("Calling MarkAsSeen for conversation:", convoId, "and user:", currentUserId); //to be removed later 
                 await window.connection.invoke("MarkAsSeen", convoId, currentUserId);
             }
         } catch (err) {
@@ -250,7 +261,9 @@ window.connection.on("ReceiveMessageStatusUpdate", (data) => {
     console.log("Status update received", data);
     const statusEl = document.querySelector(`.status-text-${data.messageId}`);
     if (statusEl) {
-        statusEl.textContent = `[${getMessageStatusText(data.status)}]`;
+        const statusText = window.getMessageStatusText(data.status);
+        statusEl.textContent = `[${statusText}]`;
+        statusEl.setAttribute("data-status", statusText);
     } else {
         console.warn("Status element not found for", data.messageId);
     }
@@ -258,26 +271,14 @@ window.connection.on("ReceiveMessageStatusUpdate", (data) => {
 
 window.connection.onreconnected(async () => {
     const conversationId = document.getElementById("conversationId")?.value;
+    const currentUserId = document.getElementById("senderId")?.value;
     if (conversationId) {
         try {
             await window.connection.invoke("JoinConversationGroup", conversationId);
             console.log("Re-joined group after reconnect:", conversationId);
-        } catch (err) {
-            console.error("Failed to re-join group:", err);
-        }
-    }
-});
 
-window.prepareChatBox = function () {
-    const currentUserId = document.getElementById("senderId")?.value;
-    const conversationId = document.getElementById("conversationId")?.value;
-    document.getElementById("chatPopup").style.display = "block";
-    if (window.connection && conversationId) {
-        window.connection.invoke("JoinConversationGroup", conversationId);
-    }
-    fetch(`/Chat/Messages?conversationId=${conversationId}&currentUserId=${currentUserId}`)
-        .then(res => res.json())
-        .then(messages => {
+            const res = await fetch(`/Chat/Messages?conversationId=${conversationId}&currentUserId=${currentUserId}`);
+            const messages = await res.json();
             const list = document.getElementById("messagesList");
             list.innerHTML = "";
             messages.forEach(msg => {
@@ -297,7 +298,50 @@ window.prepareChatBox = function () {
                 `;
                 list.appendChild(li);
             });
-        });
+        } catch (err) {
+            console.error("Failed to re-join group or re-fetch messages:", err);
+        }
+    }
+});
+
+window.prepareChatBox = async function () {
+    const currentUserId = document.getElementById("senderId")?.value;
+    const conversationId = document.getElementById("conversationId")?.value;
+    document.getElementById("chatPopup").style.display = "block";
+    if (window.connection && conversationId) {
+        await window.connection.invoke("JoinConversationGroup", conversationId);
+    }
+    const res = await fetch(`/Chat/Messages?conversationId=${conversationId}&currentUserId=${currentUserId}`);
+    const messages = await res.json();
+    const list = document.getElementById("messagesList");
+    list.innerHTML = "";
+    messages.forEach(msg => {
+        const isSelf = msg.senderId === currentUserId;
+        const li = document.createElement("div");
+        li.classList.add("message", isSelf ? "self" : "other");
+        const displayName = isSelf ? "You" : (msg.senderName || "Dealer");
+        const statusHtml = isSelf
+            ? `<div class="message-status">[${window.getMessageStatusText(msg.status)}]</div>`
+            : '';
+        li.innerHTML = `
+            <div class="message-bubble">
+                <div class="message-author">${displayName}:</div>
+                <div class="message-content">${msg.content}</div>
+                ${statusHtml}
+            </div>
+        `;
+        list.appendChild(li);
+    });
+
+    list.scrollTop = list.scrollHeight;
+
+    if (window.connection && conversationId && currentUserId) {
+        try {
+            await window.connection.invoke("MarkAsSeen", conversationId, currentUserId);
+        } catch (err) {
+            console.error("Failed to mark messages as seen:", err);
+        }
+    }
 };
 
 let typingTimeout;
@@ -315,7 +359,6 @@ window.connection.on("ReceiveTyping", function (userName) {
 });
 
 function setupChatFeatureEvents() {
-    
     const menuBtn = document.getElementById("menuBtn");
     const chatMenu = document.getElementById("chatMenu");
     if (menuBtn && chatMenu) {
@@ -340,7 +383,6 @@ function setupChatFeatureEvents() {
             e.stopPropagation();
             emojiPicker.style.display = emojiPicker.style.display === "none" ? "block" : "none";
         };
-        // Hide picker when clicking outside
         document.addEventListener("click", function hideEmojiPicker(e) {
             if (emojiPicker.style.display === "block" && !emojiPicker.contains(e.target) && e.target !== emojiBtn) {
                 emojiPicker.style.display = "none";
@@ -354,7 +396,6 @@ function setupChatFeatureEvents() {
         });
     }
 
-    // File upload
     const fileInput = document.getElementById("fileInput");
     if (fileInput) {
         fileInput.onchange = function () {
@@ -376,6 +417,43 @@ function setupChatFeatureEvents() {
                 });
         };
     }
+
+    const closeChatBtn = document.getElementById("closeChatBtn");
+    const chatContainer = document.getElementById("chatPopup");
+    if (closeChatBtn && chatContainer) {
+        closeChatBtn.onclick = function () {
+            chatContainer.style.display = "none";
+        };
+    }
+
+    if (messageInput) {
+        messageInput.addEventListener("keydown", function (e) {
+            if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    }
 }
 
 setupChatFeatureEvents();
+
+window.connection.on("ConversationSeen", function (conversationId, userId) {
+    document.querySelectorAll(`[data-conversation-id='${conversationId}']`).forEach(function (link) {
+        const parentLi = link.closest(".conversation-item");
+        if (parentLi) {
+            const badge = parentLi.querySelector(".badge.bg-danger");
+            if (badge) badge.remove();
+        }
+    });
+});
+
+window.connection.onclose(() => {
+    console.log("SignalR connection closed");
+});
+window.connection.onreconnecting(() => {
+    console.log("SignalR reconnecting...");
+});
+window.connection.onreconnected(() => {
+    console.log("SignalR reconnected");
+});
