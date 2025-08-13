@@ -8,6 +8,17 @@ window.startConnection = async function () {
     try {
         await window.connection.start();
         console.log("SignalR connected. State:", window.connection.state);
+
+        // Join all conversation groups and await each
+        const joinPromises = [];
+        document.querySelectorAll(".open-chat-link[data-conversation-id]").forEach(function (link) {
+            const conversationId = link.dataset.conversationId;
+            if (conversationId) {
+                joinPromises.push(window.connection.invoke("JoinConversationGroup", conversationId));
+            }
+        });
+        await Promise.all(joinPromises);
+        console.log("Joined all conversation groups.");
     } catch (err) {
         console.error("Connection failed, retrying in 5s", err);
         setTimeout(window.startConnection, 5000);
@@ -28,6 +39,7 @@ window.connection.on("ConversationSeen", function (conversationId, userId) {
             if (badge) badge.remove();
         }
     });
+    if (window.updateUnreadMessages) window.updateUnreadMessages();
 });
 
 window.startConnection();
@@ -140,6 +152,9 @@ window.prepareChat = async function (homeId) {
         });
 
         await window.connection.invoke("MarkAsSeen", conversationId, currentUserId);
+        setTimeout(() => {
+            if (window.updateUnreadMessages) window.updateUnreadMessages();
+        }, 300); // 300ms delay
     } catch (err) {
         console.error("Error in prepareChat:", err);
     } finally {
@@ -193,7 +208,7 @@ function sendMessage() {
             <div class="message-author">You:</div>
             <div class="message-content">${msg}</div>
             <div class="message-status">
-                <span class="status-text status-text-${tempId}" style="font-size:0.8em; color: gray;">[${getMessageStatusText(0)}]</span>
+                <span class="status-text status-text-${tempId}">[${getMessageStatusText(0)}]</span>
             </div>
         </div>
     `;
@@ -242,19 +257,47 @@ window.connection.on("ReceiveMessage", async (message) => {
     document.getElementById("messagesList").appendChild(li);
     document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
 
+    const chatPopup = document.getElementById("chatPopup");
+    const isChatOpen = chatPopup && chatPopup.style.display !== "none";
     if (!isSelf && message.receiverId === currentUserId) {
         try {
             console.log("Calling MarkAsDelivered for message:", message.messageId);
-            await window.connection.invoke("MarkAsDelivered", message.messageId); //to be removed later
+            await window.connection.invoke("MarkAsDelivered", message.messageId);
             const convoId = document.getElementById("conversationId")?.value;
-            if (convoId) {
-                console.log("Calling MarkAsSeen for conversation:", convoId, "and user:", currentUserId); //to be removed later 
+            if (convoId && isChatOpen) { // <-- Only if chat is open!
+                console.log("Calling MarkAsSeen for conversation:", convoId, "and user:", currentUserId);
                 await window.connection.invoke("MarkAsSeen", convoId, currentUserId);
             }
         } catch (err) {
             console.error("Failed to mark as delivered or seen", err);
         }
     }
+
+    // Always update badge in chat list for unread messages
+    if (message.receiverId === currentUserId) {
+        document.querySelectorAll(`[data-conversation-id='${message.conversationId}']`).forEach(function (link) {
+            const parentLi = link.closest(".conversation-item");
+            if (parentLi) {
+                let badge = parentLi.querySelector(".badge.bg-danger");
+                if (badge) {
+                    badge.textContent = parseInt(badge.textContent) + 1;
+                } else {
+                    badge = document.createElement("span");
+                    badge.className = "badge bg-danger ms-2";
+                    badge.textContent = "1";
+                    // Insert after OtherParticipantName or at the end
+                    const nameSpan = parentLi.querySelector(".other-participant");
+                    if (nameSpan) {
+                        nameSpan.parentNode.appendChild(badge);
+                    } else {
+                        parentLi.appendChild(badge);
+                    }
+                }
+            }
+        });
+    }
+
+    if (window.updateUnreadMessages) window.updateUnreadMessages();
 });
 
 window.connection.on("ReceiveMessageStatusUpdate", (data) => {
@@ -436,7 +479,7 @@ function setupChatFeatureEvents() {
     }
 }
 
-setupChatFeatureEvents();
+if (window.setupChatFeatureEvents) window.setupChatFeatureEvents();
 
 window.connection.on("ConversationSeen", function (conversationId, userId) {
     document.querySelectorAll(`[data-conversation-id='${conversationId}']`).forEach(function (link) {
@@ -455,5 +498,11 @@ window.connection.onreconnecting(() => {
     console.log("SignalR reconnecting...");
 });
 window.connection.onreconnected(() => {
-    console.log("SignalR reconnected");
+    // Re-join all groups after reconnect
+    document.querySelectorAll(".open-chat-link[data-conversation-id]").forEach(function (link) {
+        const conversationId = link.dataset.conversationId;
+        if (conversationId) {
+            window.connection.invoke("JoinConversationGroup", conversationId);
+        }
+    });
 });

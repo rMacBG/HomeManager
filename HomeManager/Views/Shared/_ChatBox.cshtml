@@ -189,19 +189,17 @@
 
 
     .status-text {
-        padding: 2px 8px;
-        border-radius: 12px;
         font-weight: bold;
-        background: #e0e7ff;
-        color: #333;
-        transition: background 0.2s, color 0.2s;
+        padding: 0 4px;
+        background: none;
+        color: inherit;
+        border-radius: 0;
+        transition: none;
     }
-
-    .status-text[data-status="Pending"]    { background: #fff3cd; color: #856404; }
-    .status-text[data-status="Sent"]       { background: #cce5ff; color: #004085; }
-    .status-text[data-status="Delivered"]  { background: #d4edda; color: #155724; }
-    .status-text[data-status="Seen"]       { background: #d1c4e9; color: #4e54c8; }
-    .status-text[data-status="Failed"]     { background: #f8d7da; color: #721c24; }
+    .status-text[data-status] {
+        background: none;
+        color: inherit;
+    }
 
 
     #imageModal {
@@ -290,7 +288,7 @@
     <img id="modalImage" src="" style="max-width:90vw;max-height:90vh;transition:transform 0.3s;cursor:zoom-in;border-radius:12px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(1);" onclick="toggleZoom()" />
 </div>
 @section Scripts {
-    <script src="~/js/chatbox.js"></script>
+    @* <script src="~/js/chatbox.js"></script> *@
 }
 
 

@@ -64,6 +64,24 @@ else
                         });
                 });
             });
+
+            if (window.connection && window.connection.state === "Connected") {
+                document.querySelectorAll(".open-chat-link[data-conversation-id]").forEach(function (link) {
+                    const conversationId = link.dataset.conversationId;
+                    if (conversationId) {
+                        window.connection.invoke("JoinConversationGroup", conversationId);
+                    }
+                });
+            } else if (window.connection) {
+                window.connection.start().then(function () {
+                    document.querySelectorAll(".open-chat-link[data-conversation-id]").forEach(function (link) {
+                        const conversationId = link.dataset.conversationId;
+                        if (conversationId) {
+                            window.connection.invoke("JoinConversationGroup", conversationId);
+                        }
+                    });
+                });
+            }
         });
     </script>
 }

@@ -21,7 +21,7 @@ namespace HomeManager.Services.Services.Interfaces
         Task<HomeDetailsViewModel> GetChatBoxViewModelAsync(Guid homeId, Guid userId);
 
         Task<IEnumerable<Conversation>> GetUserConversationsWithDetailsAsync(Guid userId);
-
+        int GetTotalUnreadCountForUser(string userId);
     }
 
 }

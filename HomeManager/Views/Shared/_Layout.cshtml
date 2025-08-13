@@ -23,6 +23,11 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HomeManager.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" rel="stylesheet" />
+    <script>
+        AOS.init();
+    </script>
 </head>
 <body class="d-flex flex-column min-vh-100">
     <header>
@@ -51,15 +56,21 @@
                         </li>
                     </ul>
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item dropdown">
+                        <li class="nav-item dropdown position-relative">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="mainMenuDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Menu
+                                <span id="menu-exclamation" style="display:none; position:absolute; top:2px; right:-10px;">
+                                    <i class="fas fa-exclamation-circle text-danger" style="font-size:1.1em;"></i>
+                                </span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mainMenuDropdown">
                                 @if (isAuthenticated)
                                 {
                                     <li><a class="dropdown-item" asp-controller="Homes" asp-action="Index">Homes</a></li>
-                                    <li><a class="dropdown-item" asp-controller="Conversation" asp-action="Index">Conversations</a></li>
+                                    <li><a class="dropdown-item position-relative" asp-controller="Conversation" asp-action="Index">
+                                        Conversations
+                                        <span id="unread-badge" class="badge bg-danger ms-2" style="display:none;">0</span>
+                                    </a></li>
                                     @if (User.IsInRole("Admin"))
                                     {
                                         <li><a class="dropdown-item" asp-controller="Admin" asp-action="Index">Admin Panel</a></li>

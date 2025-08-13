@@ -211,5 +211,14 @@ namespace HomeManager.Controllers
 
             return Json(new { url });
         }
+
+        [Authorize]
+        [HttpGet("GetUnreadCount")]
+        public IActionResult GetUnreadCount()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            int unreadCount = _conversationService.GetTotalUnreadCountForUser(userId);
+            return Json(new { unreadCount });
+        }
     }
 }

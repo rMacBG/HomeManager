@@ -1,5 +1,6 @@
 ﻿using HomeManager.Data.Data.Dtos;
 using HomeManager.Data.Data.Models;
+using HomeManager.Data.Data.Models.Enums;
 using HomeManager.Data.Data.ViewModels;
 using HomeManager.Services.Repositories;
 using HomeManager.Services.Repositories.Interfaces;
@@ -170,6 +171,29 @@ namespace HomeManager.Services.Services
         public async Task<IEnumerable<Conversation>> GetUserConversationsWithDetailsAsync(Guid userId)
         {
             return await _conversationRepository.GetUserConversationsWithDetailsAsync(userId);
+        }
+
+        public int GetTotalUnreadCountForUser(string userId)
+        {
+            if (!Guid.TryParse(userId, out Guid userGuid))
+                return 0;
+
+            var conversationsTask = GetUserConversationsWithDetailsAsync(userGuid);
+            conversationsTask.Wait();
+            var conversations = conversationsTask.Result;
+
+            int totalUnread = 0;
+            foreach (var convo in conversations)
+            {
+                if (convo.Messages != null)
+                {
+                    totalUnread += convo.Messages.Count(m =>
+                        m.ReceiverId == userGuid &&
+                        (int)m.Status < (int)MessageStatus.Seen
+                    );
+                }
+            }
+            return totalUnread;
         }
     }
 }
