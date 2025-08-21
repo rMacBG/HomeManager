@@ -42,9 +42,9 @@ namespace HomeManager.Controllers
             return Json(combined.ToList());
         }
 
-        public async Task<IActionResult> List(string query, string homeType,decimal? minPrice, decimal? maxPrice)
+        public async Task<IActionResult> List(string query, string homeType,decimal? minPrice, decimal? maxPrice, string? region, string? city)
         {
-            var homes = await _homeService.FilteredSearchAsync(query, homeType, minPrice, maxPrice);
+            var homes = await _homeService.FilteredSearchAsync(query, homeType, minPrice, maxPrice, region, city);
             var viewModel = new SearchResultsViewModel
             {
                 Query = query,
@@ -57,9 +57,9 @@ namespace HomeManager.Controllers
             return View(viewModel);
         }
         [Route("Search/AdvancedSearchList")]
-        public async Task<IActionResult> AdvancedSearchList(string query, string homeType, int? minPrice, int? maxPrice)
+        public async Task<IActionResult> AdvancedSearchList(string query, string homeType, int? minPrice, int? maxPrice, string? region, string? city)
         {
-            var results = await _homeService.FilteredSearchAsync(query, homeType, minPrice, maxPrice);
+            var results = await _homeService.FilteredSearchAsync(query, homeType, minPrice, maxPrice, region, city);
             return View(results);
         }
     }

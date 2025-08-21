@@ -17,6 +17,15 @@ namespace HomeManager.Data.Data.Dtos
         [Required]
         [MinLength(3)]
         public string HomeLocation { get; set; }
+
+        [Required]
+        [MinLength(100)]
+        public string Region { get; set; }
+
+        [Required]
+        [MinLength(100)]
+        public string City { get; set; }
+
         [Required]
         public HomeType HomeType { get; set; }
         [Required]

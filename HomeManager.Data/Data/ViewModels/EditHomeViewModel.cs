@@ -15,6 +15,9 @@ namespace HomeManager.Data.Data.ViewModels
         public string HomeDescription { get; set; }
         public string HomeLocation { get; set; }
         public decimal HomePrice { get; set; }
+        public string Region { get; set; }
+        public string City { get; set; }
+
         public HomeType HomeType { get; set; }
         public DealType HomeDealType { get; set; }
         public List<IFormFile> UploadedImages { get; set; } = new();

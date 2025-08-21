@@ -7,7 +7,10 @@
     <div class="card-body">
         <h2 class="card-title text-primary">@Model.Home.HomeName</h2>
         <h5 class="card-subtitle mb-2 text-muted">Dealer: <span class="fw-bold">@Model.OwnerName</span></h5>
+        <p>Description:</p>
         <p class="card-text">@Model.Home.HomeDescription</p>
+        <p class="card-text">Region: @Model.Home.Region</p>
+        <p class="card-text">City: @Model.Home.City</p>
         <p><i class="fa fa-map-marker-alt text-danger"></i> <strong>Location:</strong> @Model.Home.HomeLocation</p>
         <p><strong>Type:</strong> @Model.Home.HomeDealType</p>
         <p class="fw-bold text-warning">Price: @Model.Home.HomePrice.ToString("C")</p>

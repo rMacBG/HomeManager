@@ -25,6 +25,6 @@ namespace HomeManager.Services.Services.Interfaces
         Task<IEnumerable<HomeDto>> SearchHomesAsync(string query);
         Task<List<HomeDto>> GetLatestEstatesAsync(int count);
 
-        Task<IEnumerable<HomeDto>> FilteredSearchAsync(string query, string homeType, decimal? minPrice, decimal? maxPrice);
+        Task<IEnumerable<HomeDto>> FilteredSearchAsync(string query, string homeType, decimal? minPrice, decimal? maxPrice, string? region, string? city);
     }
 }

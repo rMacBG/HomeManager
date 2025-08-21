@@ -46,6 +46,8 @@ namespace HomeManager.Services.Services
                 HomeDescription = x.HomeDescription,
                 HomeDealType = x.HomeDealType,
                 HomePrice = x.HomePrice,
+                Region = x.Region,
+                City = x.City,
                 LandlordId = x.LandlordId,
                 Images = x.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>()
             }).ToList();
@@ -64,6 +66,8 @@ namespace HomeManager.Services.Services
                 HomeType = home.HomeType,
                 HomeDescription = home.HomeDescription,
                 HomeDealType= home.HomeDealType,
+                Region = home.Region,
+                City = home.City,
                 HomePrice = home.HomePrice,
                 LandlordId= home.LandlordId,
                 
@@ -90,6 +94,8 @@ namespace HomeManager.Services.Services
                 HomeDescription = home.HomeDescription,
                 HomeDealType = home.HomeDealType,
                 HomePrice = home.HomePrice,
+                Region = home.Region,
+                City = home.City,
                 LandlordId = home.LandlordId,
                 Images = home.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>()
             }) ?? new List<HomeDto>();
@@ -107,6 +113,8 @@ namespace HomeManager.Services.Services
                 HomeDescription = dto.HomeDescription,
                 HomeDealType = dto.HomeDealType,
                 HomePrice = dto.HomePrice,
+                Region = dto.Region,
+                City = dto.City,
                 LandlordId = dto.LandlordId
             };
             
@@ -123,6 +131,8 @@ namespace HomeManager.Services.Services
                 HomeDescription = dto.HomeDescription,
                 HomeDealType=dto.HomeDealType,
                 HomePrice = dto.HomePrice,
+                Region = dto.Region,
+                City = dto.City,
                 LandlordId = dto.LandlordId,
                 AddedAt = DateTime.UtcNow,
                 LastModifiedAt = DateTime.UtcNow,
@@ -168,6 +178,8 @@ namespace HomeManager.Services.Services
             home.HomeDescription = dto.HomeDescription;
             home.HomeDealType = dto.HomeDealType;
             home.HomePrice = dto.HomePrice;
+            home.Region = dto.Region;
+            home.City = dto.City;
             home.LastModifiedAt = DateTime.UtcNow;
 
             
@@ -272,13 +284,15 @@ namespace HomeManager.Services.Services
                     HomeDescription = x.HomeDescription,
                     HomeDealType = x.HomeDealType,
                     HomePrice = x.HomePrice,
+                    Region = x.Region,
+                    City = x.City,
                     LandlordId = x.LandlordId,
                     Images = x.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>()
                 })
                 .ToList();
         }
 
-        public async Task<IEnumerable<HomeDto>> FilteredSearchAsync(string query, string homeType, decimal? minPrice, decimal? maxPrice)
+        public async Task<IEnumerable<HomeDto>> FilteredSearchAsync(string query, string homeType, decimal? minPrice, decimal? maxPrice, string? region, string? city)
         {
             var estates = await _homeRepository.GetAllAsync();
 
@@ -295,6 +309,12 @@ namespace HomeManager.Services.Services
             if (maxPrice.HasValue)
                 estates = estates.Where(e => e.HomePrice <= maxPrice.Value).ToList();
 
+            if (!string.IsNullOrEmpty(region))
+                estates = estates.Where(e => e.Region == region).ToList();
+
+            if (!string.IsNullOrEmpty(city))
+                estates = estates.Where(e => e.City == city).ToList();
+
             return estates.Select(e => new HomeDto
             {
                 Id = e.Id,
@@ -304,6 +324,8 @@ namespace HomeManager.Services.Services
                 HomeDescription = e.HomeDescription,
                 HomeDealType = e.HomeDealType,
                 HomePrice = e.HomePrice,
+                Region = e.Region,
+                City = e.City,
                 LandlordId = e.LandlordId,
                 Images = e.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>()
             });

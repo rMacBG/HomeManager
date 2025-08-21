@@ -15,6 +15,8 @@ namespace HomeManager.Data.Data.Dtos
         public Guid Id { get; set; }
         public string HomeName { get; set; }
         public string HomeLocation { get; set; }
+        public string Region { get; set; }
+        public string City { get; set; }
         public HomeType HomeType { get; set; }
         public string HomeDescription { get; set; }
         public DealType HomeDealType { get; set; }
