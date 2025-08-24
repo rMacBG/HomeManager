@@ -15,5 +15,14 @@ namespace HomeManager.Data.Data.ViewModels
         public string HomeImageUrl { get; set; }
         public int UnreadCount { get; set; }
         public string LastMessagePreview { get; set; }
+
+        public static string GetPreview(string lastMessageContent, string lastMessageSenderName, string lastMessageImageUrl)
+        {
+            if (!string.IsNullOrEmpty(lastMessageImageUrl) || (lastMessageContent?.Contains("<img") ?? false))
+            {
+                return $"{lastMessageSenderName} sent a picture";
+            }
+            return lastMessageContent;
+        }
     }
 }

@@ -21,6 +21,8 @@ namespace HomeManager.Services.Services.Interfaces
 
         Task UpdateUserRoleAsync(Guid userId, Role newRole);
 
+        Task UpdateUserAsync(User user);
+
         Task DeleteUserAsync(Guid id);
 
         Task<IEnumerable<UserDto>> SearchUsersAsync(string query);

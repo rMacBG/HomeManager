@@ -112,5 +112,10 @@ namespace HomeManager.Services.Services
                 return userId;
             return null;
         }
+
+        public async Task UpdateUserAsync(User user)
+        {
+            await _userRepository.UpdateAsync(user);
+        }
     }
 }

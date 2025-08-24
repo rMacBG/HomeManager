@@ -9,27 +9,39 @@
 }
 else
 {
-    <ul class="conversation-list">
-        @foreach (var conversation in Model)
-        {
-            <li class="conversation-item d-flex align-items-center mb-3">
-                <img src="@conversation.HomeImageUrl" class="home-avatar me-2" alt="Home" style="width:48px;height:48px;border-radius:8px;object-fit:cover;" />
-                <div class="flex-grow-1">
-                    <strong>@conversation.HomeName</strong>
-                    <div>
-                        <span class="other-participant text-muted">@conversation.OtherParticipantName</span>
-                        <span class="chat-date text-secondary ms-2">@conversation.CreatedAt.ToString("g")</span>
-                        @if (conversation.UnreadCount > 0)
-                        {
-                            <span class="badge bg-danger ms-2">@conversation.UnreadCount</span>
-                        }
+    <div id="chatListContainer">
+        @await Html.PartialAsync("_ChatListPartial", Model)
+        @* <ul class="conversation-list">
+            @foreach (var conversation in Model)
+            {
+                <li class="conversation-item d-flex align-items-center mb-3">
+                    <img src="@conversation.HomeImageUrl" class="home-avatar me-2" alt="Home" style="width:48px;height:48px;border-radius:8px;object-fit:cover;" />
+                    <div class="flex-grow-1">
+                        <strong>@conversation.HomeName</strong>
+                        <div>
+                            <span class="other-participant text-muted">@conversation.OtherParticipantName</span>
+                            <span class="chat-date text-secondary ms-2">@conversation.CreatedAt.ToString("g")</span>
+                            @if (conversation.UnreadCount > 0)
+                            {
+                                <span class="badge bg-danger ms-2">@conversation.UnreadCount</span>
+                            }
+                        </div>
+                        <span class="last-message text-truncate d-block mt-1 text-secondary" style="max-width: 300px;">
+                            @{
+                                var preview = conversation.LastMessagePreview;
+                                if (preview != null && preview.Contains("<img"))
+                                {
+                                    preview = $"{conversation.OtherParticipantName} sent a picture";
+                                }
+                            }
+                            @preview
+                        </span>
                     </div>
-                    <span class="last-message text-truncate d-block mt-1 text-secondary" style="max-width: 300px;">@conversation.LastMessagePreview</span>
-                </div>
-                <a href="javascript:void(0);" data-conversation-id="@conversation.ConversationId" class="open-chat-link btn btn-sm btn-primary ms-2">Open Chat</a>
-            </li>
-        }
-    </ul>
+                    <a href="javascript:void(0);" data-conversation-id="@conversation.ConversationId" class="open-chat-link btn btn-sm btn-primary ms-2">Open Chat</a>
+                </li>
+            }
+        </ul> *@
+    </div>
 }
 
 <div id="chatBoxContainer"></div>

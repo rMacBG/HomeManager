@@ -31,7 +31,7 @@
 </head>
 <body class="d-flex flex-column min-vh-100">
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav class="navbar navbar-expand-sm custom-navbar">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HomeManager</a>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
@@ -71,6 +71,7 @@
                                         Conversations
                                         <span id="unread-badge" class="badge bg-danger ms-2" style="display:none;">0</span>
                                     </a></li>
+                                    <li><a class="dropdown-item" asp-controller="User" asp-action="Profile">My Profile</a></li>
                                     @if (User.IsInRole("Admin"))
                                     {
                                         <li><a class="dropdown-item" asp-controller="Admin" asp-action="Index">Admin Panel</a></li>

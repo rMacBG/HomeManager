@@ -20,12 +20,14 @@ namespace HomeManager.Services.Services.SignalR
         private readonly IMessageService _messageService;
         private readonly IConversationService _conversationService;
         private readonly IMessageRepository _messageRepository;
+        private readonly IUserRepository _userRepository;
 
-        public ChatHub(IMessageService messageService, IConversationService conversationService, IMessageRepository messageRepository)
+        public ChatHub(IMessageService messageService, IConversationService conversationService, IMessageRepository messageRepository, IUserRepository userRepository)
         {
             _messageService = messageService;
             _conversationService = conversationService;
             _messageRepository = messageRepository;
+            _userRepository = userRepository;
         }
 
         public async Task SendMessage(CreateMessageDto dto)
@@ -38,7 +40,7 @@ namespace HomeManager.Services.Services.SignalR
                 {
                     messageId = message.Id,
                     senderId = message.SenderId,
-                    receiverId = message.ReceiverId, 
+                    receiverId = message.ReceiverId,
                     content = message.Content,
                     sentAt = message.SentAt.ToString("dd/MM/yyyy"),
                     messageStatus = (int)message.MessageStatus,
@@ -47,6 +49,23 @@ namespace HomeManager.Services.Services.SignalR
 
                 await Clients.Group(dto.ConversationId.ToString())
                              .SendAsync("ReceiveMessage", payload);
+
+                
+                await Clients.User(message.ReceiverId.ToString())
+                    .SendAsync("ReceiveNotification", new {
+                        ConversationId = message.ConversationId,
+                        SenderName = await GetUserNameAsync(message.SenderId) ?? "Dealer",
+                        IsImage = message.Content?.Contains("<img") ?? false,
+                        MessageContent = message.Content
+                    });
+
+                //await Clients.User(message.SenderId.ToString())
+                //    .SendAsync("ReceiveNotification", new {
+                //        ConversationId = message.ConversationId,
+                //        SenderName = await GetUserNameAsync(message.SenderId) ?? "You",
+                //        IsImage = message.Content?.Contains("<img") ?? false,
+                //        MessageContent = message.Content
+                //    });
             }
             catch (Exception ex)
             {
@@ -138,6 +157,13 @@ namespace HomeManager.Services.Services.SignalR
             }
 
             await base.OnConnectedAsync();
+        }
+
+        private async Task<string?> GetUserNameAsync(Guid userId)
+        {
+           
+            var user = await _userRepository.GetByIdAsync(userId);
+            return user?.Username;
         }
     }
 }

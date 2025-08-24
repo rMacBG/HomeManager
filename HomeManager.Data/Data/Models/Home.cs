@@ -42,5 +42,7 @@ namespace HomeManager.Data.Data.Models
         [ForeignKey(nameof(Landlord))]
         public Guid LandlordId { get; set; }
         public Landlord Landlord { get; set; }
+
+        //public ICollection<User> BookmarkedByUsers { get; set; } = new List<User>();
     }
 }

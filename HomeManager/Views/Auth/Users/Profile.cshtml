@@ -1,0 +1,30 @@
+﻿@model HomeManager.Data.Data.Models.User
+@{
+    var canEdit = ViewBag.CanEdit as bool? ?? false;
+    var avatarUrl = string.IsNullOrWhiteSpace(Model.AvatarUrl)
+        ? Url.Content("~/AvatarImages/default-avatar.png")
+        : Model.AvatarUrl;
+}
+<div class="card shadow-lg p-4" style="max-width:400px;margin:auto;">
+    <div class="text-center mb-3">
+        <img src="@avatarUrl" alt="Avatar" class="rounded-circle" style="width:96px;height:96px;object-fit:cover;border:3px solid #8f94fb;" />
+        <h3 class="mt-2">@Model.FullName</h3>
+        <p class="text-muted">@Model.Username</p>
+    </div>
+    <div class="mb-3">
+        <label class="fw-bold">Bio:</label>
+        <div>@Model.Bio</div>
+    </div>
+    <div class="mb-3">
+        <label class="fw-bold">Phone:</label>
+        <div>@Model.PhoneNumber</div>
+    </div>
+    <div class="mb-3">
+        <label class="fw-bold">Email:</label>
+        <div>@Model.Email</div>
+    </div>
+@if (canEdit)
+{
+        <a asp-action="EditProfile" asp-route-id="@Model.Id" class="btn btn-hm-edit w-100">Edit Profile</a>
+}
+    

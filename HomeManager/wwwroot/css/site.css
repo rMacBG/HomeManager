@@ -342,9 +342,10 @@ input[type="file"].form-control:focus {
     cursor: zoom-in;
 }
 .zoomable-image.zoomed {
-    transform: scale(2);
+    transform: scale(2.2);
     cursor: zoom-out;
-  }
+    z-index: 2001;
+}
 
 .carousel-item {
     transition: opacity 1s ease-in-out;
@@ -383,4 +384,29 @@ input[type="file"].form-control:focus {
     z-index: 2000;
     align-items: center;
     justify-content: center;
+}
+
+.custom-navbar {
+    background: linear-gradient(90deg, #1a237e 0%, #3949ab 100%);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(30, 30, 60, 0.1);
+    border-bottom: 2px solid #283593;
+}
+
+.custom-navbar .navbar-brand,
+.custom-navbar .nav-link,
+.custom-navbar .dropdown-item {
+    color: #fff !important;
+    font-weight: 500;
+}
+
+.custom-navbar .nav-link:hover,
+.custom-navbar .dropdown-item:hover {
+    color: #ffd600 !important;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.custom-navbar .dropdown-menu {
+    background: #3949ab;
+    border: none;
 }

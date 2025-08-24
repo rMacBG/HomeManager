@@ -18,12 +18,12 @@ namespace HomeManager.Data.Data.Dtos
         [MinLength(3)]
         public string HomeLocation { get; set; }
 
-        [Required]
-        [MinLength(100)]
+        [Required(ErrorMessage = "Please add a Region")]
+        [MinLength(2)]
         public string Region { get; set; }
 
-        [Required]
-        [MinLength(100)]
+        [Required(ErrorMessage = "Please add a City/Town")]
+        [MinLength(2)]
         public string City { get; set; }
 
         [Required]

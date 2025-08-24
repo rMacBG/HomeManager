@@ -1,0 +1,26 @@
+﻿@model HomeManager.Data.Data.Models.User
+@{
+    var avatarUrl = string.IsNullOrWhiteSpace(Model.AvatarUrl)
+        ? Url.Content("~/AvatarImages/default-avatar.png")
+        : Model.AvatarUrl;
+}
+<div class="card shadow-lg p-4" style="max-width:400px;margin:auto;">
+    <form method="post" enctype="multipart/form-data">
+        <div class="text-center mb-3">
+            <img src="@avatarUrl" alt="Avatar" class="rounded-circle" style="width:96px;height:96px;object-fit:cover;border:3px solid #8f94fb;" />
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold">Full Name</label>
+            <input asp-for="FullName" class="form-control" />
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold">Bio</label>
+            <textarea asp-for="Bio" class="form-control"></textarea>
+        </div>
+        <div class="mb-3">
+            <label class="fw-bold">Avatar image</label>
+            <input type="file" name="AvatarImage" class="form-control" accept="image/*" />
+        </div>
+        <button type="submit" class="btn btn-hm-edit w-100">Save</button>
+    </form>
+</div>

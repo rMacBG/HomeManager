@@ -1,5 +1,4 @@
-﻿//const currentUserId = document.getElementById("senderId")?.value;
-window.startConnection = async function () {
+﻿window.startConnection = async function () {
     if (window.connection.state === "Connected" || window.connection.state === "Connecting") {
         console.log("Already connected or connecting.");
         return;
@@ -31,6 +30,60 @@ window.connection = new signalR.HubConnectionBuilder()
     .configureLogging(signalR.LogLevel.Information)
     .build();
 
+window.connection.on("ReceiveNotification", function (data) {
+    console.log("ReceiveNotification event received!", data);
+    const notifArea = document.getElementById("notification-area");
+    const notif = document.createElement("div");
+    notif.className = "alert alert-info alert-dismissible fade show";
+    notif.innerHTML = `${data.SenderName} sent you ${data.IsImage ? "a picture" : "a message"}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+    notifArea.appendChild(notif);
+    setTimeout(() => notif.remove(), 5000);
+
+    if (window.updateUnreadMessages) window.updateUnreadMessages();
+
+    document.querySelectorAll(`[data-conversation-id='${data.ConversationId}']`).forEach(function (link) {
+        const parentLi = link.closest(".conversation-item");
+        if (parentLi) {
+            // Update unread badge
+            let badge = parentLi.querySelector(".badge.bg-danger");
+            if (badge) {
+                badge.textContent = parseInt(badge.textContent) + 1;
+                badge.style.display = 'inline-block';
+            } else {
+                badge = document.createElement("span");
+                badge.className = "badge bg-danger ms-2";
+                badge.textContent = "1";
+                badge.style.display = 'inline-block';
+                const nameSpan = parentLi.querySelector(".other-participant");
+                if (nameSpan) {
+                    nameSpan.parentNode.appendChild(badge);
+                } else {
+                    parentLi.appendChild(badge);
+                }
+            }
+            // Update last message preview
+            const lastMsgSpan = parentLi.querySelector(".last-message");
+            if (lastMsgSpan) {
+                lastMsgSpan.textContent = data.IsImage
+                    ? `${data.SenderName} sent a picture`
+                    : `${data.SenderName}: ${data.MessageContent || "sent a message"}`;
+            }
+        }
+    });
+    console.log("ReceiveNotification triggered, fetching chat list partial...");
+
+    fetch('/Chat/ChatListPartial')
+        .then(res => res.text())
+        .then(html => {
+            console.log("Fetched chat list partial, updating DOM...");
+            const chatListContainer = document.getElementById('chatListContainer');
+            if (chatListContainer) {
+                chatListContainer.innerHTML = html;
+                attachChatListHandlers();
+            }
+        });
+});
+
 window.connection.on("ConversationSeen", function (conversationId, userId) {
     document.querySelectorAll(`[data-conversation-id='${conversationId}']`).forEach(function (link) {
         const parentLi = link.closest(".conversation-item");
@@ -42,7 +95,7 @@ window.connection.on("ConversationSeen", function (conversationId, userId) {
     if (window.updateUnreadMessages) window.updateUnreadMessages();
 });
 
-window.startConnection();
+//window.startConnection();
 
 document.addEventListener("DOMContentLoaded", function () {
     const openChatBtn = document.getElementById("openChatBtn");
@@ -498,7 +551,7 @@ window.connection.onreconnecting(() => {
     console.log("SignalR reconnecting...");
 });
 window.connection.onreconnected(() => {
-    // Re-join all groups after reconnect
+   
     document.querySelectorAll(".open-chat-link[data-conversation-id]").forEach(function (link) {
         const conversationId = link.dataset.conversationId;
         if (conversationId) {
@@ -506,3 +559,7 @@ window.connection.onreconnected(() => {
         }
     });
 });
+
+
+
+//window.startConnection();

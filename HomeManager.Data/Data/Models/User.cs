@@ -31,11 +31,19 @@ namespace HomeManager.Data.Data.Models
         [Required]
         [MaxLength(25)]
         public string PhoneNumber { get; set; } = null!;
+
+
+        public string? Bio { get; set; }
+
+        public string? AvatarUrl { get; set; }
         public Role Role { get; set; }
 
         public string? PasswordResetToken { get; set; }
         public DateTime? PasswordResetTokenExpiry { get; set; }
 
         public ICollection<UserConversation> UsersConversations { get; set; }
+
+        //public ICollection<Home> BookmarkedHomes { get; set; } = new List<Home>();
+
     }
 }

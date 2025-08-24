@@ -32,7 +32,7 @@ namespace HomeManager.Data.Data.Context
         public DbSet<Landlord> Landlords { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<UserConversation> UsersConversations{ get; set; }
-
+        public DbSet<Rating> Ratings { get; set; }
         public DbSet<HomeImage> HomeImages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

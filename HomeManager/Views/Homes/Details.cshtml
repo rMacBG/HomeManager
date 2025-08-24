@@ -6,6 +6,16 @@
 <div class="card shadow-lg mb-4" style="border-radius:16px;">
     <div class="card-body">
         <h2 class="card-title text-primary">@Model.Home.HomeName</h2>
+        @* @{
+        var ownerAvatar = string.IsNullOrWhiteSpace(Model.Home.Landlord?.AvatarUrl)
+        ? Url.Content("~/images/default-avatar.png")
+        : Model.Home.Landlord.AvatarUrl;
+        }
+        <h5 class="card-subtitle mb-2 text-muted">
+            Dealer:
+            <img src="@ownerAvatar" class="rounded-circle me-2" style="width:32px;height:32px;object-fit:cover;border:2px solid #8f94fb;" alt="Dealer Avatar" />
+            <span class="fw-bold">@Model.OwnerName</span>
+        </h5> *@
         <h5 class="card-subtitle mb-2 text-muted">Dealer: <span class="fw-bold">@Model.OwnerName</span></h5>
         <p>Description:</p>
         <p class="card-text">@Model.Home.HomeDescription</p>
@@ -171,7 +181,7 @@
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content bg-transparent border-0">
                             <div class="modal-body text-center p-0">
-                                <img src="@image.FilePath" alt="Home Image" class="img-fluid zoomable-image" style="max-width:100%;max-height:80vh;border-radius:12px;" />
+                                <img src="@image.FilePath" alt="Home Image" class="img-fluid zoomable-image" style="max-width:100%;max-height:80vh;border-radius:12px;cursor:zoom-in;" onclick="this.classList.toggle('zoomed')" />
                             </div>
                         </div>
                     </div>

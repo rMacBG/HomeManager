@@ -98,6 +98,8 @@ namespace HomeManager.Controllers
                 HomeLocation = home.HomeLocation,
                 HomePrice = home.HomePrice,
                 HomeType = home.HomeType,
+                Region = home.Region,
+                City = home.City,
                 HomeDealType = home.HomeDealType,
                 ExistingImages = home.Images?.Select(i => i.FilePath).ToList() ?? new List<string>()
             };

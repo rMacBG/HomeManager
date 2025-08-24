@@ -220,5 +220,37 @@ namespace HomeManager.Controllers
             int unreadCount = _conversationService.GetTotalUnreadCountForUser(userId);
             return Json(new { unreadCount });
         }
+
+        [HttpGet("ChatListPartial")]
+        [Authorize]
+        public async Task<IActionResult> ChatListPartial()
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userIdStr == null) return Unauthorized();
+            Guid userId = Guid.Parse(userIdStr);
+
+            var conversations = await _conversationService.GetUserConversationsWithDetailsAsync(userId);
+
+            var viewModel = conversations.Select(c =>
+            {
+                var lastMessage = c.Messages?.OrderByDescending(m => m.SentAt).FirstOrDefault();
+                return new ConversationListItemViewModel
+                {
+                    ConversationId = c.Id,
+                    OtherParticipantName = c.UsersConversations?
+                        .FirstOrDefault(uc => uc.UserId != userId)?.User?.FullName
+                        ?? c.UsersConversations?.FirstOrDefault(uc => uc.UserId != userId)?.User?.Username
+                        ?? "Unknown",
+                    CreatedAt = c.StartedAt,
+                    HomeName = c.Home?.HomeName ?? "Unknown Home",
+                    HomeImageUrl = c.Home?.Images?.FirstOrDefault()?.FilePath ?? "/images/default-home.png",
+                    UnreadCount = c.Messages?.Count(m => m.ReceiverId == userId && (int)m.Status < (int)MessageStatus.Seen) ?? 0,
+                    LastMessagePreview = lastMessage != null ? lastMessage.Content : ""
+                };
+            }).OrderByDescending(x => x.CreatedAt).ToList();
+
+            // Explicitly reference the shared partial
+            return PartialView("~/Views/Shared/_ChatListPartial.cshtml", viewModel);
+        }
     }
 }

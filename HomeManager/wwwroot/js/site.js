@@ -14,32 +14,30 @@ window.addEventListener('DOMContentLoaded', function() {
     document.body.classList.add('loaded');
 });
 window.updateUnreadMessages = function() {
-        console.log('updateUnreadMessages called');
-        fetch('/Chat/GetUnreadCount')
-            .then(res => res.json())
-            .then(data => {
-                console.log('Unread count from backend:', data.unreadCount);
-                const badge = document.getElementById('unread-badge');
-                const exclamation = document.getElementById('menu-exclamation');
-                console.log('Badge element:', badge);
-                if (badge && exclamation) {
-                    if (data.unreadCount > 0) {
-                        badge.textContent = data.unreadCount;
-                        badge.style.display = 'inline-block';
-                        exclamation.style.display = 'inline-block';
-                    } else {
-                        badge.style.display = 'none';
-                        exclamation.style.display = 'none';
-                    }
+    console.log('updateUnreadMessages called');
+    fetch('/Chat/GetUnreadCount')
+        .then(res => res.json())
+        .then(data => {
+            console.log('Unread count from backend:', data.unreadCount);
+            const badge = document.getElementById('unread-badge');
+            const exclamation = document.getElementById('menu-exclamation');
+            if (badge && exclamation) {
+                if (data.unreadCount > 0) {
+                    badge.textContent = data.unreadCount;
+                    badge.style.display = 'inline-block';
+                    exclamation.style.display = 'inline-block';
                 } else {
-                    console.warn('Badge or exclamation not found in DOM');
+                    badge.style.display = 'none';
+                    exclamation.style.display = 'none';
                 }
-            })
-            .catch(err => {
-                console.error('Fetch error:', err);
-            });
-    }
-
+            } else {
+                console.warn('Badge or exclamation not found in DOM');
+            }
+        })
+        .catch(err => {
+            console.error('Fetch error:', err);
+        });
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     const input = document.getElementById('UploadedImages');
@@ -73,21 +71,45 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-// connection.on("ReceiveNotification", function (message) {
-//     const notifArea = document.getElementById("notification-area");
-//     const notif = document.createElement("div");
-//     notif.className = "alert alert-info alert-dismissible fade show";
-//     notif.innerHTML = message + '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
-//     notifArea.appendChild(notif);
-//     setTimeout(() => notif.remove(), 5000);
-// });
-
-// connection.start().catch(function (err) {
-//     return console.error(err.toString());
-// });
-
-
-
 document.addEventListener('DOMContentLoaded', function() {
     updateUnreadMessages();
 });
+
+const chatChannel = new BroadcastChannel('chat-sync');
+chatChannel.onmessage = function(event) {
+    if (event.data === 'refreshUnread') {
+        window.updateUnreadMessages && window.updateUnreadMessages();
+    }
+};
+
+window.updateUnreadMessages && window.updateUnreadMessages();
+chatChannel.postMessage('refreshUnread');
+
+//function attachChatListHandlers() {
+//    document.querySelectorAll(".open-chat-link").forEach(function (link) {
+//        link.addEventListener("click", async function () {
+//            const conversationId = this.dataset.conversationId;
+//            const parentLi = this.closest(".conversation-item");
+//            if (parentLi) {
+//                const badge = parentLi.querySelector(".badge.bg-danger");
+//                if (badge) badge.remove();
+//            }
+//            fetch(`/Chat/ChatBoxPartial?conversationId=${conversationId}`)
+//                .then(response => {
+//                    if (!response.ok) throw new Error("Failed to load chat box.");
+//                    return response.text();
+//                })
+//                .then(html => {
+//                    document.getElementById("chatBoxContainer").innerHTML = "";
+//                    document.getElementById("chatBoxContainer").innerHTML = html;
+//                    setupChatFeatureEvents();
+//                    if (window.prepareChatBox) window.prepareChatBox();
+//                })
+//                .catch(err => {
+//                    alert("Could not load chat: " + err);
+//                });
+//        });
+//    });
+//}
+
+
