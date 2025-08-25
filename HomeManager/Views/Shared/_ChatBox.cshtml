@@ -232,6 +232,7 @@
     <div class="chat-header">
         <span>Chat with @Model.OtherParticipantName</span>
         <button id="closeChatBtn" class="close-btn">&times;</button>
+        
     </div>
     <div class="chat-body" id="messagesList">
         @if (Model.Messages != null)
@@ -248,7 +249,9 @@
                         <br />
                         @if (!string.IsNullOrEmpty(msg.ImageUrl))
                         {
-                            <img src="@msg.ImageUrl" class="chat-image zoomable-image" alt="Sent image" style="max-width:180px;max-height:180px;cursor:zoom-in;border-radius:8px;margin:6px 0;" onclick="this.classList.toggle('zoomed')" />
+                            <img src="@msg.ImageUrl" class="chat-image zoomable-image" alt="Sent image"
+         style="max-width:180px;max-height:180px;cursor:zoom-in;border-radius:8px;margin:6px 0;"
+         onclick="openImageModal('@msg.ImageUrl')" />
                         }
                         @msg.Content
                         <span class="message-status">
@@ -257,9 +260,11 @@
 </span>
                         </span>
                     </div>
+                    
                 </div>
             }
         }
+        
     </div>
     <div id="typingIndicator" style="font-size:0.9em;color:#a21caf;margin:4px 0 0 8px;display:none;">
         @Model.OtherParticipantName is typing...
@@ -283,12 +288,37 @@
 
 
 
-<div id="imageModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:2000;align-items:center;justify-content:center;">
-    <span style="position:absolute;top:24px;right:32px;font-size:2em;color:#fff;cursor:pointer;" onclick="closeImageModal()">&times;</span>
+@* <div id="imageModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:2000;align-items:center;justify-content:center;">
+    <span style="position:absolute;top:24px;right:32px;font-size:2em;color:#fff;cursor:pointer;" onclick="closeImageModal()">&times;</span
     <img id="modalImage" src="" style="max-width:90vw;max-height:90vh;transition:transform 0.3s;cursor:zoom-in;border-radius:12px;position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(1);" onclick="toggleZoom()" />
-</div>
+    <script>
+        function openImageModal(src) {
+            const modal = document.getElementById("imageModal");
+            const modalImg = document.getElementById("modalImage");
+            modalImg.src = src;
+            modalImg.style.transform = "translate(-50%,-50%) scale(1)";
+            modal.style.display = "flex";
+        }
+        function closeImageModal() {
+            document.getElementById("imageModal").style.display = "none";
+        }
+        function toggleZoom() {
+            const modalImg = document.getElementById("modalImage");
+            if (modalImg.style.transform.includes("scale(1)")) {
+                modalImg.style.transform = "translate(-50%,-50%) scale(2.2)";
+            } else {
+                modalImg.style.transform = "translate(-50%,-50%) scale(1)";
+            }
+        }
+        window.openImageModal = openImageModal;
+        window.closeImageModal = closeImageModal;
+        window.toggleZoom = toggleZoom;
+    </script>
+</div> *@
 @section Scripts {
     @* <script src="~/js/chatbox.js"></script> *@
+    
+    
 }
 
 

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using HomeManager.Data.Data.Models;
 using HomeManager.Services.Services;
 using HomeManager.Services.Services.Interfaces;
+using HomeManager.Data.Data.ViewModels; 
 
 namespace HomeManager.Controllers
 {
@@ -10,7 +11,12 @@ namespace HomeManager.Controllers
     public class UserController : Controller
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService) => _userService = userService;
+        private readonly IHomeService _homeService; 
+        public UserController(IUserService userService, IHomeService homeService) // Modify this line
+        {
+            _userService = userService;
+            _homeService = homeService; 
+        }
 
         public IActionResult Index()
         {
@@ -20,20 +26,16 @@ namespace HomeManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Profile(Guid? id)
         {
-            User user;
-            if (id == null)
-            {
-                user = await _userService.GetCurrentUserAsync();
-            }
-            else
-            {
-                user = await _userService.GetByIdAsync(id.Value);
-            }
+            User user = id == null
+                ? await _userService.GetCurrentUserAsync()
+                : await _userService.GetByIdAsync(id.Value);
             if (user == null) return NotFound();
 
+            var estates = await _homeService.GetByOwnerIdsync(user.Id);
             var currentUserId = _userService.GetCurrentUserId();
             ViewBag.CanEdit = currentUserId.HasValue && currentUserId.Value == user.Id;
-            return View("~/Views/Auth/Users/Profile.cshtml", user); 
+            var vm = new UserProfileViewModel { User = user, Estates = estates };
+            return View("~/Views/Auth/Users/Profile.cshtml", vm);
         }
 
         [HttpPost]

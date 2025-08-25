@@ -57,7 +57,10 @@ namespace HomeManager.Controllers
             var viewModel = new HomeDetailsViewModel
             {
                 Home = home,
-                OwnerName = owner?.FullName ?? owner?.Username ?? "Unknown"
+                OwnerName = owner?.FullName ?? owner?.Username ?? "Unknown",
+                LandlordAvatarUrl = string.IsNullOrWhiteSpace(owner?.AvatarUrl)
+            ? "/AvatarImages/default-avatar.png"
+            : owner.AvatarUrl
 
             };
 

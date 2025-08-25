@@ -184,7 +184,7 @@ window.prepareChat = async function (homeId) {
         const list = document.getElementById("messagesList");
         list.innerHTML = "";
         messages.forEach(msg => {
-            const isSelf = msg.senderId === currentUserId; // <-- USE ONLY AFTER DECLARATION
+            const isSelf = msg.senderId === currentUserId; 
             const li = document.createElement("div");
             li.classList.add("message", isSelf ? "self" : "other");
 
@@ -194,10 +194,11 @@ window.prepareChat = async function (homeId) {
                 : '';
 
             const timestamp = new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const messageContent = ensureImageOnClick(msg.content);
             li.innerHTML = `
         <div class="message-bubble">
             <div class="message-author">${displayName} <span class="message-timestamp">${timestamp}</span></div>
-            <div class="message-content">${msg.content}</div>
+            <div class="message-content">${messageContent}</div>
             ${statusHtml}
         </div>
     `;
@@ -317,7 +318,7 @@ window.connection.on("ReceiveMessage", async (message) => {
             console.log("Calling MarkAsDelivered for message:", message.messageId);
             await window.connection.invoke("MarkAsDelivered", message.messageId);
             const convoId = document.getElementById("conversationId")?.value;
-            if (convoId && isChatOpen) { // <-- Only if chat is open!
+            if (convoId && isChatOpen) { 
                 console.log("Calling MarkAsSeen for conversation:", convoId, "and user:", currentUserId);
                 await window.connection.invoke("MarkAsSeen", convoId, currentUserId);
             }
@@ -338,7 +339,7 @@ window.connection.on("ReceiveMessage", async (message) => {
                     badge = document.createElement("span");
                     badge.className = "badge bg-danger ms-2";
                     badge.textContent = "1";
-                    // Insert after OtherParticipantName or at the end
+                    
                     const nameSpan = parentLi.querySelector(".other-participant");
                     if (nameSpan) {
                         nameSpan.parentNode.appendChild(badge);
@@ -469,7 +470,6 @@ function setupChatFeatureEvents() {
         }, { once: true });
     }
 
-    // Emoji picker (simple prompt for demo)
     const emojiBtn = document.getElementById("emojiBtn");
     const emojiPicker = document.getElementById("emojiPicker");
     const messageInput = document.getElementById("messageInput");
@@ -503,13 +503,14 @@ function setupChatFeatureEvents() {
             fetch("/Chat/UploadFile", { method: "POST", body: formData })
                 .then(res => res.json())
                 .then(data => {
-                    window.connection.invoke("SendMessage", {
-                        conversationId: document.getElementById("conversationId").value,
-                        senderId: document.getElementById("senderId").value,
-                        content: `<img src='${data.url}' class='img-fluid rounded' style='max-width:180px;' />`,
-                        sentAt: new Date().toISOString(),
-                        status: 0
-                    });
+                    
+window.connection.invoke("SendMessage", {
+    conversationId: document.getElementById("conversationId").value,
+    senderId: document.getElementById("senderId").value,
+    content: `<img src='${data.url}' class='chat-image zoomable-image' style='max-width:180px;cursor:zoom-in;border-radius:8px;' onclick="openImageModal('${data.url}')" />`,
+    sentAt: new Date().toISOString(),
+    status: 0
+});
                 });
         };
     }
@@ -561,5 +562,34 @@ window.connection.onreconnected(() => {
 });
 
 
+function openImageModal(src) {
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImage");
+    modalImg.src = src;
+    modalImg.style.transform = "translate(-50%,-50%) scale(1)";
+    modal.style.display = "flex";
+}
 
-//window.startConnection();
+function closeImageModal() {
+    document.getElementById("imageModal").style.display = "none";
+}
+
+function toggleZoom() {
+    const modalImg = document.getElementById("modalImage");
+    if (modalImg.style.transform.includes("scale(1)")) {
+        modalImg.style.transform = "translate(-50%,-50%) scale(2.2)";
+    } else {
+        modalImg.style.transform = "translate(-50%,-50%) scale(1)";
+    }
+}
+
+window.openImageModal = openImageModal;
+window.closeImageModal = closeImageModal;
+window.toggleZoom = toggleZoom;
+
+function ensureImageOnClick(html) {
+    return html.replace(/<img([^>]+)src=['"]([^'"]+)['"]/g, function(match, attrs, src) {
+        if (attrs.includes('onclick')) return match; // already has onclick
+        return `<img${attrs}src='${src}' onclick="openImageModal('${src}')"`;
+    });
+}

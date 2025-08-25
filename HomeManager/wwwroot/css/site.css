@@ -386,6 +386,23 @@ input[type="file"].form-control:focus {
     justify-content: center;
 }
 
+#imageModal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.8);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+}
+
+#imageModal[style*="display: none"] {
+    display: none !important;
+}
+
 .custom-navbar {
     background: linear-gradient(90deg, #1a237e 0%, #3949ab 100%);
     color: #fff;

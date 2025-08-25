@@ -63,13 +63,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('.zoomable-image').forEach(function (img) {
-        img.addEventListener('click', function () {
-            img.classList.toggle('zoomed');
-        });
-    });
-});
+//document.addEventListener('DOMContentLoaded', function () {
+//    document.querySelectorAll('.zoomable-image').forEach(function (img) {
+//        img.addEventListener('click', function () {
+//            img.classList.toggle('zoomed');
+//        });
+//    });
+//});
 
 document.addEventListener('DOMContentLoaded', function() {
     updateUnreadMessages();

@@ -14,6 +14,7 @@ namespace HomeManager.Data.Data.ViewModels
         public string OwnerName { get; set; }
         public ConversationDto Conversation { get; set; }
 
+        public string LandlordAvatarUrl { get; set; }
         public string OtherParticipantName { get; set; }
         public IEnumerable<MessageDto> Messages { get; set; }
     }

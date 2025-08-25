@@ -1,30 +1,41 @@
-﻿@model HomeManager.Data.Data.Models.User
+﻿@model HomeManager.Data.Data.ViewModels.UserProfileViewModel
 @{
     var canEdit = ViewBag.CanEdit as bool? ?? false;
-    var avatarUrl = string.IsNullOrWhiteSpace(Model.AvatarUrl)
+    var avatarUrl = string.IsNullOrWhiteSpace(Model.User.AvatarUrl)
         ? Url.Content("~/AvatarImages/default-avatar.png")
-        : Model.AvatarUrl;
+        : Model.User.AvatarUrl;
 }
 <div class="card shadow-lg p-4" style="max-width:400px;margin:auto;">
     <div class="text-center mb-3">
         <img src="@avatarUrl" alt="Avatar" class="rounded-circle" style="width:96px;height:96px;object-fit:cover;border:3px solid #8f94fb;" />
-        <h3 class="mt-2">@Model.FullName</h3>
-        <p class="text-muted">@Model.Username</p>
+        <h3 class="mt-2">@Model.User.FullName</h3>
+        <p class="text-muted">@Model.User.Username</p>
     </div>
     <div class="mb-3">
         <label class="fw-bold">Bio:</label>
-        <div>@Model.Bio</div>
+        <div>@Model.User.Bio</div>
     </div>
     <div class="mb-3">
         <label class="fw-bold">Phone:</label>
-        <div>@Model.PhoneNumber</div>
+        <div>@Model.User.PhoneNumber</div>
     </div>
     <div class="mb-3">
         <label class="fw-bold">Email:</label>
-        <div>@Model.Email</div>
+        <div>@Model.User.Email</div>
     </div>
 @if (canEdit)
 {
-        <a asp-action="EditProfile" asp-route-id="@Model.Id" class="btn btn-hm-edit w-100">Edit Profile</a>
+        <a asp-action="EditProfile" asp-route-id="@Model.User.Id" class="btn btn-hm-edit w-100">Edit Profile</a>
 }
-    
+@if (Model.Estates.Any())
+{
+    <h4 class="mt-4">Estates by this user:</h4>
+    <ul>
+        @foreach (var estate in Model.Estates)
+        {
+            <li>
+                <a asp-controller="Homes" asp-action="Details" asp-route-id="@estate.Id">@estate.HomeName</a>
+            </li>
+        }
+    </ul>
+}
