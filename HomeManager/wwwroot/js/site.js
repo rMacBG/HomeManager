@@ -63,13 +63,12 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
-//document.addEventListener('DOMContentLoaded', function () {
-//    document.querySelectorAll('.zoomable-image').forEach(function (img) {
-//        img.addEventListener('click', function () {
-//            img.classList.toggle('zoomed');
-//        });
-//    });
-//});
+document.addEventListener('click', function (e) {
+    if (e.target.classList.contains('zoomable-image') &&
+        !e.target.closest('.modal.fade')) {
+          window.openImageModal(e.target.src);
+      }
+  });
 
 document.addEventListener('DOMContentLoaded', function() {
     updateUnreadMessages();
@@ -111,5 +110,27 @@ chatChannel.postMessage('refreshUnread');
 //        });
 //    });
 //}
+
+function openImageModal(src) {
+    const modal = document.getElementById("imageModal");
+    const modalImg = document.getElementById("modalImage");
+    modalImg.src = src;
+    modalImg.style.transform = "translate(-50%,-50%) scale(1)";
+    modal.style.display = "flex";
+}
+function closeImageModal() {
+    document.getElementById("imageModal").style.display = "none";
+}
+function toggleZoom() {
+    const modalImg = document.getElementById("modalImage");
+    if (modalImg.style.transform.includes("scale(1)")) {
+        modalImg.style.transform = "translate(-50%,-50%) scale(2.2)";
+    } else {
+        modalImg.style.transform = "translate(-50%,-50%) scale(1)";
+    }
+}
+window.openImageModal = openImageModal;
+window.closeImageModal = closeImageModal;
+window.toggleZoom = toggleZoom;
 
 

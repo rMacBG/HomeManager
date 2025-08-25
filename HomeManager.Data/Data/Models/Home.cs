@@ -43,6 +43,8 @@ namespace HomeManager.Data.Data.Models
         public Guid LandlordId { get; set; }
         public Landlord Landlord { get; set; }
 
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
         //public ICollection<User> BookmarkedByUsers { get; set; } = new List<User>();
     }
 }

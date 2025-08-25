@@ -38,6 +38,10 @@ namespace HomeManager.Data.Data.Dtos
         [Required]
         public Guid LandlordId { get; set; }
 
+
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+
         public List<IFormFile> UploadedImages { get; set; } = new();
     }
 }

@@ -180,7 +180,7 @@
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content bg-transparent border-0">
                             <div class="modal-body text-center p-0">
-                                <img src="@image.FilePath" alt="Home Image" class="img-fluid zoomable-image" style="max-width:100%;max-height:80vh;border-radius:12px;cursor:zoom-in;" onclick="this.classList.toggle('zoomed')" />
+                                <img src="@image.FilePath" alt="Home Image" class="img-fluid zoomable-image" style="max-width:100%;max-height:80vh;border-radius:12px;cursor:zoom-in;" onclick="this.classList.toggle('zoomed')"/>
                             </div>
                         </div>
                     </div>
@@ -194,7 +194,7 @@
         <p>No images available for this home.</p>
     }
 </div>
-<p>User ID Test: @User.FindFirst(ClaimTypes.NameIdentifier)?.Value</p>
+@* <p>User ID Test: @User.FindFirst(ClaimTypes.NameIdentifier)?.Value</p>
 <p>Is Authenticated: @User.Identity.IsAuthenticated</p>
 <p>Debug ConversationId: @if (Model.Conversation != null)
     {
@@ -203,7 +203,7 @@
     else
     {
     <p>No conversation found.</p>
-    } </p>
+    } </p> *@
 
     @await Html.PartialAsync("_ChatBox", Model)
 
@@ -269,25 +269,8 @@ else
             });
         });
     </script>
+    
 
-    <script>
-    document.addEventListener('click', function (e) {
-        
-        if (
-            e.target.classList.contains('zoomable-image') &&
-            e.target.closest('.modal.show')
-        ) {
-            e.target.classList.toggle('zoomed');
-        }
-    });
-
-    document.querySelectorAll('.modal').forEach(modal => {
-        modal.addEventListener('hidden.bs.modal', function () {
-            const img = modal.querySelector('.zoomable-image');
-            if (img) img.classList.remove('zoomed');
-        });
-    });
-</script>
 }
 
 @{

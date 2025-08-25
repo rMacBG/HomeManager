@@ -71,3 +71,25 @@
 {
     <p>No results found.</p>
 }
+<div id="map" style="height:400px;width:100%;"></div>
+<script>
+    function initMap() {
+        var map = new google.maps.Map(document.getElementById('map'), {
+            center: { lat: 40.7128, lng: -74.0060 }, // Default center
+            zoom: 12
+        });
+
+        var homes = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.HomeResults));
+        homes.forEach(function(home) {
+            if (home.latitude && home.longitude) {
+                var marker = new google.maps.Marker({
+                    position: { lat: home.latitude, lng: home.longitude },
+                    map: map,
+                    title: home.homeName
+                });
+            }
+        });
+    }
+    window.onload = initMap;
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places"></script>

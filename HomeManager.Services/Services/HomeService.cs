@@ -49,7 +49,9 @@ namespace HomeManager.Services.Services
                 Region = x.Region,
                 City = x.City,
                 LandlordId = x.LandlordId,
-                Images = x.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>()
+                Images = x.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>(),
+                Latitude = x.Latitude,
+                Longitude = x.Longitude,
             }).ToList();
         }
 
@@ -74,7 +76,9 @@ namespace HomeManager.Services.Services
                 Images = home.Images.Select(img => new HomeImageDto
                 {
                     FilePath = img.FilePath,
-                }).ToList()
+                }).ToList(),
+                Latitude = home.Latitude,
+                Longitude = home.Longitude
             
         };
 
@@ -97,7 +101,9 @@ namespace HomeManager.Services.Services
                 Region = home.Region,
                 City = home.City,
                 LandlordId = home.LandlordId,
-                Images = home.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>()
+                Images = home.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>(),
+                Latitude = home.Latitude,
+                Longitude = home.Longitude,
             }) ?? new List<HomeDto>();
         }
 
@@ -136,6 +142,8 @@ namespace HomeManager.Services.Services
                 LandlordId = dto.LandlordId,
                 AddedAt = DateTime.UtcNow,
                 LastModifiedAt = DateTime.UtcNow,
+                Latitude = dto.Latitude,
+                Longitude = dto.Longitude,
 
             };
 
@@ -181,6 +189,8 @@ namespace HomeManager.Services.Services
             home.Region = dto.Region;
             home.City = dto.City;
             home.LastModifiedAt = DateTime.UtcNow;
+            home.Latitude = dto.Latitude;
+            home.Longitude = dto.Longitude;
 
             
             if (dto.ImagesToRemove != null && dto.ImagesToRemove.Any())
@@ -287,7 +297,9 @@ namespace HomeManager.Services.Services
                     Region = x.Region,
                     City = x.City,
                     LandlordId = x.LandlordId,
-                    Images = x.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>()
+                    Images = x.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>(),
+                    Latitude = x.Latitude,
+                    Longitude = x.Longitude,
                 })
                 .ToList();
         }
@@ -327,7 +339,9 @@ namespace HomeManager.Services.Services
                 Region = e.Region,
                 City = e.City,
                 LandlordId = e.LandlordId,
-                Images = e.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>()
+                Images = e.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>(),
+                Latitude = e.Latitude,
+                Longitude = e.Longitude,
             });
         }
     }

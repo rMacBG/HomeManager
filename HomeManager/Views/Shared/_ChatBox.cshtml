@@ -250,8 +250,7 @@
                         @if (!string.IsNullOrEmpty(msg.ImageUrl))
                         {
                             <img src="@msg.ImageUrl" class="chat-image zoomable-image" alt="Sent image"
-         style="max-width:180px;max-height:180px;cursor:zoom-in;border-radius:8px;margin:6px 0;"
-         onclick="openImageModal('@msg.ImageUrl')" />
+         style="max-width:180px;max-height:180px;cursor:zoom-in;border-radius:8px;margin:6px 0;" />
                         }
                         @msg.Content
                         <span class="message-status">

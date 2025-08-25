@@ -18,6 +18,8 @@ namespace HomeManager.Data.Data.ViewModels
         public string Region { get; set; }
         public string City { get; set; }
 
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
         public HomeType HomeType { get; set; }
         public DealType HomeDealType { get; set; }
         public List<IFormFile> UploadedImages { get; set; } = new();

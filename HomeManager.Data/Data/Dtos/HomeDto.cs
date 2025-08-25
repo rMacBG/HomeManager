@@ -22,7 +22,9 @@ namespace HomeManager.Data.Data.Dtos
         public DealType HomeDealType { get; set; }
         public decimal HomePrice { get; set; }
         public Guid LandlordId { get; set; }
-        
+
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
         public Guid ConversationId { get; set; }
 
         public List<HomeImageDto> Images { get; set; } = new();
