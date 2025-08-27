@@ -5,24 +5,46 @@
 
 <div class="card shadow-lg mb-4" style="border-radius:16px;">
     <div class="card-body">
-        <h2 class="card-title text-primary">@Model.Home.HomeName</h2>
-        @{
-            var ownerAvatar = Url.Content(Model.LandlordAvatarUrl);
-        }
-        <h5 class="card-subtitle mb-2 text-muted">
-            Dealer:
-            <a asp-controller="User" asp-action="Profile" asp-route-id="@Model.Home.LandlordId">
-                <img src="@ownerAvatar" class="rounded-circle me-2" style="width:32px;height:32px;object-fit:cover;border:2px solid #8f94fb;" alt="Dealer Avatar" />
-                <span class="fw-bold">@Model.OwnerName</span>
-            </a>
-        </h5>
-        <p>Description:</p>
-        <p class="card-text">@Model.Home.HomeDescription</p>
-        <p class="card-text">Region: @Model.Home.Region</p>
-        <p class="card-text">City: @Model.Home.City</p>
-        <p><i class="fa fa-map-marker-alt text-danger"></i> <strong>Location:</strong> @Model.Home.HomeLocation</p>
-        <p><strong>Type:</strong> @Model.Home.HomeDealType</p>
-        <p class="fw-bold text-warning">Price: @Model.Home.HomePrice.ToString("C")</p>
+        <div class="d-flex align-items-center mb-3">
+            @{
+                var ownerAvatar = Url.Content(Model.LandlordAvatarUrl);
+            }
+            <img src="@ownerAvatar" class="rounded-circle me-3" style="width:48px;height:48px;object-fit:cover;border:2px solid #8f94fb;" alt="Dealer Avatar" />
+            <div>
+                <h2 class="card-title text-primary mb-0">@Model.Home.HomeName</h2>
+                <div class="text-muted">
+                    <span class="fw-bold">@Model.OwnerName</span>
+                    <span class="ms-2"><i class="fa fa-phone text-success"></i> @Model.DealerPhone</span>
+                    <a asp-controller="User" asp-action="Profile" asp-route-id="@Model.Home.LandlordId"
+                       class="btn btn-sm btn-outline-primary ms-3" style="vertical-align:middle;">
+                        <i class="fa fa-user"></i> Go to profile
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="mb-3 p-3" style="background:linear-gradient(90deg,#f3e8ff 0%,#e0e7ff 100%);border-radius:12px;">
+            <h5 class="mb-2" style="color:#6d28d9;"><i class="fa fa-info-circle me-2"></i>Description</h5>
+            <p class="mb-0" style="font-size:1.1em;">@Model.Home.HomeDescription</p>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-6 mb-2">
+                <span class="badge bg-primary"><i class="fa fa-map-marker-alt me-1"></i> @Model.Home.HomeLocation</span>
+            </div>
+            <div class="col-md-3 mb-2">
+                <span class="badge bg-info text-dark"><i class="fa fa-globe me-1"></i> @Model.Home.Region</span>
+            </div>
+            <div class="col-md-3 mb-2">
+                <span class="badge bg-secondary"><i class="fa fa-city me-1"></i> @Model.Home.City</span>
+            </div>
+        </div>
+        <div class="row mb-2">
+            <div class="col-md-6 mb-2">
+                <span class="badge bg-success"><i class="fa fa-home me-1"></i> @Model.Home.HomeDealType</span>
+            </div>
+            <div class="col-md-6 mb-2">
+                <span class="badge bg-warning text-dark fw-bold"><i class="fa fa-tag me-1"></i> @Model.Home.HomePrice.ToString("C")</span>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -156,15 +178,42 @@
         z-index: 1000;
     }
 </style>
-<iframe
-    width="600"
-    height="450"
-    style="border:0"
-    loading="lazy"
-    allowfullscreen
-    referrerpolicy="no-referrer-when-downgrade"
-    src="https://www.google.com/maps/embed/v1/place?key=YOUR_GOOGLE_MAPS_API_KEY&q=@Model.Home.HomeLocation">
-</iframe>
+@{
+    var lat = Model.Home.Latitude;
+    var lng = Model.Home.Longitude;
+    var hasCoords = lat != 0 && lng != 0;
+}
+@if (hasCoords)
+{
+    <div id="detailsMap" style="height:400px;width:100%;"></div>
+    <script>
+        function initDetailsMap() {
+            var map = new google.maps.Map(document.getElementById('detailsMap'), {
+                center: { lat: @lat, lng: @lng },
+                zoom: 15
+            });
+            new google.maps.Marker({
+                position: { lat: @lat, lng: @lng },
+                map: map,
+                title: "@Model.Home.HomeName"
+            });
+        }
+        window.initDetailsMap = initDetailsMap;
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJ9L4-eFlTuD7QWvoLbEkUb6d0LA6Bmmk&callback=initDetailsMap" async defer></script>
+}
+else
+{
+    <iframe
+        width="600"
+        height="450"
+        style="border:0"
+        loading="lazy"
+        allowfullscreen
+        referrerpolicy="no-referrer-when-downgrade"
+            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyAJ9L4-eFlTuD7QWvoLbEkUb6d0LA6Bmmk&q=@Model.Home.HomeLocation">
+    </iframe>
+}
 <div class="row g-3 mb-4">
     @if (Model.Home.Images?.Any() == true)
     {
@@ -236,6 +285,59 @@ else
 }
 
 <div id="chatBoxContainer"></div>
+
+@if (Model.Ratings.Any())
+{
+    <div class="mb-4">
+        <h5>Ratings & Comments</h5>
+        @foreach (var rating in Model.Ratings.OrderByDescending(r => r.CreatedAt))
+        {
+            <div class="border rounded p-2 mb-2">
+                <div>
+                    <strong>
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <span class="fa fa-star @(i <= rating.Value ? "checked" : "")"></span>
+                        }
+                        @rating.Value/5
+                    </strong>
+                    <span class="text-muted" style="font-size:0.9em;">
+                        @rating.CreatedAt.ToShortDateString()
+                    </span>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(rating.Comment))
+                {
+                    <div class="mt-1">@rating.Comment</div>
+                }
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="mb-4 text-muted">No ratings yet.</div>
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <form method="post" asp-action="AddRating" asp-controller="Homes">
+        <input type="hidden" name="homeId" value="@Model.Home.Id" />
+        <div class="mb-2">
+            <label>Rate this home:</label>
+            <select name="ratingValue" class="form-select" required>
+                @for (int i = 1; i <= 5; i++)
+                {
+                    <option value="@i">@i</option>
+                }
+            </select>
+        </div>
+        <div class="mb-2">
+            <label>Comment (optional):</label>
+            <textarea name="comment" class="form-control" maxlength="750"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit Rating</button>
+    </form>
+}
 
 @section Scripts {
      

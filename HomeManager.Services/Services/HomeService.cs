@@ -50,6 +50,7 @@ namespace HomeManager.Services.Services
                 City = x.City,
                 LandlordId = x.LandlordId,
                 Images = x.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>(),
+                Ratings = x.Ratings.ToList(),
                 Latitude = x.Latitude,
                 Longitude = x.Longitude,
             }).ToList();
@@ -67,20 +68,20 @@ namespace HomeManager.Services.Services
                 HomeLocation = home.HomeLocation,
                 HomeType = home.HomeType,
                 HomeDescription = home.HomeDescription,
-                HomeDealType= home.HomeDealType,
+                HomeDealType = home.HomeDealType,
                 Region = home.Region,
                 City = home.City,
                 HomePrice = home.HomePrice,
-                LandlordId= home.LandlordId,
-                
+                LandlordId = home.LandlordId,
+                Ratings = home.Ratings.ToList(),
                 Images = home.Images.Select(img => new HomeImageDto
                 {
                     FilePath = img.FilePath,
                 }).ToList(),
                 Latitude = home.Latitude,
                 Longitude = home.Longitude
-            
-        };
+
+            };
 
             return homeById;
         }
@@ -102,6 +103,7 @@ namespace HomeManager.Services.Services
                 City = home.City,
                 LandlordId = home.LandlordId,
                 Images = home.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>(),
+                Ratings = home.Ratings.ToList(),
                 Latitude = home.Latitude,
                 Longitude = home.Longitude,
             }) ?? new List<HomeDto>();
@@ -123,7 +125,7 @@ namespace HomeManager.Services.Services
                 City = dto.City,
                 LandlordId = dto.LandlordId
             };
-            
+
             return home;
         }
         public async Task<Guid> CreateAsync(CreateHomeDto dto)
@@ -135,7 +137,7 @@ namespace HomeManager.Services.Services
                 HomeLocation = dto.HomeLocation,
                 HomeType = dto.HomeType,
                 HomeDescription = dto.HomeDescription,
-                HomeDealType=dto.HomeDealType,
+                HomeDealType = dto.HomeDealType,
                 HomePrice = dto.HomePrice,
                 Region = dto.Region,
                 City = dto.City,
@@ -192,7 +194,7 @@ namespace HomeManager.Services.Services
             home.Latitude = dto.Latitude;
             home.Longitude = dto.Longitude;
 
-            
+
             if (dto.ImagesToRemove != null && dto.ImagesToRemove.Any())
             {
                 home.Images.RemoveAll(img => dto.ImagesToRemove.Contains(img.FilePath));
@@ -204,7 +206,7 @@ namespace HomeManager.Services.Services
                 }
             }
 
-            
+
             if (dto.UploadedImages != null && dto.UploadedImages.Any())
             {
                 foreach (var image in dto.UploadedImages)
@@ -248,7 +250,7 @@ namespace HomeManager.Services.Services
             {
                 Id = h.Id,
                 HomeName = h.HomeName,
-                
+
             });
         }
 
@@ -343,6 +345,34 @@ namespace HomeManager.Services.Services
                 Latitude = e.Latitude,
                 Longitude = e.Longitude,
             });
+        }
+
+        public async Task AddRatingAsync(Guid homeId, Guid userId, int ratingValue, string? comment)
+        {
+            var home = await _homeRepository.GetByIdAsync(homeId)
+                ?? throw new Exception("Home not found!");
+            var user = await _userRepository.GetByIdAsync(userId)
+                ?? throw new Exception("User not found!");
+            if (ratingValue < 1 || ratingValue > 5)
+                throw new ArgumentOutOfRangeException(nameof(ratingValue), "Rating value must be between 1 and 5.");
+            var rating = new Rating
+            {
+                Id = Guid.NewGuid(),
+                HomeId = homeId,
+                UserId = userId,
+                Value = ratingValue,
+                Comment = comment,
+                CreatedAt = DateTime.UtcNow
+            };
+            await _homeRepository.AddRatingAsync(rating);
+        }
+
+        public async Task<double> GetAverageRatingAsync(Guid homeId)
+        {
+            var ratings = await _homeRepository.GetRatingsForHomeAsync(homeId);
+            if (ratings == null || !ratings.Any())
+                return 0.0;
+            return ratings.Average(r => r.Value);
         }
     }
 }

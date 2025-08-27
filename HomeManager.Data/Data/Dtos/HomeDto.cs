@@ -26,7 +26,7 @@ namespace HomeManager.Data.Data.Dtos
         public double Latitude { get; set; }
         public double Longitude { get; set; }
         public Guid ConversationId { get; set; }
-
+        public List<Rating> Ratings { get; set; } = new();
         public List<HomeImageDto> Images { get; set; } = new();
 
     }

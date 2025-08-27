@@ -58,6 +58,8 @@ namespace HomeManager.Controllers
             {
                 Home = home,
                 OwnerName = owner?.FullName ?? owner?.Username ?? "Unknown",
+                Ratings = home.Ratings.ToList(),
+                DealerPhone = owner?.PhoneNumber,
                 LandlordAvatarUrl = string.IsNullOrWhiteSpace(owner?.AvatarUrl)
             ? "/AvatarImages/default-avatar.png"
             : owner.AvatarUrl
@@ -147,5 +149,25 @@ namespace HomeManager.Controllers
 
             return PartialView("_ChatBox", viewModel);
         }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> AddRating(Guid homeId, int ratingValue, string? comment)
+        {
+            if (ratingValue < 1 || ratingValue > 5)
+            {
+                ModelState.AddModelError("", "Rating value must be between 1 and 5.");
+                return RedirectToAction("Details", new { id = homeId });
+            }
+            var userId = _userService.GetCurrentUserId();
+            if (userId == null)
+            {
+                return RedirectToAction("Register", "Auth");
+            }
+            await _homeService.AddRatingAsync(homeId, userId.Value, ratingValue, comment);
+            return RedirectToAction("Details", new { id = homeId });
+        }
+
+        
     }
 }

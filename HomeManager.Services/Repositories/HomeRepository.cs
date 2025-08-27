@@ -30,7 +30,8 @@ namespace HomeManager.Services.Repositories
         public async Task<Home?> GetByIdAsync(Guid Id)
         {
             //return await _context.Homes.FindAsync(Id);
-            return await _context.Homes.Include(x => x.Images)
+            return await _context.Homes.Include(x => x.Images).
+                Include(x => x.Ratings)
                 .FirstOrDefaultAsync(x => x.Id == Id);
         }
 
@@ -70,6 +71,20 @@ namespace HomeManager.Services.Repositories
         {
             _context.HomeImages.Add(image);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task AddRatingAsync(Rating rating)
+        {
+            _context.Ratings.Add(rating);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Rating>> GetRatingsForHomeAsync(Guid homeId)
+        {
+            return await _context.Ratings
+                .Where(r => r.HomeId == homeId)
+                .OrderByDescending(r => r.CreatedAt)
+                .ToListAsync();
         }
     }
 }

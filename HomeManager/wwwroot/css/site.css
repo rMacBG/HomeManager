@@ -637,3 +637,13 @@ input[type="file"].form-control:focus {
     cursor: zoom-in;
     border-radius: 12px;
 }
+
+.fa-star { color: #ffd600; }
+.fa-star.checked { color: #ffc107; }
+
+.badge {
+    font-size: 1em;
+    padding: 0.6em 1.2em;
+    border-radius: 1em;
+    margin-right: 0.5em;
+}

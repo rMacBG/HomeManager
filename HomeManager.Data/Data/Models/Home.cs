@@ -45,6 +45,8 @@ namespace HomeManager.Data.Data.Models
 
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+
+        public ICollection<Rating> Ratings { get; set; } = new List<Rating>();
         //public ICollection<User> BookmarkedByUsers { get; set; } = new List<User>();
     }
 }

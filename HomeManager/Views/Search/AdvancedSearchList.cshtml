@@ -32,18 +32,39 @@
     </div>
 </form>
 
-@* @if (Model.Any())
-{
-    <ul>
-    @foreach (var home in Model)
-    {
-        <li>
-            @home.HomeName - @home.HomeLocation - @home.HomePrice.ToString("C")
-        </li>
+<div class="mb-3">
+    <input id="mapSearchInput" type="text" class="form-control" placeholder="Search location..." />
+    <button id="mapSearchBtn" class="btn btn-primary mt-2">Search</button>
+</div>
+<div id="map" style="height:400px;width:100%;"></div>
+<script>
+    let map, marker, geocoder;
+    function initMap() {
+        geocoder = new google.maps.Geocoder();
+        map = new google.maps.Map(document.getElementById("map"), {
+            center: { lat: 40.7128, lng: -74.0060 }, // Default center
+            zoom: 10
+        });
     }
-    </ul>
-}
-else
-{
-    <p>No results found.</p>
-} *@
+    window.initMap = initMap;
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("mapSearchBtn").addEventListener("click", function () {
+            const address = document.getElementById("mapSearchInput").value;
+            if (!address) return;
+            geocoder.geocode({ address: address }, function (results, status) {
+                if (status === "OK") {
+                    map.setCenter(results[0].geometry.location);
+                    if (marker) marker.setMap(null);
+                    marker = new google.maps.Marker({
+                        map: map,
+                        position: results[0].geometry.location
+                    });
+                } else {
+                    alert("Geocode was not successful: " + status);
+                }
+            });
+        });
+    });
+</script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJ9L4-eFlTuD7QWvoLbEkUb6d0LA6Bmmk&callback=initMap" async defer></script>

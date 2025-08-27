@@ -20,6 +20,9 @@ namespace HomeManager.Services.Repositories.Interfaces
 
         public Task DeleteAsync(Home Home);
 
+        public Task AddRatingAsync(Rating rating);
+
+        Task<List<Rating>> GetRatingsForHomeAsync(Guid homeId);
         Task<IEnumerable<Home>> SearchAsync(string qry);
 
     }
