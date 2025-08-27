@@ -166,7 +166,7 @@
 
     .zoomable-image {
         transition: transform 0.3s;
-        transform: scale(1); /* Ensure default scale */
+        transform: scale(1);
     }
 
     .zoomable-image:hover {
@@ -182,11 +182,18 @@
     var lat = Model.Home.Latitude;
     var lng = Model.Home.Longitude;
     var hasCoords = lat != 0 && lng != 0;
+   
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+    var ownerId = Model.Home.LandlordId.ToString();
+
 }
 @if (hasCoords)
 {
+    
     <div id="detailsMap" style="height:400px;width:100%;"></div>
+    
     <script>
+        console.log("Loading map with coordinates:", @lat, @lng);
         function initDetailsMap() {
             var map = new google.maps.Map(document.getElementById('detailsMap'), {
                 center: { lat: @lat, lng: @lng },
@@ -200,10 +207,16 @@
         }
         window.initDetailsMap = initDetailsMap;
     </script>
+    
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAJ9L4-eFlTuD7QWvoLbEkUb6d0LA6Bmmk&callback=initDetailsMap" async defer></script>
 }
 else
 {
+    <script>
+    {
+        console.log("No valid coordinates, using address:", "@Model.Home.HomeLocation");
+    }
+    </script>
     <iframe
         width="600"
         height="450"
@@ -256,7 +269,12 @@ else
 
     @await Html.PartialAsync("_ChatBox", Model)
 
-@if (User.Identity.IsAuthenticated)
+@if (User.Identity.IsAuthenticated && currentUserId == ownerId)
+{
+    
+    <div  class="btn btn-primary mt-3">You cannot chat with yourself sorry</div>
+}
+else if (User.Identity.IsAuthenticated)
 {
     <button id="openChatBtn" data-home-id="@Model.Home.Id" class="btn btn-primary mt-3">Ask the Dealer</button>
 }
@@ -375,10 +393,7 @@ else
 
 }
 
-@{
-    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-    var ownerId = Model.Home.LandlordId.ToString();
-}
+
 
 @if (User.Identity.IsAuthenticated && currentUserId == ownerId)
 {

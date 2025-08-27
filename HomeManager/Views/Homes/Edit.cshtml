@@ -6,6 +6,8 @@
     <textarea asp-for="HomeDescription" class="form-control" placeholder="Description"></textarea>
     <input asp-for="HomeLocation" class="form-control" placeholder="Address" />
     <input asp-for="HomePrice" class="form-control" placeholder="Price" />
+    <input asp-for="City" class="form-control" placeholder="City" />
+    <input asp-for="Region" class="form-control" placeholder="Region" />
     <div class="form-group">
         <label asp-for="HomeType" class="control-label"></label>
         <select asp-for="HomeType" class="form-control" asp-items="Html.GetEnumSelectList<HomeType>()">
@@ -22,7 +24,9 @@
 
         <span asp-validation-for="HomeDealType" class="text-danger"></span>
     </div>
-    <input asp-for="HomeLocation" class="form-control" placeholder="Google Maps Link or Coordinates" />
+    <input type="hidden" asp-for="HomeLocation" value="Default Location" />
+    <input asp-for="Latitude" class="form-control" placeholder="Latitude" step="any" />
+    <input asp-for="Longitude" class="form-control" placeholder="Longitude" step="any" />
     <div class="mb-3">
         <label for="UploadedImages" class="form-label">Add Images</label>
         <input type="file" name="UploadedImages" id="UploadedImages" multiple class="form-control" />
@@ -38,6 +42,7 @@
             </label>
         </div>
     }
+   
 
     <button type="submit" class="btn btn-hm">Save</button>
 </form>

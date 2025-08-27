@@ -123,7 +123,9 @@ namespace HomeManager.Services.Services
                 HomePrice = dto.HomePrice,
                 Region = dto.Region,
                 City = dto.City,
-                LandlordId = dto.LandlordId
+                LandlordId = dto.LandlordId,
+                Latitude = dto.Latitude,
+                Longitude = dto.Longitude
             };
 
             return home;
@@ -134,7 +136,7 @@ namespace HomeManager.Services.Services
             {
                 Id = Guid.NewGuid(),
                 HomeName = dto.HomeName,
-                HomeLocation = dto.HomeLocation,
+                HomeLocation = string.IsNullOrWhiteSpace(dto.HomeLocation) ? "Default Location" : dto.HomeLocation,
                 HomeType = dto.HomeType,
                 HomeDescription = dto.HomeDescription,
                 HomeDealType = dto.HomeDealType,
@@ -183,7 +185,7 @@ namespace HomeManager.Services.Services
                 ?? throw new Exception("Home not Found!");
 
             home.HomeName = dto.HomeName;
-            home.HomeLocation = dto.HomeLocation;
+            home.HomeLocation = string.IsNullOrWhiteSpace(dto.HomeLocation) ? "Default Location" : dto.HomeLocation;
             home.HomeType = dto.HomeType;
             home.HomeDescription = dto.HomeDescription;
             home.HomeDealType = dto.HomeDealType;

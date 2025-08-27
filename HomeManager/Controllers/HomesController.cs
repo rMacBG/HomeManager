@@ -94,7 +94,6 @@ namespace HomeManager.Controllers
             if (home == null)
                 return NotFound();
 
-            
             var model = new EditHomeViewModel
             {
                 Id = home.Id,
@@ -106,6 +105,8 @@ namespace HomeManager.Controllers
                 Region = home.Region,
                 City = home.City,
                 HomeDealType = home.HomeDealType,
+                Latitude = home.Latitude,         
+                Longitude = home.Longitude,      
                 ExistingImages = home.Images?.Select(i => i.FilePath).ToList() ?? new List<string>()
             };
 
@@ -116,6 +117,14 @@ namespace HomeManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, EditHomeViewModel model)
         {
+            foreach (var key in ModelState.Keys)
+            {
+                var errors = ModelState[key].Errors;
+                foreach (var error in errors)
+                {
+                    Console.WriteLine($"ModelState error for '{key}': {error.ErrorMessage}");
+                }
+            }
             if (!ModelState.IsValid) return View(model);
 
             await _homeService.UpdateAsync(id, model);
