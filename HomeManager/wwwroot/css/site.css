@@ -647,3 +647,18 @@ input[type="file"].form-control:focus {
     border-radius: 1em;
     margin-right: 0.5em;
 }
+
+.img-gallery-item {
+    padding: 4px;
+}
+
+    .img-gallery-item img {
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        transition: transform 0.2s;
+    }
+
+        .img-gallery-item img:hover {
+            transform: scale(1.04);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }

@@ -18,7 +18,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - HomeManager</title>
+    <title>@ViewData["Title"] - Imoteka Hub</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/HomeManager.styles.css" asp-append-version="true" />
@@ -33,19 +33,13 @@
     <header>
         <nav class="navbar navbar-expand-sm custom-navbar">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">HomeManager</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Imoteka Hub</a>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <form id="searchForm" class="d-flex align-items-center">
-                                <input type="text" id="searchInput" class="form-control me-2" placeholder="Search homes or users..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" />                                
-                                <button class="btn btn-homemanager" type="submit">Search</button>
+                            <form asp-controller="Search" asp-action="List" method="get" id="searchForm" class="d-flex align-items-center" >
+                                <input type="text" id="searchInput" class="form-control me-2" placeholder="Search homes or users..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="query" />
+                                <button  class="btn btn-homemanager" type="submit">Search</button>
                             </form>
                             <div id="searchResults" style="position:absolute; z-index: 1000; background:#fff; width:250px;"></div>
                             
@@ -56,6 +50,12 @@
                         </li>
                     </ul>
                     <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
                         <li class="nav-item dropdown position-relative">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="mainMenuDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Menu
@@ -64,9 +64,10 @@
                                 </span>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="mainMenuDropdown">
+                                <li><a class="dropdown-item" asp-controller="Homes" asp-action="Index">Homes</a></li>
                                 @if (isAuthenticated)
                                 {
-                                    <li><a class="dropdown-item" asp-controller="Homes" asp-action="Index">Homes</a></li>
+                                   
                                     <li><a class="dropdown-item position-relative" asp-controller="Conversation" asp-action="Index">
                                         Conversations
                                         <span id="unread-badge" class="badge bg-danger ms-2" style="display:none;">0</span>
@@ -87,6 +88,7 @@
                                 }
                                 else
                                 {
+                                    
                                     <li><a class="dropdown-item" asp-controller="Auth" asp-action="Login">Login</a></li>
                                     <li><a class="dropdown-item" asp-controller="Auth" asp-action="Register">Register</a></li>
                                 }

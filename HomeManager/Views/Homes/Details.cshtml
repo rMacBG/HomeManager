@@ -42,7 +42,7 @@
                 <span class="badge bg-success"><i class="fa fa-home me-1"></i> @Model.Home.HomeDealType</span>
             </div>
             <div class="col-md-6 mb-2">
-                <span class="badge bg-warning text-dark fw-bold"><i class="fa fa-tag me-1"></i> @Model.Home.HomePrice.ToString("C")</span>
+                <span class="badge bg-warning text-dark fw-bold"><i class="fa fa-tag me-1"></i> @Model.Home.HomePrice.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("fr-FR"))</span>
             </div>
         </div>
     </div>
@@ -173,8 +173,7 @@
         transform: scale(1.2);
     }
 
-    .zoomable-image.zoomed {
-        transform: scale(3);
+    .zoomable-image.zoomed {    
         z-index: 1000;
     }
 </style>
@@ -227,7 +226,7 @@ else
             src="https://www.google.com/maps/embed/v1/place?key=AIzaSyAJ9L4-eFlTuD7QWvoLbEkUb6d0LA6Bmmk&q=@Model.Home.HomeLocation">
     </iframe>
 }
-<div class="row g-3 mb-4">
+<div class="row g-1 mb-4">
     @if (Model.Home.Images?.Any() == true)
     {
         var imgIndex = 0;
@@ -242,7 +241,7 @@ else
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content bg-transparent border-0">
                             <div class="modal-body text-center p-0">
-                                <img src="@image.FilePath" alt="Home Image" class="img-fluid zoomable-image" style="max-width:100%;max-height:80vh;border-radius:12px;cursor:zoom-in;" onclick="this.classList.toggle('zoomed')"/>
+                                <img src="@image.FilePath" alt="Home Image" class="img-fluid zoomable-image" style="max-width:100%;max-height:80vh;border-radius:12px;cursor:zoom-in;" @* onclick="this.classList.toggle('zoomed')" *@/>
                             </div>
                         </div>
                     </div>
@@ -389,7 +388,71 @@ else
             });
         });
     </script>
-    
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            document.querySelectorAll('.zoomable-image').forEach(function(img) {
+                let isZoomed = false;
+                let isDragging = false;
+                let startX = 0, startY = 0, lastX = 0, lastY = 0;
+
+                img.addEventListener("click", function (e) {
+                    // Only zoom if not dragging
+                    if (!isDragging) {
+                        isZoomed = !isZoomed;
+                        if (isZoomed) {
+                            img.classList.add("zoomed");
+                            img.style.cursor = "grab";
+                            img.style.transition = "transform 0.3s";
+                            img.style.transform = `scale(3)`;
+                            lastX = 0; lastY = 0;
+                        } else {
+                            img.classList.remove("zoomed");
+                            img.style.cursor = "zoom-in";
+                            img.style.transform = "scale(1)";
+                            lastX = 0; lastY = 0;
+                        }
+                    }
+                });
+
+                img.addEventListener("mousedown", function (e) {
+                    if (img.classList.contains("zoomed")) {
+                        isDragging = true;
+                        startX = e.clientX - lastX;
+                        startY = e.clientY - lastY;
+                        img.style.cursor = "grabbing";
+                        e.preventDefault();
+                    }
+                });
+
+                document.addEventListener("mousemove", function (e) {
+                    if (isDragging && img.classList.contains("zoomed")) {
+                        lastX = e.clientX - startX;
+                        lastY = e.clientY - startY;
+                        img.style.transform = `scale(3) translate(${lastX / 3}px, ${lastY / 3}px)`;
+                    }
+                });
+
+                document.addEventListener("mouseup", function () {
+                    if (isDragging) {
+                        isDragging = false;
+                        if (img.classList.contains("zoomed")) {
+                            img.style.cursor = "grab";
+                        }
+                    }
+                });
+
+                // Optional: Reset pan when modal closes
+                img.closest('.modal')?.addEventListener('hidden.bs.modal', function () {
+                    img.classList.remove("zoomed");
+                    img.style.cursor = "zoom-in";
+                    img.style.transform = "scale(1)";
+                    lastX = 0; lastY = 0;
+                    isZoomed = false;
+                });
+            });
+        });
+    </script>
 
 }
 

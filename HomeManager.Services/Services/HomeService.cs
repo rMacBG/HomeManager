@@ -196,7 +196,6 @@ namespace HomeManager.Services.Services
             home.Latitude = dto.Latitude;
             home.Longitude = dto.Longitude;
 
-
             if (dto.ImagesToRemove != null && dto.ImagesToRemove.Any())
             {
                 home.Images.RemoveAll(img => dto.ImagesToRemove.Contains(img.FilePath));

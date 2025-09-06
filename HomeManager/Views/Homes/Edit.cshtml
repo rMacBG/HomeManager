@@ -27,6 +27,7 @@
     <input type="hidden" asp-for="HomeLocation" value="Default Location" />
     <input asp-for="Latitude" class="form-control" placeholder="Latitude" step="any" />
     <input asp-for="Longitude" class="form-control" placeholder="Longitude" step="any" />
+    <div id="map" style="height: 350px; width: 100%; margin-bottom: 1rem;"></div>
     <div class="mb-3">
         <label for="UploadedImages" class="form-label">Add Images</label>
         <input type="file" name="UploadedImages" id="UploadedImages" multiple class="form-control" />
@@ -46,3 +47,57 @@
 
     <button type="submit" class="btn btn-hm">Save</button>
 </form>
+
+@section Scripts {
+    <script>
+        let map;
+        let marker;
+
+        function initMap() {
+            // Default center (e.g., Sofia, Bulgaria)
+            const defaultLatLng = { lat: 42.6977, lng: 23.3219 };
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: defaultLatLng,
+                zoom: 8
+            });
+
+            const latInput = document.getElementById("Latitude");
+            const lngInput = document.getElementById("Longitude");
+            let lat = parseFloat(latInput.value);
+            let lng = parseFloat(lngInput.value);
+            if (!isNaN(lat) && !isNaN(lng) && lat !== 0 && lng !== 0) {
+                marker = new google.maps.Marker({
+                    position: { lat, lng },
+                    map: map
+                });
+                map.setCenter({ lat, lng });
+            }
+
+            map.addListener("click", function (e) {
+                const clickedLat = e.latLng.lat();
+                const clickedLng = e.latLng.lng();
+
+                if (!marker) {
+                    marker = new google.maps.Marker({
+                        position: { lat: clickedLat, lng: clickedLng },
+                        map: map
+                    });
+                } else {
+                    marker.setPosition({ lat: clickedLat, lng: clickedLng });
+                }
+
+                latInput.value = clickedLat;
+                lngInput.value = clickedLng;
+            });
+        }
+        window.initMap = initMap;
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (typeof google !== "undefined") {
+                initMap();
+            }
+        });
+    </script>
+}

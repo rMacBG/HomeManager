@@ -41,15 +41,13 @@ document.addEventListener("DOMContentLoaded", function () {
     const input = document.getElementById("searchInput");
     const resultsDiv = document.getElementById("searchResults");
 
-    form.addEventListener("submit", function(e) {
-        e.preventDefault();
-    });
+   
+    //form.addEventListener("submit", function(e) {
+    //});
 
-    input.addEventListener("keydown", function(e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-        }
-    });
+    //input.addEventListener("keydown", function(e) {
+       
+    //});
 
     input.addEventListener("keyup", async function (e) {
         const query = input.value.trim();

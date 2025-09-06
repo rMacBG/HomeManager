@@ -50,29 +50,30 @@ namespace HomeManager.Services.Services.SignalR
                 await Clients.Group(dto.ConversationId.ToString())
                              .SendAsync("ReceiveMessage", payload);
 
-                
+
                 await Clients.User(message.ReceiverId.ToString())
-                    .SendAsync("ReceiveNotification", new {
+                    .SendAsync("ReceiveNotification", new
+                    {
                         ConversationId = message.ConversationId,
                         SenderName = await GetUserNameAsync(message.SenderId) ?? "Dealer",
                         IsImage = message.Content?.Contains("<img") ?? false,
                         MessageContent = message.Content
                     });
-
-                //await Clients.User(message.SenderId.ToString())
-                //    .SendAsync("ReceiveNotification", new {
-                //        ConversationId = message.ConversationId,
-                //        SenderName = await GetUserNameAsync(message.SenderId) ?? "You",
-                //        IsImage = message.Content?.Contains("<img") ?? false,
-                //        MessageContent = message.Content
-                //    });
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"SendMessage failed {ex.Message}");
                 throw;
             }
-        }
+        }                                                                                                                                                                  //await Clients.User(message.SenderId.ToString())
+                                                                                                                                                                                //    .SendAsync("ReceiveNotification", new {
+                                                                                                                                                                                //        ConversationId = message.ConversationId,
+                                                                                                                                                                                //        SenderName = await GetUserNameAsync(message.SenderId) ?? "You",
+                                                                                                                                                                                //        IsImage = message.Content?.Contains("<img") ?? false,
+                                                                                                                                                                                //        MessageContent = message.Content
+                                                                                                                                                                                //    });
+
+        
         public async Task AcknowledgeDelivery(Guid messageId)
         {
             await _messageService.MarkAsDeliveredAsync(messageId);

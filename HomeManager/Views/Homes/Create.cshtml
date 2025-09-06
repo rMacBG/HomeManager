@@ -42,13 +42,14 @@
     </div>
     <input type="hidden" asp-for="HomeLocation" value="Default Location" />
     <div class="form-floating-label">
-        <input asp-for="Latitude" class="form-control" placeholder="Latitude" step="any" />
+        <input asp-for="Latitude" class="form-control"  step="any" />
         <label asp-for="Latitude"></label>
     </div>
     <div class="form-floating-label">
-        <input asp-for="Longitude" class="form-control" placeholder="Longitude" step="any" />
+        <input asp-for="Longitude" class="form-control" step="any" />
         <label asp-for="Longitude"></label>
     </div>
+    <div id="map" style="height: 350px; width: 100%; margin-bottom: 1rem;"></div>
     <div class="form-group">
         <label for="UploadedImages">Upload Images</label>
         <input type="file" name="UploadedImages" multiple class="form-control" id="UploadedImages" />
@@ -57,3 +58,55 @@
     
     <button type="submit" class="btn btn-hm">Create Listing</button>
 </form>
+
+@section Scripts {
+    <script>
+        let map;
+        let marker;
+
+        function initMap() {
+            const defaultLatLng = { lat: 42.6977, lng: 23.3219 };
+
+            map = new google.maps.Map(document.getElementById("map"), {
+                center: defaultLatLng,
+                zoom: 8
+            });
+
+            const latInput = document.getElementById("Latitude");
+            const lngInput = document.getElementById("Longitude");
+            let lat = parseFloat(latInput.value);
+            let lng = parseFloat(lngInput.value);
+            if (!isNaN(lat) && !isNaN(lng)) {
+                marker = new google.maps.Marker({
+                    position: { lat, lng },
+                    map: map
+                });
+                map.setCenter({ lat, lng });
+            }
+
+            map.addListener("click", function (e) {
+                const clickedLat = e.latLng.lat();
+                const clickedLng = e.latLng.lng();
+                if (!marker) {
+                    marker = new google.maps.Marker({
+                        position: { lat: clickedLat, lng: clickedLng },
+                        map: map
+                    });
+                } else {
+                    marker.setPosition({ lat: clickedLat, lng: clickedLng });
+                }
+
+                latInput.value = clickedLat;
+                lngInput.value = clickedLng;
+            });
+        }
+        window.initMap = initMap;
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            if (typeof google !== "undefined") {
+                initMap();
+            }
+        });
+    </script>
+}

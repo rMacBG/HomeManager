@@ -1,4 +1,6 @@
-﻿window.startConnection = async function () {
+﻿console.log("chatbox.js loaded!");
+
+window.startConnection = async function () {
     if (window.connection.state === "Connected" || window.connection.state === "Connecting") {
         console.log("Already connected or connecting.");
         return;
@@ -184,7 +186,7 @@ window.prepareChat = async function (homeId) {
         const list = document.getElementById("messagesList");
         list.innerHTML = "";
         messages.forEach(msg => {
-            const isSelf = msg.senderId === currentUserId; 
+            const isSelf = msg.senderId === currentUserId;
             const li = document.createElement("div");
             li.classList.add("message", isSelf ? "self" : "other");
 
@@ -318,7 +320,7 @@ window.connection.on("ReceiveMessage", async (message) => {
             console.log("Calling MarkAsDelivered for message:", message.messageId);
             await window.connection.invoke("MarkAsDelivered", message.messageId);
             const convoId = document.getElementById("conversationId")?.value;
-            if (convoId && isChatOpen) { 
+            if (convoId && isChatOpen) {
                 console.log("Calling MarkAsSeen for conversation:", convoId, "and user:", currentUserId);
                 await window.connection.invoke("MarkAsSeen", convoId, currentUserId);
             }
@@ -339,7 +341,7 @@ window.connection.on("ReceiveMessage", async (message) => {
                     badge = document.createElement("span");
                     badge.className = "badge bg-danger ms-2";
                     badge.textContent = "1";
-                    
+
                     const nameSpan = parentLi.querySelector(".other-participant");
                     if (nameSpan) {
                         nameSpan.parentNode.appendChild(badge);
@@ -443,9 +445,12 @@ window.prepareChatBox = async function () {
 
 let typingTimeout;
 
-document.getElementById("messageInput").addEventListener("input", function () {
-    window.connection.invoke("SendTyping", document.getElementById("conversationId").value);
-});
+const messageInputEl = document.getElementById("messageInput");
+if (messageInputEl) {
+    messageInputEl.addEventListener("input", function () {
+        window.connection.invoke("SendTyping", document.getElementById("conversationId").value);
+    });
+}
 
 window.connection.on("ReceiveTyping", function (userName) {
     const indicator = document.getElementById("typingIndicator");
@@ -455,7 +460,7 @@ window.connection.on("ReceiveTyping", function (userName) {
     typingTimeout = setTimeout(() => indicator.style.display = "none", 2000);
 });
 
-function setupChatFeatureEvents() {
+window.setupChatFeatureEvents = function () {
     const menuBtn = document.getElementById("menuBtn");
     const chatMenu = document.getElementById("chatMenu");
     if (menuBtn && chatMenu) {
@@ -503,14 +508,14 @@ function setupChatFeatureEvents() {
             fetch("/Chat/UploadFile", { method: "POST", body: formData })
                 .then(res => res.json())
                 .then(data => {
-                    
-window.connection.invoke("SendMessage", {
-    conversationId: document.getElementById("conversationId").value,
-    senderId: document.getElementById("senderId").value,
-    content: `<img src='${data.url}' class='chat-image zoomable-image' style='max-width:180px;cursor:zoom-in;border-radius:8px;' onclick="openImageModal('${data.url}')" />`,
-    sentAt: new Date().toISOString(),
-    status: 0
-});
+
+                    window.connection.invoke("SendMessage", {
+                        conversationId: document.getElementById("conversationId").value,
+                        senderId: document.getElementById("senderId").value,
+                        content: `<img src='${data.url}' class='chat-image zoomable-image' style='max-width:180px;cursor:zoom-in;border-radius:8px;' onclick="openImageModal('${data.url}')" />`,
+                        sentAt: new Date().toISOString(),
+                        status: 0
+                    });
                 });
         };
     }
@@ -552,7 +557,7 @@ window.connection.onreconnecting(() => {
     console.log("SignalR reconnecting...");
 });
 window.connection.onreconnected(() => {
-   
+
     document.querySelectorAll(".open-chat-link[data-conversation-id]").forEach(function (link) {
         const conversationId = link.dataset.conversationId;
         if (conversationId) {
@@ -588,8 +593,9 @@ window.closeImageModal = closeImageModal;
 window.toggleZoom = toggleZoom;
 
 function ensureImageOnClick(html) {
-    return html.replace(/<img([^>]+)src=['"]([^'"]+)['"]/g, function(match, attrs, src) {
+    return html.replace(/<img([^>]+)src=['"]([^'"]+)['"]/g, function (match, attrs, src) {
         if (attrs.includes('onclick')) return match; // already has onclick
         return `<img${attrs}src='${src}' onclick="openImageModal('${src}')"`;
     });
 }
+
