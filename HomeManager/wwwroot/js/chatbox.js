@@ -599,3 +599,22 @@ function ensureImageOnClick(html) {
     });
 }
 
+//function ensureImageOnClick(html) {
+//    return html.replace(/<img([^>]+)src=['"]([^'"]+)['"]/g, function (match, attrs, src) {
+//        let newAttrs = attrs;
+//        if (!/class=['"][^'"]*zoomable-image[^'"]*['"]/.test(attrs)) {
+//            if (/class=['"]/.test(attrs)) {
+//                newAttrs = newAttrs.replace(/class=['"]([^'"]*)['"]/, function (m, c) {
+//                    return `class="${c} zoomable-image"`;
+//                });
+//            } else {
+//                newAttrs += ` class="zoomable-image"`;
+//            }
+//        }
+//        if (!attrs.includes('onclick')) {
+//            newAttrs += ` onclick="openImageModal('${src}')"`;
+//        }
+//        return `<img${newAttrs}src='${src}'`;
+//    });
+//}
+
