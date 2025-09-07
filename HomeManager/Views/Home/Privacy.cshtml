@@ -3,4 +3,75 @@
 }
 <h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+@{
+    ViewData["Title"] = "Privacy Policy";
+}
+
+<div class="container mt-5">
+    <h1 class="mb-4">Privacy Policy</h1>
+    <p><strong>Last updated:</strong> @DateTime.Now.ToString("MMMM dd, yyyy")</p>
+
+    <p>
+        At <strong>Imoteka Hub</strong>, we respect your privacy and are committed to protecting your personal data.
+        This Privacy Policy explains what information we collect, how we use it, and how we keep it safe
+        when you use our real estate platform.
+    </p>
+
+    <h3>1. Information We Collect</h3>
+    <ul>
+        <li>Full name</li>
+        <li>Email address</li>
+        <li>Phone number</li>
+        <li>Information related to listed or viewed properties</li>
+        <li>IP address and technical data (cookies, browser, device)</li>
+    </ul>
+
+    <h3>2. How We Use Your Information</h3>
+    <ul>
+        <li>To contact you regarding property inquiries</li>
+        <li>To provide and maintain our services</li>
+        <li>To improve website functionality and user experience</li>
+        <li>To send updates, offers, or newsletters (only if you have given consent)</li>
+    </ul>
+
+    <h3>3. Data Retention</h3>
+    <p>
+        Personal data is stored securely and retained only as long as necessary
+        for the purposes for which it was collected.
+    </p>
+
+    <h3>4. Sharing Your Information</h3>
+    <p>
+        At <strong>Imoteka Hub</strong>, we do not sell or rent your personal data to third parties.
+        We may share your data only when:
+    </p>
+    <ul>
+        <li>It is necessary to provide a service you requested</li>
+        <li>It is required to comply with legal obligations</li>
+    </ul>
+
+    <h3>5. Cookies</h3>
+    <p>
+        Our website uses cookies to:
+    </p>
+    <ul>
+        <li>Remember your preferences</li>
+        <li>Analyze site traffic and usage</li>
+        <li>Improve the overall user experience</li>
+    </ul>
+
+    <h3>6. Your Rights</h3>
+    <p>You have the right to:</p>
+    <ul>
+        <li>Access and update your personal data</li>
+        <li>Request deletion of your personal data</li>
+        <li>Withdraw consent to data processing at any time</li>
+    </ul>
+
+    <h3>7. Contact Us</h3>
+    <p>
+        If you have any questions regarding this Privacy Policy or your personal data, please contact us at:<br />
+        📧 <a href="mailto:contact@imotekahub.com">contact@imotekahub.com</a><br />
+        📞 +359 88 123 4567
+    </p>
+</div>
