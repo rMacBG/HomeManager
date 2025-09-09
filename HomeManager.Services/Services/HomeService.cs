@@ -49,7 +49,8 @@ namespace HomeManager.Services.Services
                 Region = x.Region,
                 City = x.City,
                 LandlordId = x.LandlordId,
-                Images = x.Images?.Select(img => new HomeImageDto { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>(),
+                Images = x.Images?.Select(img => new HomeImageDto
+                { FilePath = img.FilePath }).ToList() ?? new List<HomeImageDto>(),
                 Ratings = x.Ratings.ToList(),
                 Latitude = x.Latitude,
                 Longitude = x.Longitude,

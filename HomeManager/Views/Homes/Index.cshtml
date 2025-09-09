@@ -14,8 +14,15 @@
                 <div class="d-flex flex-column justify-content-between flex-grow-1 p-3">
                     <h5>@home.HomeName</h5>
                     <p>@home.HomeDescription</p>
-                    <p>@home.HomePrice</p>
-                    <a asp-action="Details" asp-route-id="@home.Id" class="btn btn-hm align-self-start">View Details</a>
+                    <div class="d-flex align-items-center mb-1" style="gap: 0.0rem;">
+                        <span class="badge bg-warning text-dark fw-bold">
+                            <i class="fa fa-tag me-1"></i> @home.HomePrice.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("fr-FR"))
+                        </span>
+                        <span class="badge bg-primary">
+                            <i class="fa fa-map-marker-alt me-1"></i> @home.HomeLocation
+                        </span>
+                    </div>
+                    <a asp-action="Details" asp-route-id="@home.Id" class="btn btn-hm align-self-start mt-2">View Details</a>
                 </div>
                 <div class="home-card-img-container ms-3">
                     <a href="#" data-bs-toggle="modal" data-bs-target="@("#imgModal" + index)">

@@ -28,7 +28,7 @@
                             <div class="carousel-caption d-none d-md-block bg-dark bg-opacity-75 rounded-3 p-3">
                                 <h5 class="fw-bold">@estate.HomeName</h5>
                                 <p class="mb-1">@estate.HomeLocation</p>
-                                <p class="mb-0 text-warning fw-semibold">@estate.HomePrice.ToString("C")</p>
+                                <p class="mb-0 text-warning fw-semibold">@estate.HomePrice.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("fr-FR"))</p>
                             </div>
                         </a>
                     </div>

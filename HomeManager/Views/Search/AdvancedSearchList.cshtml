@@ -38,13 +38,38 @@
 </div>
 <div id="map" style="height:400px;width:100%;"></div>
 <script>
+    var estates = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model));
     let map, marker, geocoder;
     function initMap() {
         geocoder = new google.maps.Geocoder();
         map = new google.maps.Map(document.getElementById("map"), {
-            center: { lat: 40.7128, lng: -74.0060 }, // Default center
+            center: { lat: 42.6977, lng: 23.3219 },
             zoom: 10
         });
+
+        var bounds = new google.maps.LatLngBounds();
+        var infoWindow = new google.maps.InfoWindow();
+        estates.forEach(function (estate) {
+            if (estate.Latitude && estate.Longitude) {
+                var pos = { lat: estate.Latitude, lng: estate.Longitude };
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: pos,
+                    title: estate.HomeName
+                });
+                marker.addListener('click', function () {
+                    infoWindow.setContent(
+                        '<div><strong>' + estate.HomeName + '</strong><br>' +
+                        '<a id="mapSearchInput" href="/Homes/Details/' + estate.Id + '">View Details</a></div>'
+                    );
+                    infoWindow.open(map, marker);
+                });
+                bounds.extend(pos);
+            }
+        });
+        if (!bounds.isEmpty()) {
+            map.fitBounds(bounds);
+        }
     }
     window.initMap = initMap;
 
