@@ -195,12 +195,13 @@ window.prepareChat = async function (homeId) {
                 ? `<div class="message-status">[${window.getMessageStatusText(msg.status)}]</div>`
                 : '';
 
-            const timestamp = new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const messageContent = ensureImageOnClick(msg.content);
+            const sentAt = msg.sentAt
+                ? new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                : '';
             li.innerHTML = `
         <div class="message-bubble">
-            <div class="message-author">${displayName} <span class="message-timestamp">${timestamp}</span></div>
-            <div class="message-content">${messageContent}</div>
+            <div class="message-author">${displayName} <span class="message-timestamp">${sentAt}</span></div>
+            <div class="message-content">${msg.content}</div>
             ${statusHtml}
         </div>
     `;
@@ -303,13 +304,16 @@ window.connection.on("ReceiveMessage", async (message) => {
         }
     }
 
+    const sentAt = message.sentAt
+        ? new Date(message.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        : '';
     li.innerHTML = `
-        <div class="message-bubble">
-            <div class="message-author">${displayName}:</div>
-            <div class="message-content">${message.content}</div>
-            ${isSelf ? `<div class="message-status">[${getMessageStatusText(message.status)}]</div>` : ''}
-        </div>
-    `;
+    <div class="message-bubble">
+        <div class="message-author">${displayName} <span class="message-timestamp">${sentAt}</span></div>
+        <div class="message-content">${message.content}</div>
+        ${isSelf ? `<div class="message-status">[${getMessageStatusText(message.status)}]</div>` : ''}
+    </div>
+`;
     document.getElementById("messagesList").appendChild(li);
     document.getElementById("messagesList").scrollTop = document.getElementById("messagesList").scrollHeight;
 
@@ -388,9 +392,13 @@ window.connection.onreconnected(async () => {
                 const statusHtml = isSelf
                     ? `<div class="message-status">[${window.getMessageStatusText(msg.status)}]</div>`
                     : '';
+
+                const sentAt = msg.sentAt
+                    ? new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+                    : '';
                 li.innerHTML = `
                     <div class="message-bubble">
-                        <div class="message-author">${displayName}:</div>
+                        <div class="message-author">${displayName} <span class="message-timestamp">${sentAt}</span></div>
                         <div class="message-content">${msg.content}</div>
                         ${statusHtml}
                     </div>
@@ -422,9 +430,13 @@ window.prepareChatBox = async function () {
         const statusHtml = isSelf
             ? `<div class="message-status">[${window.getMessageStatusText(msg.status)}]</div>`
             : '';
+
+        const sentAt = msg.sentAt
+            ? new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            : '';
         li.innerHTML = `
             <div class="message-bubble">
-                <div class="message-author">${displayName}:</div>
+                <div class="message-author">${displayName} <span class="message-timestamp">${sentAt}</span></div>
                 <div class="message-content">${msg.content}</div>
                 ${statusHtml}
             </div>
@@ -592,29 +604,31 @@ window.openImageModal = openImageModal;
 window.closeImageModal = closeImageModal;
 window.toggleZoom = toggleZoom;
 
-function ensureImageOnClick(html) {
-    return html.replace(/<img([^>]+)src=['"]([^'"]+)['"]/g, function (match, attrs, src) {
-        if (attrs.includes('onclick')) return match; // already has onclick
-        return `<img${attrs}src='${src}' onclick="openImageModal('${src}')"`;
-    });
-}
-
 //function ensureImageOnClick(html) {
 //    return html.replace(/<img([^>]+)src=['"]([^'"]+)['"]/g, function (match, attrs, src) {
-//        let newAttrs = attrs;
-//        if (!/class=['"][^'"]*zoomable-image[^'"]*['"]/.test(attrs)) {
-//            if (/class=['"]/.test(attrs)) {
-//                newAttrs = newAttrs.replace(/class=['"]([^'"]*)['"]/, function (m, c) {
-//                    return `class="${c} zoomable-image"`;
-//                });
-//            } else {
-//                newAttrs += ` class="zoomable-image"`;
-//            }
-//        }
-//        if (!attrs.includes('onclick')) {
-//            newAttrs += ` onclick="openImageModal('${src}')"`;
-//        }
-//        return `<img${newAttrs}src='${src}'`;
+//        if (attrs.includes('onclick')) return match; // already has onclick
+//        return `<img${attrs}src='${src}' onclick="openImageModal('${src}')"`;
 //    });
 //}
+
+function ensureImageOnClick(html) {
+    return html.replace(/<img([^>]+)src=['"]([^'"]+)['"]/g, function (match, attrs, src) {
+        let newAttrs = attrs;
+        // Ensure class includes zoomable-image
+        if (!/class=['"][^'"]*zoomable-image[^'"]*['"]/.test(attrs)) {
+            if (/class=['"]/.test(attrs)) {
+                newAttrs = newAttrs.replace(/class=['"]([^'"]*)['"]/, function (m, c) {
+                    return `class="${c} zoomable-image"`;
+                });
+            } else {
+                newAttrs += ` class="zoomable-image"`;
+            }
+        }
+        // Ensure onclick is present
+        if (!attrs.includes('onclick')) {
+            newAttrs += ` onclick="openImageModal('${src}')"`;
+        }
+        return `<img${newAttrs}src='${src}'`;
+    });
+}
 

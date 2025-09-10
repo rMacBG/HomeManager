@@ -68,6 +68,7 @@ else
                         .then(html => {
                             document.getElementById("chatBoxContainer").innerHTML = "";
                             document.getElementById("chatBoxContainer").innerHTML = html;
+                            window.observeChatBox && window.observeChatBox();
                             setupChatFeatureEvents();
                             if (window.prepareChatBox) window.prepareChatBox();
                         })

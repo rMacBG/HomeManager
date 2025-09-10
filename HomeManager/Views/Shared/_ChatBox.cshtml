@@ -183,8 +183,8 @@
         font-weight: bold;
         text-align: right;
         margin-top: 2px;
-        /* Add a little padding for separation */
         padding: 2px 0;
+        color: gray; 
     }
 
 
@@ -250,9 +250,13 @@
                         @if (!string.IsNullOrEmpty(msg.ImageUrl))
                         {
                             <img src="@msg.ImageUrl" class="chat-image zoomable-image" alt="Sent image"
-         style="max-width:180px;max-height:180px;cursor:zoom-in;border-radius:8px;margin:6px 0;" />
+     style="max-width:180px;max-height:180px;cursor:zoom-in;border-radius:8px;margin:6px 0;" />
                         }
-                        @msg.Content
+                        else
+                        {
+                            <pre>@Html.Raw(System.Net.WebUtility.HtmlEncode(EnsureZoomableClass(msg.Content)))</pre>
+                        }
+                        
                         <span class="message-status">
                             <span class="status-text status-text-@msg.Id" data-status="@msg.MessageStatus.ToString()">
     [@msg.MessageStatus]
@@ -285,7 +289,34 @@
     </div>
 </div>
 
+@functions {
+    public static string EnsureZoomableClass(string html)
+    {
+        if (string.IsNullOrEmpty(html)) return html;
+        // Match <img ...> tags, regardless of attribute order or quote style
+        return System.Text.RegularExpressions.Regex.Replace(
+            html,
+            @"<img\b([^>]*)(?<!/)>",
+            m =>
+            {
+                var tag = m.Value;
+                // If already has zoomable-image, return as is
+                if (tag.Contains("zoomable-image")) return tag;
 
+                // Add zoomable-image to class attribute, or add class if missing
+                if (tag.Contains("class=\""))
+                    tag = System.Text.RegularExpressions.Regex.Replace(tag, @"class=""([^""]*)""", @"class=""$1 zoomable-image""");
+                else if (tag.Contains("class='"))
+                    tag = System.Text.RegularExpressions.Regex.Replace(tag, @"class='([^']*)'", @"class='$1 zoomable-image'");
+                else
+                    tag = tag.Replace("<img", "<img class=\"zoomable-image\"");
+
+                return tag;
+            },
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase
+        );
+    }
+}
 
 @* <div id="imageModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:2000;align-items:center;justify-content:center;">
     <span style="position:absolute;top:24px;right:32px;font-size:2em;color:#fff;cursor:pointer;" onclick="closeImageModal()">&times;</span

@@ -164,16 +164,16 @@
         transform: scale(1.05);
     }
 
-    .zoomable-image {
+    .gallery-zoomable-image {
         transition: transform 0.3s;
         transform: scale(1);
     }
 
-    .zoomable-image:hover {
+    .gallery-zoomable-image:hover {
         transform: scale(1.2);
     }
 
-    .zoomable-image.zoomed {    
+    .gallery-zoomable-image.zoomed {    
         z-index: 1000;
     }
 </style>
@@ -241,7 +241,7 @@ else
                     <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content bg-transparent border-0">
                             <div class="modal-body text-center p-0">
-                                <img src="@image.FilePath" alt="Home Image" class="img-fluid zoomable-image" style="max-width:100%;max-height:80vh;border-radius:12px;cursor:zoom-in;" @* onclick="this.classList.toggle('zoomed')" *@/>
+                                <img src="@image.FilePath" alt="Home Image" class="img-fluid gallery-zoomable-image" style="max-width:100%;max-height:80vh;border-radius:12px;cursor:zoom-in;" @* onclick="this.classList.toggle('zoomed')" *@/>
                             </div>
                         </div>
                     </div>
@@ -391,7 +391,7 @@ else
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            document.querySelectorAll('.zoomable-image').forEach(function(img) {
+            document.querySelectorAll('.gallery-zoomable-image').forEach(function(img) {
                 let isZoomed = false;
                 let isDragging = false;
                 let startX = 0, startY = 0, lastX = 0, lastY = 0;

@@ -66,9 +66,10 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('click', function (e) {
     if ((e.target.classList.contains('zoomable-image') || e.target.classList.contains('chat-image')) &&
         !e.target.closest('.modal.fade')) {
-          window.openImageModal(e.target.src);
-      }
-  });
+        console.log('Image clicked:', e.target.src); // Debug log
+        window.openImageModal(e.target.src);
+    }
+});
 
 document.addEventListener('DOMContentLoaded', function() {
     updateUnreadMessages();
@@ -200,6 +201,34 @@ if (modalImg) {
         }
     };
 }
+
+
+function patchChatImages() {
+    // Find all images in the chat popup that do NOT have the zoomable-image class
+    document.querySelectorAll('#chatPopup img:not(.zoomable-image)').forEach(img => {
+        img.classList.add('zoomable-image');
+    });
+}
+
+// Patch images every time the chat box is loaded or updated
+function observeChatBox() {
+    const chatPopup = document.getElementById('chatPopup');
+    if (!chatPopup) return;
+
+    // Patch immediately in case content is already there
+    patchChatImages();
+
+    // Observe for changes (e.g., AJAX loads, SignalR updates)
+    const observer = new MutationObserver(() => {
+        patchChatImages();
+    });
+    observer.observe(chatPopup, { childList: true, subtree: true });
+}
+
+// Run on DOMContentLoaded and whenever chat is opened
+document.addEventListener('DOMContentLoaded', observeChatBox);
+// Also call after AJAX loads if needed
+window.observeChatBox = observeChatBox;
 
 
 
