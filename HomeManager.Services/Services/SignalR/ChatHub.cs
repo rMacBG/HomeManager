@@ -42,7 +42,7 @@ namespace HomeManager.Services.Services.SignalR
                     senderId = message.SenderId,
                     receiverId = message.ReceiverId,
                     content = message.Content,
-                    sentAt = message.SentAt.ToString("dd/MM/yyyy"),
+                    sentAt = message.SentAt.ToString("o"),
                     messageStatus = (int)message.MessageStatus,
                     tempId = dto.TempId,
                 };
@@ -164,7 +164,9 @@ namespace HomeManager.Services.Services.SignalR
         {
            
             var user = await _userRepository.GetByIdAsync(userId);
-            return user?.Username;
+            Console.WriteLine($"GetUserNameAsync: userId={userId}, user={(user == null ? "null" : user.Username)}");
+
+            return user?.Username ?? user?.FullName;
         }
     }
 }

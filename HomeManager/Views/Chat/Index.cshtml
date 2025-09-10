@@ -48,12 +48,13 @@ else
 
 @section Scripts {
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        function attachChatListHandlers() {
             document.querySelectorAll(".open-chat-link").forEach(function (link) {
+                link.onclick = null; // Remove any previous handler
                 link.addEventListener("click", async function () {
                     const conversationId = this.dataset.conversationId;
 
-                    // --- Remove unread badge immediately ---
+                    // Remove unread badge immediately
                     const parentLi = this.closest(".conversation-item");
                     if (parentLi) {
                         const badge = parentLi.querySelector(".badge.bg-danger");
@@ -77,6 +78,11 @@ else
                         });
                 });
             });
+        }
+        window.attachChatListHandlers = attachChatListHandlers;
+
+        document.addEventListener("DOMContentLoaded", function () {
+            attachChatListHandlers();
 
             if (window.connection && window.connection.state === "Connected") {
                 document.querySelectorAll(".open-chat-link[data-conversation-id]").forEach(function (link) {

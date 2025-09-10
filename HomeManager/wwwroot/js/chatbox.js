@@ -10,7 +10,6 @@ window.startConnection = async function () {
         await window.connection.start();
         console.log("SignalR connected. State:", window.connection.state);
 
-        // Join all conversation groups and await each
         const joinPromises = [];
         document.querySelectorAll(".open-chat-link[data-conversation-id]").forEach(function (link) {
             const conversationId = link.dataset.conversationId;
@@ -30,6 +29,7 @@ window.startConnection = async function () {
 window.connection = new signalR.HubConnectionBuilder()
     .withUrl("/hubs/chat")
     .configureLogging(signalR.LogLevel.Information)
+    .withAutomaticReconnect() 
     .build();
 
 window.connection.on("ReceiveNotification", function (data) {
@@ -37,7 +37,7 @@ window.connection.on("ReceiveNotification", function (data) {
     const notifArea = document.getElementById("notification-area");
     const notif = document.createElement("div");
     notif.className = "alert alert-info alert-dismissible fade show";
-    notif.innerHTML = `${data.SenderName} sent you ${data.IsImage ? "a picture" : "a message"}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+    notif.innerHTML = `${data.senderName} sent you ${data.isImage ? "a picture" : "a message"}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
     notifArea.appendChild(notif);
     setTimeout(() => notif.remove(), 5000);
 
@@ -132,6 +132,8 @@ document.addEventListener("DOMContentLoaded", function () {
     } else {
         console.warn("messageInput not found in DOM");
     }
+
+    window.startConnection();
 });
 
 let chatLoading = false;
@@ -190,14 +192,17 @@ window.prepareChat = async function (homeId) {
             const li = document.createElement("div");
             li.classList.add("message", isSelf ? "self" : "other");
 
-            const displayName = isSelf ? "You" : (msg.senderName || "Dealer");
+            const otherName = document.getElementById("chatPopup")?.dataset.otherName || "Other";
+            const displayName = isSelf ? "You" : (msg.senderName || otherName);
             const statusHtml = isSelf
                 ? `<div class="message-status">[${window.getMessageStatusText(msg.status)}]</div>`
                 : '';
 
-            const sentAt = msg.sentAt
-                ? new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                : '';
+            let sentAt = '';
+            if (msg.sentAt) {
+                const date = new Date(msg.sentAt);
+                sentAt = isNaN(date) ? '' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
             li.innerHTML = `
         <div class="message-bubble">
             <div class="message-author">${displayName} <span class="message-timestamp">${sentAt}</span></div>
@@ -260,9 +265,12 @@ function sendMessage() {
     li.dataset.temp = "true";
     li.classList.add("message", "self");
 
+    const now = new Date();
+    const sentAt = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
     li.innerHTML = `
         <div class="message-bubble">
-            <div class="message-author">You:</div>
+            <div class="message-author">You <span class="message-timestamp">${sentAt}</span></div>
             <div class="message-content">${msg}</div>
             <div class="message-status">
                 <span class="status-text status-text-${tempId}">[${getMessageStatusText(0)}]</span>
@@ -289,7 +297,8 @@ window.connection.on("ReceiveMessage", async (message) => {
     const isSelf = message.senderId === currentUserId;
     const li = document.createElement("div");
     li.classList.add("message", isSelf ? "self" : "other");
-    const displayName = isSelf ? "You" : (message.senderName ? message.senderName : "Dealer");
+    const otherName = document.getElementById("chatPopup")?.dataset.otherName || "Other";
+    const displayName = isSelf ? "You" : (message.senderName ? message.senderName : otherName);
     if (isSelf && message.tempId) {
         const tempEl = document.getElementById(message.tempId);
         if (tempEl) {
@@ -304,9 +313,11 @@ window.connection.on("ReceiveMessage", async (message) => {
         }
     }
 
-    const sentAt = message.sentAt
-        ? new Date(message.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        : '';
+    let sentAt = '';
+    if (message.sentAt) {
+        const date = new Date(message.sentAt);
+        sentAt = isNaN(date) ? '' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    }
     li.innerHTML = `
     <div class="message-bubble">
         <div class="message-author">${displayName} <span class="message-timestamp">${sentAt}</span></div>
@@ -388,14 +399,17 @@ window.connection.onreconnected(async () => {
                 const isSelf = msg.senderId === currentUserId;
                 const li = document.createElement("div");
                 li.classList.add("message", isSelf ? "self" : "other");
-                const displayName = isSelf ? "You" : (msg.senderName || "Dealer");
+                const otherName = document.getElementById("chatPopup")?.dataset.otherName || "Other";
+                const displayName = isSelf ? "You" : (msg.senderName || otherName);
                 const statusHtml = isSelf
                     ? `<div class="message-status">[${window.getMessageStatusText(msg.status)}]</div>`
                     : '';
 
-                const sentAt = msg.sentAt
-                    ? new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-                    : '';
+                let sentAt = '';
+                if (msg.sentAt) {
+                    const date = new Date(msg.sentAt);
+                    sentAt = isNaN(date) ? '' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                }
                 li.innerHTML = `
                     <div class="message-bubble">
                         <div class="message-author">${displayName} <span class="message-timestamp">${sentAt}</span></div>
@@ -426,14 +440,17 @@ window.prepareChatBox = async function () {
         const isSelf = msg.senderId === currentUserId;
         const li = document.createElement("div");
         li.classList.add("message", isSelf ? "self" : "other");
-        const displayName = isSelf ? "You" : (msg.senderName || "Dealer");
+        const otherName = document.getElementById("chatPopup")?.dataset.otherName || "Other";
+        const displayName = isSelf ? "You" : (msg.senderName || otherName);
         const statusHtml = isSelf
             ? `<div class="message-status">[${window.getMessageStatusText(msg.status)}]</div>`
             : '';
 
-        const sentAt = msg.sentAt
-            ? new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-            : '';
+        let sentAt = '';
+        if (msg.sentAt) {
+            const date = new Date(msg.sentAt);
+            sentAt = isNaN(date) ? '' : date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
         li.innerHTML = `
             <div class="message-bubble">
                 <div class="message-author">${displayName} <span class="message-timestamp">${sentAt}</span></div>
