@@ -1,30 +1,35 @@
 ﻿@using HomeManager.Data.Data.Models.Enums
 @model HomeManager.Data.Data.Dtos.CreateHomeDto
 <form asp-action="Create" method="post" enctype="multipart/form-data" class="create-form-animate">
+    <label for="HomeName" class="form-label" style="color: darkmagenta">Home Name*</label>
     <div class="form-floating-label">
         <input asp-for="HomeName" class="form-control" placeholder=" " />
-        <label asp-for="HomeName"></label>
+        @* <label asp-for="HomeName"></label> *@
     </div>
+    <label for="HomeName" class="form-label" style="color: darkmagenta">Description</label>
     <div class="form-floating-label">
+        
         <textarea asp-for="HomeDescription" class="form-control" placeholder="Description"></textarea>
     </div>
+    <label for="HomeName" class="form-label" style="color: darkmagenta">Address*</label>
     <div class="form-floating-label">
         <input asp-for="HomeLocation" class="form-control" placeholder="Address" />
     </div>
     <div class="mb-3">
-        <label for="Region" class="form-label">Region</label>
+        <label for="Region" class="form-label" style="color: darkmagenta">Region</label>
         <input type="text" class="form-control" id="Region" name="Region" required />
     </div>
     <div class="mb-3">
-        <label for="City" class="form-label">City/Town</label>
+        <label for="City" class="form-label" style="color: darkmagenta">City/Town*</label>
         <input type="text" class="form-control" id="City" name="City" required />
     </div>
+    <label for="City" class="form-label" style="color: darkmagenta">Price*</label>
     <div class="form-floating-label">
         <input asp-for="HomePrice" class="form-control" placeholder="Price" />
     </div>
     <div class="form-group mb-3">
         <div class="form-group">
-            <label asp-for="HomeType" class="control-label"></label>
+            <label asp-for="HomeType" class="control-label" style="color: darkmagenta">Home Type*</label>
             
             <select asp-for="HomeType" class="form-control" asp-items="Html.GetEnumSelectList<HomeType>()">
                 <option value="">Select Home Type</option>
@@ -33,7 +38,7 @@
         <span asp-validation-for="HomeType" class="text-danger"></span>
     </div>
     <div class="form-group">
-        <label asp-for="HomeDealType" class="control-label"></label>
+        <label asp-for="HomeDealType" class="control-label" style="color: darkmagenta">Deal Type*</label>
         <select asp-for="HomeDealType" class="form-control" asp-items="Html.GetEnumSelectList<DealType>()">
             <option value="">Select Deal Type</option>
         </select>
@@ -41,13 +46,15 @@
         <span asp-validation-for="HomeDealType" class="text-danger"></span>
     </div>
     <input type="hidden" asp-for="HomeLocation" value="Default Location" />
-    <div class="form-floating-label">
+    <label for="Latitue" class="form-label" style="color: darkmagenta">Latitude</label>
+    <div class="form-group mb-3">
         <input asp-for="Latitude" class="form-control"  step="any" />
-        <label asp-for="Latitude"></label>
+        @* <label asp-for="Latitude"></label> *@
     </div>
+    <label for="Longitude" class="form-label" style="color: darkmagenta">Longitude</label>
     <div class="form-floating-label">
         <input asp-for="Longitude" class="form-control" step="any" />
-        <label asp-for="Longitude"></label>
+        @* <label asp-for="Longitude"></label> *@
     </div>
     <div id="map" style="height: 350px; width: 100%; margin-bottom: 1rem;"></div>
     <div class="form-group">

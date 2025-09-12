@@ -23,6 +23,10 @@
         <label class="fw-bold">Email:</label>
         <div>@Model.User.Email</div>
     </div>
+    <div class="mb-3">
+        <label class="fw-bold">User Role:</label>
+        <div>@Model.User.Role</div>
+    </div>
 @if (canEdit)
 {
         <a asp-action="EditProfile" asp-route-id="@Model.User.Id" class="btn btn-hm-edit w-100">Edit Profile</a>

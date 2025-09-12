@@ -6,7 +6,7 @@
         <li class="conversation-item d-flex align-items-center mb-3" data-conversation-id="@conversation.ConversationId">
             <img src="@conversation.HomeImageUrl" class="home-avatar me-2" alt="Home" style="width:48px;height:48px;border-radius:8px;object-fit:cover;" />
             <div class="flex-grow-1">
-                <strong>@conversation.HomeName</strong>
+                <strong>@conversation.OtherParticipantName</strong>
                 <div>
                     <span class="other-participant text-muted">@conversation.OtherParticipantName</span>
                     <span class="chat-date text-secondary ms-2">@conversation.CreatedAt.ToString("g")</span>
